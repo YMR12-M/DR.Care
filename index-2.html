@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DR.Care مغسلة عربيات مصرية احترافية — حجز أونلاين، أسعار واضحة، متابعة للطلب.">
+  <meta name="theme-color" content="#ffd21f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DR.Care">
+  <meta property="og:title" content="DR.Care | مغسلة عربيات مصرية">
+  <meta property="og:description" content="احجز غسلة عربيتك أونلاين — خدمة متكاملة بأسعار واضحة">
+  <meta property="og:type" content="website">
+  <title>DR.Care | مغسلة عربيات مصرية</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div id="offlineToast" role="status" aria-live="polite">وضع عدم الاتصال</div>
+
+  <div id="pwaInstallBanner" role="complementary">
+    <div class="pwa-icon">DR</div>
+    <div class="pwa-text">
+      <strong>ثبّت تطبيق DR.Care</strong>
+      <small>احجز بسهولة من الشاشة الرئيسية</small>
+    </div>
+    <button id="pwaInstallBtn" type="button">تثبيت</button>
+    <button id="pwaDismissBtn" type="button" aria-label="إغلاق">✕</button>
+  </div>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="DR.Care الرئيسية">
+        <span class="brand-mark" aria-hidden="true">DR</span>
+        <span class="brand-text">
+          <strong>DR.Care</strong>
+          <small>مغسلة عربيات مصرية</small>
+        </span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="فتح القائمة" aria-controls="mainNav" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="main-nav" id="mainNav" aria-label="روابط الموقع">
+        <a href="#services">الخدمات</a>
+        <a href="#packages">الباقات</a>
+        <a href="#egyptian">هويتنا</a>
+        <a href="#booking">الحجز</a>
+        <a href="customer-bookings.html">حجوزاتي</a>
+        <a id="customerLoginLink" href="customer-login.html">حسابي</a>
+        <a href="admin.html">الإدارة</a>
+        <a class="nav-cta" href="#booking">احجز الآن</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ══════════════ HERO ══════════════ -->
+    <section class="hero" id="home" aria-labelledby="heroTitle">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-overlay-bottom"></div>
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Car wash · Detailing · Egyptian care</p>
+          <h1 id="heroTitle">DR.Care</h1>
+          <p class="hero-lead">تجربة عناية بالعربية معمولة للسوق المصري: حجز أونلاين، أسعار واضحة، متابعة لحظية، وجودة تشطيب تليق بعربيتك.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#booking">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              احجز غسلة
+            </a>
+            <a class="btn btn-ghost" href="#packages">اختار باقتك</a>
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-label="أرقام تشغيلية">
+          <div class="hero-panel-grid">
+            <div class="hero-stat">
+              <strong>25</strong>
+              <span>دقيقة للغسلة السريعة</span>
+            </div>
+            <div class="hero-stat">
+              <strong>4.9</strong>
+              <span>تقييم تجربة العملاء</span>
+            </div>
+            <div class="hero-stat">
+              <strong>24/7</strong>
+              <span>استقبال طلبات أونلاين</span>
+            </div>
+          </div>
+          <div class="hero-panel-footer">متاح في القاهرة الجديدة · مدينة نصر · الشيخ زايد</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ INFO STRIP ══════════════ -->
+    <div class="info-strip" aria-label="معلومات الفروع">
+      <div class="container strip-grid">
+        <div class="strip-item">
+          <div class="strip-icon">📍</div>
+          <div class="strip-text">
+            <strong>الفروع</strong>
+            <small>القاهرة الجديدة · مدينة نصر · الشيخ زايد</small>
+          </div>
+        </div>
+        <div class="strip-item">
+          <div class="strip-icon">🕘</div>
+          <div class="strip-text">
+            <strong>المواعيد</strong>
+            <small>يومياً من ٩ صباحاً حتى ١٢ مساءً</small>
+          </div>
+        </div>
+        <div class="strip-item">
+          <div class="strip-icon">📞</div>
+          <div class="strip-text">
+            <strong>الخط الساخن</strong>
+            <small>0100 555 2026</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ SERVICES ══════════════ -->
+    <section class="section services-section" id="services" aria-labelledby="servicesTitle">
+      <div class="container">
+        <div class="section-heading reveal">
+          <p class="section-kicker">Our Services</p>
+          <h2 id="servicesTitle">من غسلة يومية لتفاصيل كاملة</h2>
+          <p class="section-copy">الخدمة متقسمة بطريقة سهلة للعميل وسهلة للتشغيل، عشان كل عربية تاخد وقتها الصح من غير انتظار.</p>
+        </div>
+
+        <div class="services-grid">
+          <article class="service-card reveal" style="transition-delay:.05s">
+            <div class="service-icon" aria-hidden="true">01</div>
+            <h3>غسيل فوم خارجي</h3>
+            <p>فوم نشط، ضغط مياه محسوب، وتنشيف مايكروفايبر يحافظ على الدهان من أي خدش.</p>
+          </article>
+          <article class="service-card reveal" style="transition-delay:.10s">
+            <div class="service-icon" aria-hidden="true">02</div>
+            <h3>تنظيف داخلي وتعقيم</h3>
+            <p>شفط، تابلوه، فرش، أرضيات، وتعقيم للنقط المستخدمة يومياً بأعلى معايير النظافة.</p>
+          </article>
+          <article class="service-card reveal" style="transition-delay:.15s">
+            <div class="service-icon" aria-hidden="true">03</div>
+            <h3>واكس وتلميع حماية</h3>
+            <p>لمعة عميقة وحماية احترافية من التراب، الشمس، ومياه الطرق المصرية.</p>
+          </article>
+          <article class="service-card reveal" style="transition-delay:.20s">
+            <div class="service-icon" aria-hidden="true">04</div>
+            <h3>جنوط وكاوتش</h3>
+            <p>تنظيف مخصص للجنوط وتلميع كاوتش بتشطيب واضح ولافت من أول نظرة.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ PACKAGES ══════════════ -->
+    <section class="section packages-section" id="packages" aria-labelledby="packagesTitle">
+      <div class="container">
+        <div class="section-heading reveal">
+          <p class="section-kicker">Packages</p>
+          <h2 id="packagesTitle">اختار الباقة المناسبة لعربيتك</h2>
+          <p class="section-copy">أسعار واضحة ومحسوبة حسب نوع العربية — بدون مفاجآت أو رسوم خفية.</p>
+        </div>
+
+        <div class="packages-grid" id="packagesGrid">
+          <article class="package-card reveal" data-package-card="quick" style="transition-delay:.05s">
+            <p class="package-label">Quick Wash</p>
+            <h3>غسلة سريعة</h3>
+            <p>غسيل خارجي، فوم، تنشيف، وتنظيف زجاج. مثالية للاستخدام اليومي.</p>
+            <div class="package-price">
+              <strong>150</strong>
+              <span>جنيه</span>
+            </div>
+            <button class="package-action" type="button" data-select-package="quick">اختيار الباقة</button>
+          </article>
+
+          <article class="package-card package-card-featured reveal" data-package-card="full" style="transition-delay:.10s">
+            <div class="package-featured-badge">الأكثر طلباً</div>
+            <p class="package-label">Most Popular</p>
+            <h3>Full Care</h3>
+            <p>غسيل خارجي وداخلي، تنظيف تابلوه، تعطير، وتلميع إطارات. التجربة الكاملة.</p>
+            <div class="package-price">
+              <strong>280</strong>
+              <span>جنيه</span>
+            </div>
+            <button class="package-action" type="button" data-select-package="full">اختيار الباقة</button>
+          </article>
+
+          <article class="package-card reveal" data-package-card="detail" style="transition-delay:.15s">
+            <p class="package-label">Detailing</p>
+            <h3>دكتور العربية</h3>
+            <p>تنظيف عميق، واكس حماية، عناية بالفرش، وتشطيب نهائي يستاهل.</p>
+            <div class="package-price">
+              <strong>650</strong>
+              <span>جنيه</span>
+            </div>
+            <button class="package-action" type="button" data-select-package="detail">اختيار الباقة</button>
+          </article>
+
+          <article class="package-card reveal" data-package-card="fleet" style="transition-delay:.20s">
+            <p class="package-label">Fleet</p>
+            <h3>باقات الشركات</h3>
+            <p>عقود شهرية للشركات، مكاتب التأجير، والأساطيل الصغيرة بأسعار مخصوصة.</p>
+            <div class="package-price">
+              <strong>حسب</strong>
+              <span>التعاقد</span>
+            </div>
+            <button class="package-action" type="button" data-select-package="fleet">طلب عرض</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ EGYPTIAN IDENTITY ══════════════ -->
+    <section class="section egyptian-section" id="egyptian" aria-labelledby="egyptianTitle">
+      <div class="container">
+        <div class="egyptian-layout">
+          <div class="egyptian-visual reveal">
+            <div class="egyptian-badge">
+              <span class="egyptian-badge-label">Made in Egypt</span>
+              <strong class="egyptian-badge-name">DR.Care</strong>
+              <span class="egyptian-badge-sub">Cairo · Nasr City · Sheikh Zayed</span>
+              <div class="egyptian-floater">صُنع في مصر ✦</div>
+            </div>
+          </div>
+          <div class="reveal" style="transition-delay:.1s">
+            <p class="section-kicker">Egyptian Identity</p>
+            <h2 id="egyptianTitle">احتراف عالمي بروح مصرية واضحة</h2>
+            <p class="section-copy">العميل المصري عايز سرعة، أمانة، سعر واضح، ومعاملة محترمة. التجربة هنا مبنية على التفاصيل دي من أول ثانية.</p>
+            <div class="culture-tags">
+              <span>قهوة وشاي في الانتظار</span>
+              <span>تعطير شرقي خفيف</span>
+              <span>لغة قريبة من العميل</span>
+              <span>سعر واضح قبل الشغل</span>
+              <span>متابعة بعد الخدمة</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ PROCESS ══════════════ -->
+    <section class="section process-section" aria-labelledby="processTitle">
+      <div class="container">
+        <div class="section-heading reveal">
+          <p class="section-kicker">How It Works</p>
+          <h2 id="processTitle">من الحجز للتسليم</h2>
+        </div>
+        <div class="process-grid">
+          <article class="process-card reveal" style="transition-delay:.05s">
+            <div class="process-num" aria-hidden="true">01</div>
+            <h3>حجز أونلاين</h3>
+            <p>العميل يختار الباقة، الفرع، والميعاد المناسب.</p>
+          </article>
+          <article class="process-card reveal" style="transition-delay:.10s">
+            <div class="process-num" aria-hidden="true">02</div>
+            <h3>تأكيد الطلب</h3>
+            <p>الطلب يدخل لوحة الإدارة بحالة جديدة فور الإرسال.</p>
+          </article>
+          <article class="process-card reveal" style="transition-delay:.15s">
+            <div class="process-num" aria-hidden="true">03</div>
+            <h3>تنفيذ الخدمة</h3>
+            <p>الفريق يغير الحالة أثناء التشغيل في اللحظة.</p>
+          </article>
+          <article class="process-card reveal" style="transition-delay:.20s">
+            <div class="process-num" aria-hidden="true">04</div>
+            <h3>تسليم ومتابعة</h3>
+            <p>تأكيد نهائي ومراجعة رضا العميل بعد التسليم.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ BOOKING ══════════════ -->
+    <section class="section booking-section" id="booking" aria-labelledby="bookingTitle">
+      <div class="container booking-layout">
+        <div class="booking-copy reveal">
+          <p class="section-kicker">Real Booking</p>
+          <h2 id="bookingTitle">احجز دورك في DR.Care</h2>
+          <p class="section-copy">النموذج متصل بـ PHP API. الطلب بيتحفظ في قاعدة البيانات وبيظهر في لوحة الإدارة فوراً.</p>
+          <div class="booking-note">
+            <strong>جاهز للسوق</strong>
+            <span>تحقق من رقم الموبايل، حساب سعر تلقائي، اختيار فرع، وطريقة دفع.</span>
+          </div>
+        </div>
+
+        <form class="booking-form reveal" id="bookingForm" novalidate style="transition-delay:.1s">
+          <div class="form-grid">
+            <label for="name">
+              الاسم
+              <input type="text" id="name" name="name" placeholder="اكتب اسمك الكريم" autocomplete="name" required>
+            </label>
+            <label for="email">
+              البريد الإلكتروني
+              <input type="email" id="email" name="email" placeholder="your@gmail.com" autocomplete="email" required>
+            </label>
+          </div>
+          <div class="form-grid">
+            <label for="phone">
+              رقم الموبايل
+              <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX" autocomplete="tel" inputmode="numeric" required>
+            </label>
+            <label for="appointment">
+              الميعاد المناسب
+              <input type="datetime-local" id="appointment" name="appointment">
+            </label>
+          </div>
+          <div class="form-grid">
+            <label for="servicePackage">
+              الباقة
+              <select id="servicePackage" name="servicePackage" required></select>
+            </label>
+            <label for="carType">
+              نوع العربية
+              <select id="carType" name="carType" required></select>
+            </label>
+          </div>
+          <div class="form-grid">
+            <label for="branch">
+              الفرع
+              <select id="branch" name="branch" required></select>
+            </label>
+            <label for="paymentMethod">
+              طريقة الدفع
+              <select id="paymentMethod" name="paymentMethod" required></select>
+            </label>
+          </div>
+          <label for="plateNumber">
+            رقم اللوحة (اختياري)
+            <input type="text" id="plateNumber" name="plateNumber" placeholder="مثلاً: أ ب ج 1234">
+          </label>
+          <label for="notes">
+            ملاحظات
+            <textarea id="notes" name="notes" rows="3" placeholder="مثلاً: عايز تركيز على الفرش أو الجنوط"></textarea>
+          </label>
+
+          <div class="estimate" aria-live="polite">
+            <span>السعر التقريبي</span>
+            <strong id="estimateValue">0 جنيه</strong>
+          </div>
+
+          <button class="btn btn-primary submit-btn" type="submit" id="submitBtn">تأكيد الحجز</button>
+          <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© 2026 DR.Care — مغسلة عربيات مصرية جاهزة للتوسع.</p>
+      <div class="footer-links">
+        <a href="customer-login.html">تسجيل دخول العملاء</a>
+        <a href="customer-profile.html">حسابي</a>
+        <a href="admin.html">لوحة الإدارة</a>
+        <a href="login.html">إدارة النظام</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="idb.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

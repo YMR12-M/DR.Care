@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd21f">
+  <title>DR.Care | تفعيل البريد الإلكتروني</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-mark" style="width:64px;height:64px;border-radius:16px;background:var(--yellow);display:inline-flex;align-items:center;justify-content:center;color:#0a0800;font-size:1.4rem;font-weight:900;font-family:'Montserrat',sans-serif;margin-bottom:18px;box-shadow:0 8px 32px rgba(255,210,31,0.35);">DR</div>
+        <h1>DR.Care</h1>
+        <p>تفعيل البريد الإلكتروني</p>
+      </div>
+
+      <!-- Loading -->
+      <div id="stateLoading" style="text-align:center;padding:2rem 0;color:var(--gray)">
+        جاري التحقق…
+      </div>
+
+      <!-- Success -->
+      <div id="stateSuccess" style="display:none;text-align:center;padding:1rem 0">
+        <div style="font-size:3rem;margin-bottom:1rem">✅</div>
+        <h2 style="color:var(--yellow);margin-bottom:.75rem;font-size:1.2rem">تم التفعيل بنجاح!</h2>
+        <p style="color:var(--gray);line-height:1.7;font-size:.95rem">بريدك الإلكتروني مفعّل الآن. سيتم تحويلك لحجوزاتك…</p>
+      </div>
+
+      <!-- Error -->
+      <div id="stateError" style="display:none;text-align:center;padding:1rem 0">
+        <div style="font-size:3rem;margin-bottom:1rem">⚠️</div>
+        <h2 style="color:#ff4d4d;margin-bottom:.75rem;font-size:1.1rem" id="errorMsg">الرابط غير صالح</h2>
+        <p style="color:var(--gray);line-height:1.7;font-size:.9rem">الرابط منتهي الصلاحية أو البريد مفعّل بالفعل.</p>
+      </div>
+
+      <div class="auth-footer" style="margin-top:1.5rem">
+        <a href="customer-bookings.html">← حجوزاتي</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = new URLSearchParams(location.search).get('token') || '';
+
+    const show = (id) => ['stateLoading','stateSuccess','stateError'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? 'block' : 'none';
+    });
+
+    (async () => {
+      if (!token || token.length !== 64) { show('stateError'); return; }
+      try {
+        const res  = await fetch('api/customer-login.php', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ action: 'verify_email', token })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          show('stateSuccess');
+          setTimeout(() => { window.location.href = 'customer-bookings.html'; }, 2500);
+        } else {
+          document.getElementById('errorMsg').textContent = data.message || 'الرابط غير صالح';
+          show('stateError');
+        }
+      } catch {
+        document.getElementById('errorMsg').textContent = 'تعذّر الاتصال بالخادم';
+        show('stateError');
+      }
+    })();
+  </script>
+</body>
+</html>

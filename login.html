@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="تسجيل دخول لوحة إدارة DR.Care">
+  <meta name="theme-color" content="#ffd21f">
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>DR.Care | تسجيل الدخول</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .login-header .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--yellow) 0%, #ffb700 100%);
+      color: #000;
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+
+    .login-header h1 {
+      font-size: 28px;
+      margin: 12px 0 8px;
+      color: var(--white);
+    }
+
+    .login-header p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .form-group input {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--white);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255, 210, 31, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: var(--muted);
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, var(--yellow) 0%, #ffb700 100%);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 210, 31, 0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .login-message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .login-message.show {
+      display: block;
+    }
+
+    .login-message.error {
+      background: rgba(255, 107, 91, 0.1);
+      color: #ff6b5b;
+      border: 1px solid rgba(255, 107, 91, 0.2);
+    }
+
+    .login-message.success {
+      background: rgba(126, 217, 92, 0.1);
+      color: #7ed95c;
+      border: 1px solid rgba(126, 217, 92, 0.2);
+    }
+
+    .login-footer {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .login-footer a {
+      color: var(--yellow);
+      text-decoration: none;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="brand-mark">DR</div>
+        <h1>DR.Care</h1>
+        <p>لوحة إدارة الحجوزات</p>
+      </div>
+
+      <form class="login-form" id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="username">اسم المستخدم</label>
+          <input type="text" id="username" name="username" placeholder="أدخل اسم المستخدم" autocomplete="username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">كلمة المرور</label>
+          <input type="password" id="password" name="password" placeholder="أدخل كلمة المرور" autocomplete="current-password" required>
+        </div>
+
+        <button class="login-btn" type="submit" id="loginBtn">تسجيل الدخول</button>
+      </form>
+
+      <div class="login-message" id="loginMessage" role="status" aria-live="polite"></div>
+
+      <div class="login-footer">
+        <p>تأكد من ضبط بيانات المشرف في ملف الإعدادات `.env` قبل الاستخدام.</p>
+        <p><a href="index.html">العودة للموقع الرئيسي</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+    const loginBtn = document.getElementById('loginBtn');
+    const isServedOverHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+
+    function showMessage(message, type) {
+      loginMessage.textContent = message;
+      loginMessage.className = `login-message show ${type}`;
+      setTimeout(() => {
+        loginMessage.classList.remove('show');
+      }, 5000);
+    }
+
+    if (!isServedOverHttp) {
+      showMessage('يجب فتح الصفحة من خلال خادم محلي (http://localhost) وليس مباشرة من ملف.', 'error');
+      loginBtn.disabled = true;
+    }
+
+    loginForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        showMessage('يجب ملء جميع الحقول', 'error');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'جاري التحقق...';
+
+      try {
+        const response = await fetch('api/admin-login.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          showMessage(data.message || 'فشل تسجيل الدخول', 'error');
+          return;
+        }
+
+        showMessage('تسجيل دخول ناجح، جاري إعادة التوجيه...', 'success');
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 1000);
+      } catch (error) {
+        showMessage('خطأ في الاتصال: ' + error.message, 'error');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'تسجيل الدخول';
+      }
+    });
+  </script>
+</body>
+</html>

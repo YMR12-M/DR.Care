@@ -1,0 +1,41 @@
+# Local environment variables
+.env
+.env.local
+
+# SQLite database files and sensitive data artifacts
+/data/*.db
+/data/*.sqlite
+/data/backups/
+/data/*.pem
+/data/*.key
+
+# SSL certificates and keys (local dev only)
+*.pem
+*.key
+*.crt
+composer-setup.php
+
+offline-cache/
+
+# Node / frontend dependencies
+node_modules/
+
+# PHP / Composer
+vendor/
+.phpunit.cache/
+composer.lock
+composer.phar
+
+# Test artifacts
+/tests/tmp/
+
+# IDE / macOS
+.DS_Store
+*.log
+*.swp
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+

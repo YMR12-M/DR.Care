@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd21f">
+  <title>DR.Care | حسابي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && window.innerWidth <= 900) {
+      window.location.replace('mobile-profile.html');
+    }
+  </script>
+  <style>
+    .cp-page { min-height: 100vh; background: var(--ink); }
+
+    /* ── Profile hero ── */
+    .cp-hero {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 40px 0 32px;
+      position: relative; overflow: hidden;
+    }
+    .cp-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 60%, rgba(255,210,31,0.06) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .cp-hero-inner {
+      position: relative;
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+
+    .cp-avatar-wrap { position: relative; flex-shrink: 0; }
+    .cp-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--yellow); color: #0a0800;
+      font-family: var(--font-en); font-size: 2rem; font-weight: 900;
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 4px rgba(255,210,31,0.18), 0 12px 36px rgba(255,210,31,0.25);
+    }
+    .cp-avatar-badge {
+      position: absolute; bottom: 2px; left: 2px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--success); border: 2px solid var(--panel);
+    }
+
+    .cp-user-info { flex: 1; }
+    .cp-user-info .cp-kicker {
+      font-family: var(--font-en); font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 4px;
+    }
+    .cp-user-info strong { display: block; font-size: 1.3rem; font-weight: 900; letter-spacing: -0.01em; }
+    .cp-user-info .cp-meta {
+      display: flex; gap: 16px; margin-top: 6px; flex-wrap: wrap;
+    }
+    .cp-meta-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.8rem; color: var(--muted); font-weight: 600;
+    }
+    .cp-meta-item svg { flex-shrink: 0; color: var(--muted-2); }
+
+    .cp-hero-stats {
+      display: flex; gap: 16px; margin-inline-start: auto;
+    }
+    .cp-hero-stat {
+      text-align: center; padding: 12px 20px;
+      background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+    }
+    .cp-hero-stat strong {
+      display: block; font-family: var(--font-en);
+      font-size: 1.4rem; font-weight: 900; color: var(--yellow); line-height: 1;
+    }
+    .cp-hero-stat span { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+    /* ── Tabs ── */
+    .cp-tabs {
+      display: flex; gap: 2px; margin-top: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .cp-tab {
+      padding: 11px 20px;
+      font-size: 0.85rem; font-weight: 700; color: var(--muted);
+      background: transparent; border: none; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .cp-tab:hover { color: var(--white); }
+    .cp-tab.active { color: var(--yellow); border-bottom-color: var(--yellow); }
+
+    /* ── Main layout ── */
+    .cp-main { padding: 32px 0 64px; }
+    .cp-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; max-width: 960px; }
+
+    .cp-panel-content { display: none; }
+    .cp-panel-content.show { display: block; }
+
+    /* ── Form card ── */
+    .cp-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-xl); overflow: hidden;
+    }
+
+    .cp-card-head {
+      padding: 20px 24px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .cp-card-head__icon {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      background: var(--yellow-soft); border: 1px solid var(--yellow-line);
+      display: grid; place-items: center; color: var(--yellow); flex-shrink: 0;
+    }
+    .cp-card-head h3 { font-size: 0.95rem; font-weight: 800; margin: 0; }
+    .cp-card-head p  { font-size: 0.78rem; color: var(--muted); margin: 2px 0 0; }
+
+    .cp-card-body { padding: 24px; display: grid; gap: 16px; }
+
+    /* ── Fields (redesigned) ── */
+    .cp-field {
+      background: var(--panel-2); border: 1px solid var(--line-2);
+      border-radius: var(--radius); padding: 12px 16px;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .cp-field:focus-within {
+      border-color: var(--yellow-line);
+      box-shadow: 0 0 0 3px rgba(255,210,31,0.08);
+    }
+    .cp-field label {
+      display: block; font-size: 0.68rem; font-weight: 700;
+      color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 5px; font-family: var(--font-en);
+    }
+    .cp-field input {
+      display: block; width: 100%; background: transparent;
+      border: none; outline: none; color: var(--white);
+      font-size: 0.95rem; font-family: var(--font); padding: 0;
+      margin: 0; min-height: unset;
+    }
+    .cp-field input::placeholder { color: var(--muted-2); }
+    .cp-field input[readonly] { opacity: 0.45; cursor: not-allowed; }
+    .cp-field-note { font-size: 0.72rem; color: var(--muted-2); margin-top: 5px; }
+    .cp-field-error { font-size: 0.75rem; color: var(--error); margin-top: 5px; display: none; font-weight: 600; }
+    .cp-field-error.show { display: block; }
+
+    /* ── Messages ── */
+    .cp-msg {
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      font-size: 0.82rem; font-weight: 700; display: none;
+    }
+    .cp-msg.show { display: block; }
+    .cp-msg.success { background: rgba(111,207,71,0.1); color: var(--success); border: 1px solid rgba(111,207,71,0.25); }
+    .cp-msg.error   { background: rgba(240,83,62,0.1);  color: var(--error);   border: 1px solid rgba(240,83,62,0.22); }
+
+    /* ── Info box ── */
+    .cp-infobox {
+      background: var(--yellow-soft); border: 1px solid var(--yellow-line);
+      border-radius: var(--radius-sm); padding: 12px 16px;
+      font-size: 0.82rem; color: var(--muted); line-height: 1.7;
+    }
+
+    /* ── Btn row ── */
+    .cp-btn-row { display: flex; gap: 10px; }
+
+    /* ── Sidebar cards ── */
+    .cp-sidebar { display: grid; gap: 14px; }
+
+    .cp-stat-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .cp-stat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid var(--line);
+      gap: 10px;
+    }
+    .cp-stat-row:last-child { border-bottom: none; }
+    .cp-stat-row label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+    .cp-stat-row value { font-size: 0.85rem; font-weight: 800; color: var(--white); }
+    .cp-stat-row value.green { color: var(--success); }
+
+    .cp-danger-card {
+      background: var(--panel); border: 1px solid rgba(240,83,62,0.2);
+      border-radius: var(--radius-lg); padding: 18px;
+    }
+    .cp-danger-card p {
+      font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; line-height: 1.7;
+    }
+
+    /* ── Loyalty / Rewards redesign ── */
+    .loy-hero {
+      position: relative;
+      background: linear-gradient(135deg, rgba(255,210,31,.1) 0%, rgba(255,210,31,.03) 60%, transparent 100%);
+      border: 1px solid var(--yellow-line);
+      border-radius: var(--radius-xl);
+      padding: 28px 24px 20px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .loy-hero__glow {
+      position: absolute; top: -60px; right: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,210,31,.18), transparent 70%);
+      pointer-events: none;
+    }
+    .loy-hero__top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 20px;
+      margin-bottom: 24px; position: relative;
+    }
+    .loy-pts-block { flex: 1; }
+    .loy-eyebrow {
+      font-family: var(--font-en); font-size: .62rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted-2); margin-bottom: 6px;
+    }
+    .loy-pts-row { display: flex; align-items: baseline; gap: 8px; }
+    .loy-pts-num {
+      font-family: var(--font-en); font-size: 3.6rem; font-weight: 900;
+      color: var(--yellow); line-height: 1;
+    }
+    .loy-pts-word { font-size: .9rem; font-weight: 700; color: var(--muted); }
+    .loy-pts-next { font-size: .82rem; color: var(--muted); margin-top: 10px; }
+
+    .loy-tier-badge { text-align: center; flex-shrink: 0; position: relative; }
+    .loy-tier-badge__ring {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: rgba(255,210,31,.1); border: 2px solid var(--yellow-line);
+      display: grid; place-items: center; margin: 0 auto 8px;
+      box-shadow: 0 0 28px rgba(255,210,31,.18);
+    }
+    .loy-tier-badge__icon { font-size: 2.4rem; line-height: 1; }
+    .loy-tier-badge__name {
+      font-size: .8rem; font-weight: 800; color: var(--yellow);
+      letter-spacing: .05em; font-family: var(--font-en);
+    }
+    .loy-tier-badge__label { font-size: .68rem; color: var(--muted-2); margin-top: 2px; }
+
+    /* Journey track */
+    .loy-journey { position: relative; padding-top: 4px; }
+    .loy-journey__track {
+      background: rgba(255,255,255,.08); border-radius: 50px;
+      height: 5px; overflow: hidden; margin: 0 36px;
+    }
+    .loy-journey__fill {
+      height: 100%; border-radius: 50px;
+      background: linear-gradient(90deg, var(--yellow-2), var(--yellow));
+      width: 0%; transition: width 1s cubic-bezier(.22,.68,0,1.2);
+    }
+    .loy-journey__milestones {
+      display: flex; justify-content: space-between;
+      margin-top: 10px;
+    }
+    .loy-ms { text-align: center; flex: 1; }
+    .loy-ms__dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--panel-3); border: 2px solid var(--line);
+      margin: 0 auto 6px;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+    .loy-ms.reached .loy-ms__dot { background: rgba(255,210,31,.6); border-color: var(--yellow); }
+    .loy-ms.active  .loy-ms__dot {
+      background: var(--yellow); border-color: var(--yellow);
+      box-shadow: 0 0 0 4px rgba(255,210,31,.25);
+    }
+    .loy-ms__emoji { font-size: 1.25rem; }
+    .loy-ms__name {
+      font-size: .65rem; font-weight: 700; color: var(--muted-2);
+      font-family: var(--font-en); letter-spacing: .05em; margin-top: 3px;
+    }
+    .loy-ms.reached .loy-ms__name,
+    .loy-ms.active  .loy-ms__name { color: var(--yellow); }
+
+    /* Stats strip */
+    .loy-stats-strip {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 10px; margin-bottom: 20px;
+    }
+    .loy-stat-chip {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-lg); padding: 14px 16px; text-align: center;
+    }
+    .loy-stat-chip__val {
+      display: block; font-family: var(--font-en);
+      font-size: 1.2rem; font-weight: 900; color: var(--white);
+    }
+    .loy-stat-chip__val--earn { color: var(--success); }
+    .loy-stat-chip__val--spend { color: var(--yellow); }
+    .loy-stat-chip__lbl { font-size: .72rem; color: var(--muted); font-weight: 600; margin-top: 2px; display: block; }
+
+    /* Section header */
+    .loy-section-hd {
+      font-size: .72rem; font-weight: 800; color: var(--muted-2);
+      text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .loy-section-hd::after { content:''; flex:1; height:1px; background:var(--line); }
+
+    /* Rewards grid */
+    .loy-rewards-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 24px;
+    }
+    .loy-reward-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-lg); padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+      opacity: .5; transition: border-color var(--transition), box-shadow var(--transition), opacity var(--transition);
+    }
+    .loy-reward-card--available {
+      border-color: var(--yellow-line);
+      background: rgba(255,210,31,.03); opacity: 1;
+      box-shadow: 0 2px 14px rgba(255,210,31,.09);
+    }
+    .loy-reward-card__icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--panel-2); display: grid; place-items: center;
+      font-size: 1.35rem; flex-shrink: 0;
+    }
+    .loy-reward-card--available .loy-reward-card__icon { background: rgba(255,210,31,.12); }
+    .loy-reward-card__body { flex: 1; }
+    .loy-reward-card__name { display: block; font-size: .88rem; font-weight: 800; color: var(--white); }
+    .loy-reward-card__desc { display: block; font-size: .72rem; color: var(--muted); margin-top: 3px; }
+    .loy-reward-card__foot {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: auto; padding-top: 4px;
+    }
+    .loy-reward-card__pts {
+      font-family: var(--font-en); font-size: .9rem; font-weight: 900; color: var(--yellow);
+    }
+    .loy-reward-card__pts small { font-family: var(--font); font-size: .65rem; color: var(--muted); font-weight: 600; }
+    .loy-reward-card__btn { min-height: 30px; font-size: .75rem; padding: 0 12px; }
+    .loy-reward-card__locked { font-size: .9rem; opacity: .45; }
+
+    /* History */
+    .loy-history-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 16px;
+    }
+    .loy-hist-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 20px; border-bottom: 1px solid var(--line);
+    }
+    .loy-hist-item:last-child { border-bottom: none; }
+    .loy-hist-item__icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: grid; place-items: center;
+      font-size: .85rem; font-weight: 900; flex-shrink: 0;
+    }
+    .loy-hist-item__icon--earn { background: rgba(111,207,71,.12); color: var(--success); }
+    .loy-hist-item__icon--spend { background: rgba(255,210,31,.1); color: var(--yellow); }
+    .loy-hist-item__body { flex: 1; }
+    .loy-hist-item__body strong { display: block; font-size: .85rem; color: var(--white); }
+    .loy-hist-item__body small { font-size: .72rem; color: var(--muted); }
+    .loy-hist-item__pts {
+      font-family: var(--font-en); font-size: .95rem; font-weight: 900; flex-shrink: 0;
+    }
+    .loy-hist-item__pts--earn  { color: var(--success); }
+    .loy-hist-item__pts--spend { color: var(--yellow); }
+
+    /* Info box */
+    .loy-info-box {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--yellow-soft); border: 1px solid var(--yellow-line);
+      border-radius: var(--radius-lg); padding: 16px 18px;
+    }
+    .loy-info-box__icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+    .loy-info-box strong { display: block; font-size: .85rem; color: var(--white); margin-bottom: 4px; }
+    .loy-info-box p { font-size: .78rem; color: var(--muted); line-height: 1.75; margin: 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 800px) {
+      .cp-layout { grid-template-columns: 1fr; }
+      .cp-hero-stats { display: none; }
+      .cp-hero-inner { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body class="cp-page">
+
+  <!-- HEADER -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="DR.Care">
+        <span class="brand-mark" aria-hidden="true">DR</span>
+        <span class="brand-text">
+          <strong>DR.Care</strong>
+          <small>حسابي</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="الروابط">
+        <a href="index.html">الرئيسية</a>
+        <a href="customer-bookings.html">حجوزاتي</a>
+        <a href="customer-profile.html" style="color:var(--yellow)">حسابي</a>
+        <a class="nav-cta" href="index.html#booking">حجز جديد</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- PROFILE HERO -->
+  <div class="cp-hero">
+    <div class="container">
+      <div class="cp-hero-inner">
+        <div class="cp-avatar-wrap">
+          <div class="cp-avatar" id="profileAvatar">—</div>
+          <div class="cp-avatar-badge" title="حساب نشط"></div>
+        </div>
+
+        <div class="cp-user-info">
+          <p class="cp-kicker">My Account</p>
+          <strong id="profileName">جاري التحميل...</strong>
+          <div class="cp-meta">
+            <div class="cp-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span id="profileEmail">—</span>
+            </div>
+            <div class="cp-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span id="profilePhone">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-hero-stats">
+          <div class="cp-hero-stat">
+            <strong id="heroBookingCount">—</strong>
+            <span>حجوزات</span>
+          </div>
+          <div class="cp-hero-stat">
+            <strong id="heroJoinYear">—</strong>
+            <span>عضو منذ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="cp-tabs">
+        <button class="cp-tab active" data-tab="personal">البيانات الشخصية</button>
+        <button class="cp-tab" data-tab="password">كلمة المرور</button>
+        <button class="cp-tab" data-tab="activity">النشاط</button>
+        <button class="cp-tab" data-tab="rewards" id="rewardsTabBtn">
+          ⭐ نقاطي <span id="rewardsTabBadge" style="display:none;font-size:.7rem;background:var(--yellow);color:#0a0800;padding:1px 7px;border-radius:50px;margin-right:4px;font-weight:900"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="cp-main">
+    <div class="container">
+      <div class="cp-layout">
+
+        <!-- LEFT: Panel content -->
+        <div>
+          <!-- Personal Tab -->
+          <div class="cp-panel-content show" data-tab="personal">
+            <div class="cp-card">
+              <div class="cp-card-head">
+                <div class="cp-card-head__icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div>
+                  <h3>البيانات الشخصية</h3>
+                  <p>عدّل اسمك ورقم موبايلك</p>
+                </div>
+              </div>
+              <div class="cp-card-body">
+                <div class="cp-msg" id="personalMessage" role="alert" aria-live="polite"></div>
+                <div class="cp-field">
+                  <label for="fullName">Full Name</label>
+                  <input type="text" id="fullName" placeholder="أحمد محمد" autocorrect="off">
+                  <div class="cp-field-error" id="nameError"></div>
+                </div>
+                <div class="cp-field">
+                  <label for="email">Email Address</label>
+                  <input type="email" id="email" readonly>
+                  <div class="cp-field-note">لا يمكن تعديل البريد الإلكتروني</div>
+                </div>
+                <div class="cp-field">
+                  <label for="phone">Phone Number</label>
+                  <input type="tel" id="phone" placeholder="01012345678" inputmode="numeric">
+                  <div class="cp-field-error" id="phoneError"></div>
+                </div>
+                <div class="cp-btn-row">
+                  <button class="btn btn-primary" style="min-height:46px;flex:1" id="savePersonalBtn">حفظ التغييرات</button>
+                  <button class="btn btn-ghost" style="min-height:46px" id="cancelPersonalBtn">إلغاء</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password Tab -->
+          <div class="cp-panel-content" data-tab="password">
+            <div class="cp-card">
+              <div class="cp-card-head">
+                <div class="cp-card-head__icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div>
+                  <h3>كلمة المرور</h3>
+                  <p>استخدم كلمة مرور قوية تحتوي على أحرف وأرقام</p>
+                </div>
+              </div>
+              <div class="cp-card-body">
+                <div class="cp-msg" id="passwordMessage" role="alert" aria-live="polite"></div>
+                <div class="cp-infobox">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-left:5px" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  بعد تغيير كلمة المرور هتحتاج تسجل دخول مرة تانية.
+                </div>
+                <div class="cp-field">
+                  <label for="currentPassword">Current Password</label>
+                  <input type="password" id="currentPassword" placeholder="••••••••" autocomplete="current-password">
+                  <div class="cp-field-error" id="currentPassError"></div>
+                </div>
+                <div class="cp-field">
+                  <label for="newPassword">New Password</label>
+                  <input type="password" id="newPassword" placeholder="••••••••" autocomplete="new-password">
+                  <div class="cp-field-error" id="newPassError"></div>
+                </div>
+                <div class="cp-field">
+                  <label for="confirmPassword">Confirm Password</label>
+                  <input type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password">
+                  <div class="cp-field-error" id="confirmPassError"></div>
+                </div>
+                <div class="cp-btn-row">
+                  <button class="btn btn-primary" style="min-height:46px;flex:1" id="changePasswordBtn">تحديث كلمة المرور</button>
+                  <button class="btn btn-ghost" style="min-height:46px" id="cancelPasswordBtn">إلغاء</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Tab -->
+          <div class="cp-panel-content" data-tab="activity">
+            <div class="cp-card">
+              <div class="cp-card-head">
+                <div class="cp-card-head__icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div>
+                  <h3>نشاط الحساب</h3>
+                  <p>إحصائيات وتفاصيل حسابك</p>
+                </div>
+              </div>
+              <div class="cp-stat-card" style="border:none;border-radius:0">
+                <div class="cp-stat-row">
+                  <label>تاريخ الانضمام</label>
+                  <value id="joinDate">—</value>
+                </div>
+                <div class="cp-stat-row">
+                  <label>آخر دخول</label>
+                  <value id="lastLogin">—</value>
+                </div>
+                <div class="cp-stat-row">
+                  <label>عدد الحجوزات</label>
+                  <value id="bookingCount">—</value>
+                </div>
+                <div class="cp-stat-row">
+                  <label>حالة الحساب</label>
+                  <value class="green">نشط ✓</value>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <!-- Rewards Tab -->
+          <div class="cp-panel-content" data-tab="rewards">
+
+            <!-- ① Tier Hero -->
+            <div class="loy-hero">
+              <div class="loy-hero__glow"></div>
+              <div class="loy-hero__top">
+                <div class="loy-pts-block">
+                  <p class="loy-eyebrow">Loyalty Points</p>
+                  <div class="loy-pts-row">
+                    <span class="loy-pts-num" id="cpPointsBalance">—</span>
+                    <span class="loy-pts-word">نقطة</span>
+                  </div>
+                  <p class="loy-pts-next" id="cpPointsNext">جاري التحميل...</p>
+                </div>
+                <div class="loy-tier-badge">
+                  <div class="loy-tier-badge__ring">
+                    <span class="loy-tier-badge__icon" id="cpTierEmoji">🥉</span>
+                  </div>
+                  <p class="loy-tier-badge__name" id="cpTierName">Bronze</p>
+                  <p class="loy-tier-badge__label">مستواك الحالي</p>
+                </div>
+              </div>
+              <!-- Journey track + milestones -->
+              <div class="loy-journey">
+                <div class="loy-journey__track">
+                  <div class="loy-journey__fill" id="cpLoyaltyBar"></div>
+                </div>
+                <div class="loy-journey__milestones">
+                  <div class="loy-ms" id="loyMs0">
+                    <div class="loy-ms__dot"></div>
+                    <div class="loy-ms__emoji">🥉</div>
+                    <div class="loy-ms__name">Bronze</div>
+                  </div>
+                  <div class="loy-ms" id="loyMs1">
+                    <div class="loy-ms__dot"></div>
+                    <div class="loy-ms__emoji">🥈</div>
+                    <div class="loy-ms__name">Silver</div>
+                  </div>
+                  <div class="loy-ms" id="loyMs2">
+                    <div class="loy-ms__dot"></div>
+                    <div class="loy-ms__emoji">🏆</div>
+                    <div class="loy-ms__name">Gold</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ② Quick stats strip -->
+            <div class="loy-stats-strip" id="loyStatsStrip" style="display:none">
+              <div class="loy-stat-chip">
+                <span class="loy-stat-chip__val loy-stat-chip__val--earn" id="loyTotalEarned">+0</span>
+                <span class="loy-stat-chip__lbl">نقاط مكتسبة</span>
+              </div>
+              <div class="loy-stat-chip">
+                <span class="loy-stat-chip__val loy-stat-chip__val--spend" id="loyTotalSpent">-0</span>
+                <span class="loy-stat-chip__lbl">نقاط مستردة</span>
+              </div>
+              <div class="loy-stat-chip">
+                <span class="loy-stat-chip__val" id="loyAvailCount">0</span>
+                <span class="loy-stat-chip__lbl">مكافآت متاحة</span>
+              </div>
+            </div>
+
+            <!-- ③ Coupon reveal -->
+            <div id="cpCouponReveal" style="display:none;background:rgba(111,207,71,.08);border:1px solid rgba(111,207,71,.3);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;text-align:center">
+              <p style="font-size:.82rem;color:var(--muted);margin-bottom:8px">🎉 تم إنشاء كوبون الخصم!</p>
+              <div id="cpCouponCode" style="font-family:var(--font-en);font-size:1.5rem;font-weight:900;letter-spacing:.1em;background:var(--panel-2);border:1px dashed rgba(111,207,71,.4);border-radius:var(--radius);padding:14px 20px;cursor:pointer;transition:background var(--transition)">—</div>
+              <p id="cpCouponExpiry" style="font-size:.75rem;color:var(--muted);margin-top:8px"></p>
+              <p style="font-size:.8rem;color:var(--success);margin-top:6px;font-weight:700">✓ استخدم الكود في خانة الخصم عند الحجز</p>
+            </div>
+
+            <!-- ④ Rewards grid -->
+            <p class="loy-section-hd">المكافآت المتاحة</p>
+            <div id="cpRewardsList" class="loy-rewards-grid">
+              <div style="text-align:center;padding:28px;color:var(--muted);font-size:.88rem;grid-column:1/-1">جاري التحميل...</div>
+            </div>
+
+            <!-- ⑤ Points history -->
+            <p class="loy-section-hd">سجل النقاط</p>
+            <div class="loy-history-card">
+              <div id="cpPointsHistory">
+                <div style="text-align:center;padding:28px;color:var(--muted);font-size:.85rem">لا يوجد سجل حتى الآن</div>
+              </div>
+            </div>
+
+            <!-- ⑥ How it works -->
+            <div class="loy-info-box">
+              <div class="loy-info-box__icon">💡</div>
+              <div>
+                <strong>كيف تكسب النقاط؟</strong>
+                <p>كل 10 جنيه مصروفة في حجز مكتمل = نقطة واحدة. الحد الأدنى 5 نقاط لكل حجز. استخدم برنامج الإحالة لتكسب نقاطاً مضاعفة!</p>
+              </div>
+            </div>
+          </div>
+
+        <!-- RIGHT: Sidebar -->
+        <div class="cp-sidebar">
+
+          <!-- Quick links -->
+          <div class="cp-stat-card">
+            <div class="cp-stat-row" style="background:var(--panel-2)">
+              <label style="font-family:var(--font-en);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)">Quick Links</label>
+            </div>
+            <div class="cp-stat-row" style="padding:0">
+              <a href="customer-bookings.html" style="display:flex;align-items:center;gap:10px;padding:14px 18px;width:100%;color:var(--muted);font-size:.85rem;font-weight:700;transition:color var(--transition)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                حجوزاتي
+              </a>
+            </div>
+            <div class="cp-stat-row" style="padding:0">
+              <a href="index.html#booking" style="display:flex;align-items:center;gap:10px;padding:14px 18px;width:100%;color:var(--muted);font-size:.85rem;font-weight:700;transition:color var(--transition)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                حجز جديد
+              </a>
+            </div>
+          </div>
+
+          <!-- Loyalty mini-card -->
+          <div class="cp-stat-card" id="cpLoyaltySidebar" style="display:none">
+            <div class="cp-stat-row" style="background:rgba(255,210,31,.06);border-bottom:1px solid var(--yellow-line)">
+              <label style="font-family:var(--font-en);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow)">⭐ Loyalty Points</label>
+              <button class="customer-btn" data-tab="rewards" style="font-size:.72rem;padding:4px 10px;height:auto" onclick="document.querySelector('.cp-tab[data-tab=rewards]').click()">عرض</button>
+            </div>
+            <div class="cp-stat-row">
+              <label>رصيدك</label>
+              <value style="color:var(--yellow);font-family:var(--font-en);font-size:1.1rem" id="cpSidebarPts">—</value>
+            </div>
+            <div class="cp-stat-row">
+              <label>المستوى</label>
+              <value id="cpSidebarTier">—</value>
+            </div>
+          </div>
+
+          <!-- Referral mini-card -->
+          <div class="cp-stat-card" id="cpReferralSidebar">
+            <div class="cp-stat-row" style="background:rgba(255,210,31,.06);border-bottom:1px solid var(--yellow-line)">
+              <label style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow)">🔗 نظام الإحالة</label>
+            </div>
+            <div class="cp-stat-row" style="flex-direction:column;align-items:flex-start;gap:8px;padding:14px">
+              <label style="font-size:.75rem;color:var(--muted)">كود الإحالة الخاص بك</label>
+              <div style="display:flex;gap:6px;width:100%">
+                <code id="cpRefCode" style="flex:1;background:var(--panel-3);border-radius:8px;padding:8px 12px;font-size:.9rem;font-family:var(--font-en);letter-spacing:.12em;color:var(--yellow);font-weight:700">—</code>
+                <button id="cpCopyRef" title="نسخ" style="background:var(--panel-3);border:1px solid var(--border);border-radius:8px;padding:0 10px;cursor:pointer;color:var(--muted);font-size:.85rem;flex-shrink:0">📋</button>
+              </div>
+            </div>
+            <div class="cp-stat-row">
+              <label>أحلت</label>
+              <value id="cpRefCount" style="color:var(--yellow);font-family:var(--font-en);font-size:1rem">0</value>
+            </div>
+            <div class="cp-stat-row">
+              <label>نقاط من الإحالات</label>
+              <value id="cpRefPts" style="color:var(--success);font-family:var(--font-en);font-size:1rem">0</value>
+            </div>
+            <div style="padding:10px 14px;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.6">
+              كل صديق يسجّل بكودك = <strong style="color:var(--yellow)">+50 نقطة</strong> لك + <strong style="color:var(--yellow)">+25 نقطة</strong> له عند أول حجز.
+            </div>
+          </div>
+
+          <!-- Danger zone -->
+          <div class="cp-danger-card">
+            <p>تسجيل الخروج من حسابك على هذا الجهاز. بياناتك محفوظة.</p>
+            <button class="btn btn-ghost" id="logoutBtn" style="width:100%;min-height:44px;font-size:.85rem;color:var(--error);border-color:rgba(240,83,62,.25)">
+              تسجيل الخروج
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>© 2026 DR.Care</p>
+        <div class="footer-links">
+          <a href="index.html">الرئيسية</a>
+          <a href="customer-bookings.html">حجوزاتي</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    'use strict';
+
+    let currentCustomer = null;
+
+    /* ── CSRF ── */
+    let _csrf = '';
+    fetch('api/csrf.php', { credentials: 'same-origin' })
+      .then(r => r.json()).then(d => { _csrf = d.token || ''; }).catch(() => {});
+    const csrfFetch = (url, opts = {}) => {
+      const h = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+      if (_csrf) h['X-CSRF-Token'] = _csrf;
+      return fetch(url, { credentials: 'same-origin', ...opts, headers: h });
+    };
+
+    window.addEventListener('scroll', () => {
+      document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 16);
+    }, { passive: true });
+
+    /* ── Tabs ── */
+    document.querySelectorAll('.cp-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cp-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.cp-panel-content').forEach(p => p.classList.remove('show'));
+        document.querySelector(`.cp-panel-content[data-tab="${btn.dataset.tab}"]`)?.classList.add('show');
+      });
+    });
+
+    /* ── Helpers ── */
+    const showMsg    = (el, text, type) => { el.textContent = text; el.className = `cp-msg show ${type}`; setTimeout(() => el.classList.remove('show'), 5000); };
+    const showErr    = (id, txt) => { const e = document.getElementById(id); if (e) { e.textContent = txt; e.classList.add('show'); } };
+    const clearErr   = (id)      => document.getElementById(id)?.classList.remove('show');
+    const fmtDate    = (v, opts = { year:'numeric', month:'long', day:'numeric' }) => v ? new Date(v).toLocaleDateString('ar-EG', opts) : '—';
+
+    /* ── Load profile ── */
+    const loadProfile = async () => {
+      try {
+        const res  = await fetch('api/customer-login.php?action=check', { credentials: 'same-origin' });
+        const data = await res.json();
+        if (!data.authenticated) { window.location.href = 'customer-login.html'; return; }
+
+        const pRes  = await fetch('api/customer-profile.php', { credentials: 'same-origin' });
+        const pData = await pRes.json();
+        if (!pRes.ok || !pData.ok) return;
+        currentCustomer = pData.customer;
+        displayProfile();
+      } catch { window.location.href = 'customer-login.html'; }
+    };
+
+    const displayProfile = () => {
+      if (!currentCustomer) return;
+      const c = currentCustomer;
+
+      document.getElementById('profileAvatar').textContent  = (c.name?.charAt(0) || '—').toUpperCase();
+      document.getElementById('profileName').textContent    = c.name  || '—';
+      document.getElementById('profileEmail').textContent   = c.email || '—';
+      document.getElementById('profilePhone').textContent   = c.phone || '—';
+      document.getElementById('fullName').value             = c.name  || '';
+      document.getElementById('email').value                = c.email || '';
+      document.getElementById('phone').value                = c.phone || '';
+      document.getElementById('joinDate').textContent       = fmtDate(c.created_at);
+      document.getElementById('lastLogin').textContent      = c.last_login ? fmtDate(c.last_login) : 'الآن';
+      document.getElementById('bookingCount').textContent   = c.booking_count || '0';
+      document.getElementById('heroBookingCount').textContent = c.booking_count || '0';
+      document.getElementById('heroJoinYear').textContent   = c.created_at ? new Date(c.created_at).getFullYear() : '—';
+    };
+
+    /* ── Save personal ── */
+    document.getElementById('savePersonalBtn')?.addEventListener('click', async () => {
+      const name  = document.getElementById('fullName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const msg   = document.getElementById('personalMessage');
+      const btn   = document.getElementById('savePersonalBtn');
+      let err = false;
+      if (!name  || !/^[\p{L}\s]{2,80}$/u.test(name))  { showErr('nameError',  'الاسم 2-80 حرف');           err = true; } else clearErr('nameError');
+      if (!phone || !/^01[0125][0-9]{8}$/.test(phone)) { showErr('phoneError', 'رقم موبايل غير صحيح');     err = true; } else clearErr('phoneError');
+      if (err) return;
+      btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+      try {
+        const res  = await csrfFetch('api/customer-profile.php', { method: 'PATCH', body: JSON.stringify({ name, phone }) });
+        const data = await res.json();
+        if (!res.ok || !data.ok) { showMsg(msg, data.message || 'فشل الحفظ', 'error'); return; }
+        showMsg(msg, 'تم حفظ التغييرات ✓', 'success');
+        await new Promise(r => setTimeout(r, 1200));
+        await loadProfile();
+      } catch { showMsg(msg, 'خطأ في الاتصال', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'حفظ التغييرات'; }
+    });
+
+    document.getElementById('cancelPersonalBtn')?.addEventListener('click', () => {
+      displayProfile();
+      document.getElementById('personalMessage').classList.remove('show');
+    });
+
+    /* ── Change password ── */
+    document.getElementById('changePasswordBtn')?.addEventListener('click', async () => {
+      const current = document.getElementById('currentPassword').value;
+      const newP    = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      const msg     = document.getElementById('passwordMessage');
+      const btn     = document.getElementById('changePasswordBtn');
+      let err = false;
+      if (!current)          { showErr('currentPassError', 'أدخل كلمة المرور الحالية'); err = true; } else clearErr('currentPassError');
+      if (!newP || newP.length < 6) { showErr('newPassError', '6 أحرف على الأقل'); err = true; } else clearErr('newPassError');
+      if (newP !== confirm)  { showErr('confirmPassError', 'كلمات المرور غير متطابقة'); err = true; } else clearErr('confirmPassError');
+      if (err) return;
+      btn.disabled = true; btn.textContent = 'جاري التحديث...';
+      try {
+        const res  = await csrfFetch('api/customer-profile.php', { method: 'PATCH', body: JSON.stringify({ current_password: current, new_password: newP }) });
+        const data = await res.json();
+        if (!res.ok || !data.ok) { showMsg(msg, data.message || 'فشل التحديث', 'error'); return; }
+        showMsg(msg, 'تم تحديث كلمة المرور ✓', 'success');
+        ['currentPassword','newPassword','confirmPassword'].forEach(id => document.getElementById(id).value = '');
+        setTimeout(() => window.location.href = 'customer-bookings.html', 1500);
+      } catch { showMsg(msg, 'خطأ في الاتصال', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'تحديث كلمة المرور'; }
+    });
+
+    document.getElementById('cancelPasswordBtn')?.addEventListener('click', () => {
+      ['currentPassword','newPassword','confirmPassword'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('passwordMessage').classList.remove('show');
+    });
+
+    /* ── Logout ── */
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      if (!confirm('هل تريد تسجيل الخروج؟')) return;
+      await fetch('api/customer-login.php', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout' })
+      }).catch(() => {});
+      window.location.href = 'customer-login.html';
+    });
+
+    /* ── Loyalty / Rewards ── */
+    const CP_TIERS = [
+      { min:0,  max:2,  name:'Bronze', emoji:'🥉' },
+      { min:3,  max:9,  name:'Silver', emoji:'🥈' },
+      { min:10, max:Infinity, name:'Gold', emoji:'🏆' },
+    ];
+    const CP_REWARD_ICONS = { r25:'🎫', r50:'🎟️', r100:'🏷️', r200:'💳' };
+    let cpRewardsLoaded = false;
+
+    const loadRewards = async () => {
+      if (cpRewardsLoaded) return;
+      cpRewardsLoaded = true;
+
+      try {
+        const res  = await fetch('api/loyalty.php', { credentials:'same-origin' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) return;
+
+        const { balance, rewards, history, next } = data;
+        const n        = Number(balance) || 0;
+        const tier     = CP_TIERS.find(t => n >= t.min && n <= t.max) || CP_TIERS[0];
+        const tierIdx  = CP_TIERS.indexOf(tier);
+        const nextT    = CP_TIERS[tierIdx + 1];
+
+        /* Balance display */
+        const el = document.getElementById('cpPointsBalance');
+        if (el) el.textContent = n.toLocaleString('ar-EG');
+        const nextEl = document.getElementById('cpPointsNext');
+        if (nextEl) nextEl.textContent = next ? `${(next.points - n)} نقطة للحصول على ${next.label}` : 'وصلت لأعلى مستوى! 🏆';
+        document.getElementById('cpTierEmoji').textContent = tier.emoji;
+        document.getElementById('cpTierName').textContent  = tier.name;
+
+        /* Progress bar */
+        const bar = document.getElementById('cpLoyaltyBar');
+        if (bar && nextT) {
+          bar.style.width = Math.min(((n - tier.min) / (nextT.min - tier.min)) * 100, 100) + '%';
+        } else if (bar) { bar.style.width = '100%'; }
+
+        /* Tier milestone highlights */
+        [0, 1, 2].forEach(i => {
+          const ms = document.getElementById('loyMs' + i);
+          if (!ms) return;
+          ms.classList.remove('reached', 'active');
+          if (i < tierIdx) ms.classList.add('reached');
+          else if (i === tierIdx) ms.classList.add('active');
+        });
+
+        /* Badge on tab */
+        const badge = document.getElementById('rewardsTabBadge');
+        if (badge && n > 0) { badge.textContent = n; badge.style.display = ''; }
+
+        /* Sidebar mini-card */
+        const sidebar = document.getElementById('cpLoyaltySidebar');
+        if (sidebar) { sidebar.style.display = ''; }
+        const sbPts  = document.getElementById('cpSidebarPts');
+        const sbTier = document.getElementById('cpSidebarTier');
+        if (sbPts)  sbPts.textContent  = n.toLocaleString('ar-EG');
+        if (sbTier) sbTier.textContent = `${tier.emoji} ${tier.name}`;
+
+        /* Stats strip */
+        const totalEarned = history.filter(h => h.points > 0).reduce((a, h) => a + h.points, 0);
+        const totalSpent  = Math.abs(history.filter(h => h.points < 0).reduce((a, h) => a + h.points, 0));
+        const availCount  = rewards.filter(r => r.available).length;
+        const strip = document.getElementById('loyStatsStrip');
+        if (strip) {
+          document.getElementById('loyTotalEarned').textContent = '+' + totalEarned.toLocaleString('ar-EG');
+          document.getElementById('loyTotalSpent').textContent  = '-' + totalSpent.toLocaleString('ar-EG');
+          document.getElementById('loyAvailCount').textContent  = availCount;
+          strip.style.display = '';
+        }
+
+        /* Rewards list */
+        const listEl = document.getElementById('cpRewardsList');
+        if (listEl) {
+          if (rewards.length) {
+            listEl.innerHTML = rewards.map(r => `
+              <div class="loy-reward-card${r.available ? ' loy-reward-card--available' : ''}">
+                <div class="loy-reward-card__icon">${CP_REWARD_ICONS[r.id] || '🎁'}</div>
+                <div class="loy-reward-card__body">
+                  <strong class="loy-reward-card__name">${r.label}</strong>
+                  <small class="loy-reward-card__desc">${r.desc}</small>
+                </div>
+                <div class="loy-reward-card__foot">
+                  <span class="loy-reward-card__pts">${r.points.toLocaleString('ar-EG')} <small>نقطة</small></span>
+                  ${r.available
+                    ? `<button class="btn btn-primary loy-reward-card__btn" data-redeem="${r.id}" type="button">استرداد</button>`
+                    : `<span class="loy-reward-card__locked">🔒</span>`}
+                </div>
+              </div>`).join('');
+          } else {
+            listEl.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:.88rem;grid-column:1/-1">لا توجد مكافآت حالياً</div>';
+          }
+        }
+
+        /* History */
+        const histEl = document.getElementById('cpPointsHistory');
+        if (histEl) {
+          if (history.length) {
+            const fmtH = v => v ? new Date(v).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' }) : '';
+            histEl.innerHTML = history.map(h => {
+              const isEarn = h.points > 0;
+              return `<div class="loy-hist-item">
+                <div class="loy-hist-item__icon loy-hist-item__icon--${isEarn ? 'earn' : 'spend'}">${isEarn ? '↑' : '↓'}</div>
+                <div class="loy-hist-item__body">
+                  <strong>${h.note || 'نقاط'}</strong>
+                  <small>${fmtH(h.created_at)}</small>
+                </div>
+                <span class="loy-hist-item__pts loy-hist-item__pts--${isEarn ? 'earn' : 'spend'}">${isEarn ? '+' : ''}${h.points}</span>
+              </div>`;
+            }).join('');
+          } else {
+            histEl.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:.85rem">لا يوجد سجل حتى الآن. أكمل حجزك الأول لتبدأ في كسب النقاط!</div>';
+          }
+        }
+
+      } catch { /* silent */ }
+    };
+
+    /* Redeem (delegated) */
+    document.getElementById('cpRewardsList')?.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-redeem]');
+      if (!btn) return;
+      const rewardId = btn.dataset.redeem;
+      if (!confirm('هل تريد استرداد هذه المكافأة؟ ستُخصم النقاط من رصيدك فوراً.')) return;
+      btn.disabled = true; btn.textContent = '...';
+      try {
+        const res  = await csrfFetch('api/loyalty.php', { method:'POST', body:JSON.stringify({reward_id:rewardId}) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) { alert(data.message || 'حدث خطأ'); btn.disabled=false; btn.textContent='استرداد'; return; }
+
+        const reveal = document.getElementById('cpCouponReveal');
+        const codeEl = document.getElementById('cpCouponCode');
+        const expEl  = document.getElementById('cpCouponExpiry');
+        if (reveal && codeEl) {
+          codeEl.textContent = data.coupon_code;
+          if (expEl && data.expires_at) expEl.textContent = 'صالح حتى: ' + new Date(data.expires_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+          reveal.style.display = '';
+          reveal.scrollIntoView({ behavior:'smooth', block:'nearest' });
+          codeEl.addEventListener('click', () => {
+            navigator.clipboard?.writeText(data.coupon_code).then(() => {
+              codeEl.textContent = '✓ تم النسخ!';
+              setTimeout(() => { codeEl.textContent = data.coupon_code; }, 1500);
+            });
+          });
+        }
+
+        cpRewardsLoaded = false;
+        await loadRewards();
+      } catch { alert('خطأ في الاتصال'); btn.disabled=false; btn.textContent='استرداد'; }
+    });
+
+    /* Load rewards when tab clicked */
+    document.querySelector('.cp-tab[data-tab="rewards"]')?.addEventListener('click', () => {
+      setTimeout(loadRewards, 50);
+    });
+
+    /* Referral card */
+    const loadReferral = async () => {
+      try {
+        const res  = await fetch('api/referral.php', { credentials: 'same-origin' });
+        const data = await res.json();
+        if (!data.ok) return;
+        const codeEl  = document.getElementById('cpRefCode');
+        const countEl = document.getElementById('cpRefCount');
+        const ptsEl   = document.getElementById('cpRefPts');
+        if (codeEl)  codeEl.textContent  = data.referral_code  || '—';
+        if (countEl) countEl.textContent = data.referred_count ?? 0;
+        if (ptsEl)   ptsEl.textContent   = data.points_earned  ?? 0;
+      } catch {}
+    };
+
+    document.getElementById('cpCopyRef')?.addEventListener('click', () => {
+      const code = document.getElementById('cpRefCode')?.textContent?.trim();
+      if (!code || code === '—') return;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('cpCopyRef');
+        btn.textContent = '✅';
+        setTimeout(() => { btn.textContent = '📋'; }, 2000);
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => { loadProfile(); loadReferral(); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd21f">
+  <title>DR.Care | تسجيل الدخول</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-mark" style="width:64px;height:64px;border-radius:16px;background:var(--yellow);display:inline-flex;align-items:center;justify-content:center;color:#0a0800;font-size:1.4rem;font-weight:900;font-family:'Montserrat',sans-serif;margin-bottom:18px;box-shadow:0 8px 32px rgba(255,210,31,0.35);">DR</div>
+        <h1>DR.Care</h1>
+        <p>حسابك الشخصي</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" data-tab="login">تسجيل دخول</button>
+        <button class="tab-btn" data-tab="register">حساب جديد</button>
+      </div>
+
+      <!-- Login Form -->
+      <form class="auth-form show" id="loginForm" data-tab="login" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">البريد الإلكتروني</label>
+          <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">كلمة المرور</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button class="auth-btn" type="submit" id="loginBtn">تسجيل الدخول</button>
+        <div class="auth-message" id="loginMessage" role="status" aria-live="polite"></div>
+        <div style="text-align:center;margin-top:.75rem;">
+          <a href="forgot-password.html" style="color:var(--yellow);font-size:0.88rem;text-decoration:none;opacity:.85;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">نسيت كلمة مرورك؟</a>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form class="auth-form" id="registerForm" data-tab="register" novalidate>
+        <div class="form-group">
+          <label for="registerName">الاسم الكامل</label>
+          <input type="text" id="registerName" placeholder="أحمد محمد" autocomplete="name" required>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">البريد الإلكتروني</label>
+          <input type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPhone">رقم الموبايل</label>
+          <input type="tel" id="registerPhone" placeholder="01012345678" autocomplete="tel" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">كلمة المرور</label>
+          <input type="password" id="registerPassword" placeholder="••••••••" autocomplete="new-password" required>
+        </div>
+        <div class="form-group">
+          <label for="registerConfirm">تأكيد كلمة المرور</label>
+          <input type="password" id="registerConfirm" placeholder="••••••••" autocomplete="new-password" required>
+        </div>
+        <button class="auth-btn" type="submit" id="registerBtn">إنشاء حساب</button>
+        <div class="auth-message" id="registerMessage" role="status" aria-live="polite"></div>
+      </form>
+
+      <div class="auth-footer">
+        <a id="backLink" href="index.html">← العودة للموقع</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const forms = document.querySelectorAll('.auth-form');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        forms.forEach(f => f.classList.remove('show'));
+        document.querySelector(`.auth-form[data-tab="${btn.dataset.tab}"]`)?.classList.add('show');
+      });
+    });
+
+    function showMsg(el, text, type) {
+      el.textContent = text;
+      el.className = `auth-message show ${type}`;
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    const isServedOverHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+    if (!isServedOverHttp) {
+      const warning = 'يجب فتح الصفحة من خلال خادم محلي (http://localhost) وليس مباشرة من ملف.';
+      ['loginMessage', 'registerMessage'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) showMsg(el, warning, 'error');
+      });
+      ['loginBtn', 'registerBtn'].forEach((id) => document.getElementById(id)?.setAttribute('disabled', 'disabled'));
+    }
+
+    async function parseJsonResponse(res) {
+      const contentType = res.headers.get('Content-Type') || '';
+      const text = await res.text();
+      if (!contentType.includes('application/json')) {
+        throw new Error('الرد من الخادم ليس JSON. تأكد من تشغيل خادم PHP.\n' + text.slice(0, 180));
+      }
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        throw new Error('تعذر تحليل JSON من الخادم. ' + error.message + '\n' + text.slice(0, 180));
+      }
+    }
+
+    const isMobile = () => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && window.innerWidth <= 900;
+    if (isMobile()) {
+      window.location.replace('mobile-bookings.html');
+    }
+
+    /* Return to previous page after login if user came from booking form */
+    const returnUrl = new URLSearchParams(location.search).get('return') || null;
+    const bookingsPage = () => {
+      if (returnUrl) return decodeURIComponent(returnUrl);
+      return isMobile() ? 'mobile-bookings.html' : 'customer-bookings.html';
+    };
+
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const msg = document.getElementById('loginMessage');
+      const btn = document.getElementById('loginBtn');
+      if (!email || !password) { showMsg(msg,'يجب ملء جميع الحقول','error'); return; }
+      btn.disabled = true; btn.textContent = 'جاري التحقق...';
+      try {
+        const res = await fetch('api/customer-login.php', { method:'POST', credentials: 'same-origin', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({email,password,action:'login'}) });
+        const data = await parseJsonResponse(res);
+        if (!res.ok || !data.ok) { showMsg(msg, data.message||'فشل تسجيل الدخول','error'); return; }
+        showMsg(msg,'تم تسجيل الدخول بنجاح!','success');
+        setTimeout(() => window.location.href = bookingsPage(), 900);
+      } catch(err) { showMsg(msg, 'خطأ: ' + err.message, 'error'); }
+      finally { btn.disabled=false; btn.textContent='تسجيل الدخول'; }
+    });
+
+    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('registerName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const phone = document.getElementById('registerPhone').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const confirm = document.getElementById('registerConfirm').value;
+      const msg = document.getElementById('registerMessage');
+      const btn = document.getElementById('registerBtn');
+      if (!name||!email||!phone||!password||!confirm) { showMsg(msg,'يجب ملء جميع الحقول','error'); return; }
+      if (password !== confirm) { showMsg(msg,'كلمات المرور غير متطابقة','error'); return; }
+      if (!/^01[0125][0-9]{8}$/.test(phone)) { showMsg(msg,'رقم الموبايل غير صحيح','error'); return; }
+      btn.disabled=true; btn.textContent='جاري الإنشاء...';
+      try {
+        const res = await fetch('api/customer-login.php', { method:'POST', credentials: 'same-origin', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({name,email,phone,password,action:'register'}) });
+        const data = await parseJsonResponse(res);
+        if (!res.ok||!data.ok) { showMsg(msg, data.message||'فشل إنشاء الحساب','error'); return; }
+        showMsg(msg,'تم إنشاء الحساب بنجاح!','success');
+        setTimeout(() => window.location.href = bookingsPage(), 900);
+      } catch(err) { showMsg(msg, 'خطأ: ' + err.message, 'error'); }
+      finally { btn.disabled=false; btn.textContent='إنشاء حساب'; }
+    });
+  </script>
+</body>
+</html>

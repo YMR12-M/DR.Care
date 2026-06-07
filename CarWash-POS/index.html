@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DR.Care POS | نظام نقاط البيع</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+</head>
+<body>
+
+  <!-- ── STICKY HEADER ── -->
+  <header class="pos-header">
+    <div class="pos-header__inner">
+
+      <div class="pos-brand">
+        <div class="pos-brand__mark">DR</div>
+        <div class="pos-brand__text">
+          <strong>DR.Care <span class="pos-tag">POS</span></strong>
+          <small>نظام الفواتير الداخلي</small>
+        </div>
+      </div>
+
+      <!-- Today stats -->
+      <div class="pos-today-stats" id="todayStats" style="display:none">
+        <div class="pos-today-stat">
+          <span>فواتير اليوم</span>
+          <strong id="statCount">0</strong>
+        </div>
+        <div class="pos-today-sep"></div>
+        <div class="pos-today-stat">
+          <span>إيراد اليوم</span>
+          <strong id="statRevenue" class="stat-gold">—</strong>
+        </div>
+      </div>
+
+      <div class="pos-clock" id="posClock" aria-live="off">—</div>
+
+      <div class="pos-header__end">
+        <div class="pos-conn" id="posConn" role="status">
+          <span class="pos-conn__dot"></span>
+          <span id="posConnLabel">جاري الاتصال...</span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── MAIN GRID ── -->
+  <div class="page-shell">
+    <main class="pos-main">
+
+      <!-- ══ LEFT: FORM ══ -->
+      <section class="pos-panel">
+
+        <div class="panel-head">
+          <div class="panel-head__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <p class="panel-head__kicker">New Invoice</p>
+            <h1 class="panel-head__title">إصدار فاتورة جديدة</h1>
+          </div>
+        </div>
+
+        <div class="pos-body">
+
+          <!-- Token -->
+          <div class="pos-token-strip">
+            <label for="posToken">رمز الموظف</label>
+            <input id="posToken" type="password" placeholder="••••••••" autocomplete="off">
+          </div>
+
+          <form id="posForm" autocomplete="off">
+
+            <!-- Packages -->
+            <p class="pos-kicker">Service Package</p>
+            <div class="packages-grid" id="packageGrid">
+              <button type="button" class="package-card" data-code="quick" data-price="150" aria-pressed="false">
+                <span class="pkg-icon">⚡</span>
+                <span class="pkg-label">Quick Wash</span>
+                <strong>غسلة سريعة</strong>
+                <div class="pkg-price"><small>ج</small>150</div>
+                <p>غسيل خارجي، فوم، تنشيف، تنظيف زجاج</p>
+              </button>
+              <button type="button" class="package-card" data-code="full" data-price="280" aria-pressed="false">
+                <span class="pkg-icon">✨</span>
+                <span class="pkg-label">Full Service</span>
+                <strong>Full Care</strong>
+                <div class="pkg-price"><small>ج</small>280</div>
+                <p>غسيل داخلي وخارجي، تعطير، تنظيف شامل</p>
+              </button>
+              <button type="button" class="package-card" data-code="detail" data-price="650" aria-pressed="false">
+                <span class="pkg-icon">🏆</span>
+                <span class="pkg-label">Premium Detail</span>
+                <strong>دكتور العربية</strong>
+                <div class="pkg-price"><small>ج</small>650</div>
+                <p>تنظيف عميق، تلميع، واكس حماية كاملة</p>
+              </button>
+              <button type="button" class="package-card" data-code="fleet" data-price="0" aria-pressed="false">
+                <span class="pkg-icon">🏢</span>
+                <span class="pkg-label">Corporate Fleet</span>
+                <strong>باقات الشركات</strong>
+                <div class="pkg-price pkg-price--contract">حسب التعاقد</div>
+                <p>عقود وتنسيق مخصص للأسطول التجاري</p>
+              </button>
+            </div>
+
+            <!-- Customer info -->
+            <p class="pos-kicker">Customer Info</p>
+            <div class="form-grid">
+              <label class="m-form__label"><span>اسم العميل</span><input id="customerName" type="text" placeholder="محمد علي" required></label>
+              <label class="m-form__label"><span>رقم اللوحة</span><input id="plateNumber" type="text" placeholder="أ ب ج ١٢٣٤" autocapitalize="characters" required></label>
+              <label class="m-form__label"><span>رقم الهاتف</span><input id="customerPhone" type="tel" placeholder="01001234567" inputmode="numeric" required></label>
+              <label class="m-form__label"><span>البريد (اختياري)</span><input id="customerEmail" type="email" placeholder="example@mail.com" inputmode="email"></label>
+            </div>
+
+            <!-- Service details -->
+            <p class="pos-kicker">Service Details</p>
+            <div class="form-grid">
+              <label class="m-form__label"><span>نوع السيارة</span>
+                <select id="carType">
+                  <option value="sedan" data-extra="0">سيدان</option>
+                  <option value="suv"   data-extra="60">SUV (+60 ج)</option>
+                  <option value="van"   data-extra="90">فان (+90 ج)</option>
+                  <option value="pickup" data-extra="120">نقل خفيف (+120 ج)</option>
+                </select>
+              </label>
+              <label class="m-form__label"><span>الفرع</span>
+                <select id="branch">
+                  <option value="القاهرة الجديدة">القاهرة الجديدة</option>
+                  <option value="مدينة نصر">مدينة نصر</option>
+                  <option value="الشيخ زايد">الشيخ زايد</option>
+                </select>
+              </label>
+              <label class="m-form__label"><span>طريقة الدفع</span>
+                <select id="paymentMethod">
+                  <option value="كاش">كاش</option>
+                  <option value="بطاقة بنكية">بطاقة بنكية</option>
+                  <option value="محفظة إلكترونية">محفظة إلكترونية</option>
+                </select>
+              </label>
+            </div>
+
+            <!-- Notes -->
+            <p class="pos-kicker">Notes</p>
+            <label class="m-form__label" style="display:block">
+              <span>ملاحظات (اختياري)</span>
+              <textarea id="posNotes" rows="2" placeholder="أي تفاصيل إضافية عن السيارة أو الخدمة…" style="resize:vertical;min-height:64px"></textarea>
+            </label>
+
+            <!-- Discounts -->
+            <p class="pos-kicker">Discounts</p>
+            <div class="pos-discount-strip">
+              <div class="pos-coupon-row">
+                <label class="m-form__label" style="flex:1;min-width:0">
+                  <span>كود الخصم</span>
+                  <input id="couponInput" type="text" placeholder="SUMMER25" autocapitalize="characters" autocomplete="off">
+                </label>
+                <button type="button" id="couponApplyBtn" class="btn-ghost pos-coupon-btn">تحقق</button>
+                <button type="button" id="couponClearBtn" class="btn-ghost pos-coupon-btn" style="display:none;color:var(--error)">✕ مسح</button>
+              </div>
+              <div id="couponMsg" class="pos-coupon-msg" style="display:none"></div>
+              <div class="form-grid" style="margin-top:10px">
+                <label class="m-form__label">
+                  <span>خصم يدوي</span>
+                  <input id="manualDiscAmount" type="number" min="0" max="99999" step="1" placeholder="0" inputmode="numeric">
+                </label>
+                <label class="m-form__label">
+                  <span>نوع الخصم</span>
+                  <select id="manualDiscType">
+                    <option value="fixed">جنيه ثابت</option>
+                    <option value="percent">نسبة % من الإجمالي</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="actions-row">
+              <button type="submit" class="btn-primary" id="submitBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                إنشاء الفاتورة
+              </button>
+              <button type="button" id="resetBtn" class="btn-ghost">مسح</button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+      <!-- ══ RIGHT: INVOICE ══ -->
+      <section class="invoice-panel" id="invoicePanel">
+
+        <div class="invoice-empty" id="invoiceEmpty">
+          <span class="invoice-empty__icon">🧾</span>
+          <p>الفاتورة ستظهر هنا</p>
+          <small>اختار الباقة وأدخل بيانات العميل</small>
+        </div>
+
+        <div class="invoice-card" id="invoiceCard" style="display:none">
+          <div class="invoice-brand">
+            <div class="invoice-brand__mark">DR</div>
+            <div class="invoice-brand__text">
+              <strong>DR.Care</strong>
+              <small>مغسلة عربيات مصرية</small>
+            </div>
+            <span class="invoice-num" id="invoiceNumBadge">#—</span>
+          </div>
+          <div class="invoice-date-bar" id="invoiceDate">—</div>
+          <div class="invoice-info-grid">
+            <div class="inv-cell"><label>العميل</label><value id="invoiceName">—</value></div>
+            <div class="inv-cell"><label>اللوحة</label><value id="invoicePlate">—</value></div>
+            <div class="inv-cell"><label>الهاتف</label><value id="invoicePhone">—</value></div>
+            <div class="inv-cell"><label>الفرع</label><value id="invoiceBranch">—</value></div>
+            <div class="inv-cell"><label>نوع السيارة</label><value id="invoiceCarType">—</value></div>
+            <div class="inv-cell"><label>الدفع</label><value id="invoicePayment">—</value></div>
+          </div>
+          <div class="invoice-items" id="invoiceItems"></div>
+          <div class="invoice-totals">
+            <div class="inv-total-row"><span>الخدمة</span><span id="subtotalValue">—</span></div>
+            <div class="inv-total-row"><span>إضافة نوع السيارة</span><span id="carExtraValue">—</span></div>
+            <div class="inv-total-row" id="discountRow" style="display:none;color:var(--success)"><span id="discountLabel">خصم</span><span id="discountValue">—</span></div>
+            <div class="inv-total-row inv-total-grand"><span>الإجمالي</span><span id="totalValue">—</span></div>
+          </div>
+          <div class="invoice-footer">شكراً لاختيارك DR.Care 🚗✨</div>
+          <div id="invoiceQr" class="invoice-qr-wrap" style="display:none"></div>
+          <div class="invoice-actions">
+            <button type="button" id="printBtn" class="btn-primary btn-print">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              طباعة
+            </button>
+            <button type="button" id="newInvoiceBtn" class="btn-ghost">فاتورة جديدة</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ══ BOTTOM: LOG + SEARCH ══ -->
+    <section class="pos-bottom" id="posBottom" style="display:none">
+
+      <!-- Tabs -->
+      <div class="pos-bottom-tabs">
+        <button class="pos-bottom-tab active" data-tab="log">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          سجل اليوم
+          <span class="pos-bottom-count" id="logCount">0</span>
+        </button>
+        <button class="pos-bottom-tab" data-tab="history">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4"/><polyline points="3 16 3.05 11 8 11"/></svg>
+          كل الفواتير
+        </button>
+        <button class="pos-bottom-tab" data-tab="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          بحث وتعديل
+        </button>
+        <button class="pos-bottom-tab" data-tab="stats">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          إحصائيات
+        </button>
+      </div>
+
+      <!-- Daily log -->
+      <div class="pos-tab-content" id="tab-log">
+        <div class="pos-log-table-wrap">
+          <table class="pos-log-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>العميل</th>
+                <th>اللوحة</th>
+                <th>الباقة</th>
+                <th>الإجمالي</th>
+                <th>الحالة</th>
+                <th>الوقت</th>
+                <th>تحديث الحالة</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="logBody">
+              <tr><td colspan="9" class="pos-log-empty">لا توجد فواتير اليوم</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="pos-tab-content" id="tab-history" style="display:none">
+        <div style="padding:12px 16px;display:flex;gap:10px;align-items:center">
+          <button type="button" id="loadHistoryBtn" class="btn-primary" style="height:38px;padding:0 18px;font-size:0.85rem">تحميل الكل</button>
+          <span id="historyMeta" style="font-size:0.8rem;color:var(--muted)">اضغط تحميل لعرض كل الفواتير</span>
+        </div>
+        <div class="pos-log-table-wrap" id="historyResults">
+          <p class="pos-log-empty" style="padding:32px;text-align:center">اضغط "تحميل الكل" لعرض السجل الكامل</p>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="pos-tab-content" id="tab-search" style="display:none">
+        <div class="pos-search-bar">
+          <input type="search" id="searchQuery" class="pos-search-input" placeholder="ابحث بالاسم أو رقم الموبايل أو رقم اللوحة...">
+          <button type="button" id="searchBtn" class="btn-primary" style="height:44px;padding:0 20px;flex-shrink:0">بحث</button>
+        </div>
+        <div class="pos-log-table-wrap" id="searchResults">
+          <p class="pos-log-empty" style="padding:32px;text-align:center">ابحث للعثور على حجز</p>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="pos-tab-content" id="tab-stats" style="display:none">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+          <input type="date" id="statsDate" class="pos-search-input" style="width:170px;height:38px;flex:none">
+          <button type="button" id="loadStatsBtn" class="btn-primary" style="height:38px;padding:0 18px;font-size:0.85rem">تحميل</button>
+          <span id="statsMeta" style="font-size:0.8rem;color:#9e9689"></span>
+        </div>
+        <div id="statsContent">
+          <p class="pos-log-empty" style="padding:32px;text-align:center">اضغط "تحميل" لعرض إحصائيات اليوم</p>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

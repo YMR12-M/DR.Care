@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd21f">
+  <title>DR.Care | تتبع حجزك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .claim-shell {
+      min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 16px;
+    }
+    .claim-card {
+      width: 100%; max-width: 440px;
+      background: var(--panel);
+      border: 1px solid var(--yellow-line);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,210,31,.08);
+    }
+    .claim-head {
+      background: linear-gradient(135deg, rgba(255,210,31,.12) 0%, transparent 60%);
+      padding: 28px 28px 20px;
+      border-bottom: 1px solid var(--panel-3);
+      text-align: center;
+    }
+    .claim-brand {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--yellow); color: #0a0800;
+      font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.1rem;
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 28px rgba(255,210,31,.35);
+    }
+    .claim-head h1 { font-size: 1.15rem; font-weight: 900; margin-bottom: 4px; }
+    .claim-head p  { font-size: .82rem; color: var(--muted); }
+
+    .claim-booking-card {
+      margin: 20px; padding: 16px;
+      background: var(--panel-2);
+      border: 1px solid var(--panel-4);
+      border-radius: 14px;
+    }
+    .claim-booking-card__row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--panel-3); font-size: .85rem;
+    }
+    .claim-booking-card__row:last-child { border-bottom: none; padding-bottom: 0; }
+    .claim-booking-card__row label { color: var(--muted); font-size: .78rem; }
+    .claim-booking-card__row value { font-weight: 700; color: var(--white); }
+
+    .claim-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 800;
+    }
+    .claim-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .claim-status--new        { background: rgba(255,210,31,.12); color: var(--yellow); }
+    .claim-status--confirmed  { background: rgba(91,164,245,.12); color: #5ba4f5; }
+    .claim-status--in_service { background: rgba(245,166,35,.12); color: #f5a623; }
+    .claim-status--completed  { background: rgba(111,207,71,.12); color: #6fcf47; }
+    .claim-status--cancelled  { background: rgba(240,83,62,.08);  color: #f0533e; }
+
+    .claim-body { padding: 0 20px 24px; }
+
+    .claim-section-title {
+      font-size: .68rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    }
+
+    /* Auth mini-form */
+    .claim-auth-tabs { display: flex; gap: 4px; margin-bottom: 14px; background: var(--panel-3); border-radius: 10px; padding: 4px; }
+    .claim-auth-tab  {
+      flex: 1; padding: 8px; border: none; background: none;
+      border-radius: 7px; font-family: inherit; font-size: .82rem; font-weight: 700;
+      color: var(--muted); cursor: pointer; transition: all .2s;
+    }
+    .claim-auth-tab.active { background: var(--panel-2); color: var(--yellow); box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+
+    .claim-input {
+      width: 100%; height: 46px; padding: 0 14px; margin-bottom: 10px;
+      background: var(--panel-2); border: 1px solid var(--panel-4);
+      border-radius: 10px; color: var(--white); font-family: inherit; font-size: .88rem;
+      outline: none; transition: border-color .2s;
+    }
+    .claim-input:focus { border-color: var(--yellow-line); }
+    .claim-input::placeholder { color: var(--muted); }
+
+    .claim-btn {
+      width: 100%; height: 48px; border: none; border-radius: 12px;
+      background: var(--yellow); color: #0a0800;
+      font-family: inherit; font-size: .9rem; font-weight: 900;
+      cursor: pointer; transition: opacity .2s, transform .15s;
+    }
+    .claim-btn:hover:not(:disabled) { opacity: .9; }
+    .claim-btn:active { transform: scale(.98); }
+    .claim-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .claim-btn--ghost {
+      background: var(--panel-2); color: var(--white);
+      border: 1px solid var(--panel-4);
+    }
+
+    .claim-msg {
+      padding: 10px 14px; border-radius: 10px;
+      font-size: .82rem; font-weight: 700; margin-bottom: 12px; display: none;
+    }
+    .claim-msg--ok    { background: rgba(111,207,71,.1);  color: #6fcf47; }
+    .claim-msg--error { background: rgba(240,83,62,.08);  color: #f0533e; }
+    .claim-msg--info  { background: rgba(255,210,31,.08); color: var(--yellow); }
+
+    .claim-success-icon { font-size: 3rem; text-align: center; margin: 8px 0 12px; display: block; }
+  </style>
+</head>
+<body>
+<div class="claim-shell">
+  <div class="claim-card">
+
+    <div class="claim-head">
+      <div class="claim-brand">DR</div>
+      <h1>تتبّع حجزك</h1>
+      <p>سكّن QR الفاتورة واربط الحجز بحسابك</p>
+    </div>
+
+    <!-- Loading -->
+    <div id="stateLoading" style="padding:40px;text-align:center;color:var(--muted)">
+      <div style="font-size:1.4rem;margin-bottom:8px">⏳</div>
+      جاري التحقق من الحجز…
+    </div>
+
+    <!-- Error -->
+    <div id="stateError" style="display:none;padding:32px 24px;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
+      <p id="errorMsg" style="color:var(--error);font-weight:800;margin-bottom:8px">رمز غير صالح</p>
+      <p style="color:var(--muted);font-size:.82rem">الرابط قد يكون منتهياً أو غير صحيح.</p>
+      <a href="mobile-bookings.html" style="display:inline-block;margin-top:16px;color:var(--yellow);font-size:.85rem">← الصفحة الرئيسية</a>
+    </div>
+
+    <!-- Already claimed by me -->
+    <div id="stateAlreadyMine" style="display:none;padding:24px">
+      <span class="claim-success-icon">✅</span>
+      <p style="text-align:center;font-weight:800;font-size:1rem;margin-bottom:6px">الحجز مربوط بحسابك</p>
+      <p style="text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:20px">يمكنك متابعته من حجوزاتي.</p>
+      <div id="bookingPreviewMine"></div>
+      <a href="customer-bookings.html" style="display:block;margin-top:16px">
+        <button class="claim-btn">← حجوزاتي</button>
+      </a>
+    </div>
+
+    <!-- Claimed by someone else -->
+    <div id="stateClaimedOther" style="display:none;padding:24px;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
+      <p style="font-weight:800;margin-bottom:6px">الحجز مربوط بحساب آخر</p>
+      <p style="color:var(--muted);font-size:.82rem">إذا ظننت أن هذا خطأ، تواصل مع الفرع.</p>
+    </div>
+
+    <!-- Main: booking summary + claim -->
+    <div id="stateMain" style="display:none">
+      <div id="bookingPreview"></div>
+
+      <div class="claim-body">
+
+        <!-- If logged in → just claim button -->
+        <div id="loggedInSection" style="display:none">
+          <div class="claim-msg" id="claimMsg"></div>
+          <button class="claim-btn" id="claimBtn">ربط الحجز بحسابي</button>
+        </div>
+
+        <!-- If not logged in → login/register tabs -->
+        <div id="authSection" style="display:none">
+          <p class="claim-section-title" style="margin-bottom:14px">سجّل دخولك لربط الحجز بحسابك</p>
+
+          <div class="claim-auth-tabs">
+            <button class="claim-auth-tab active" data-panel="loginPanel">تسجيل الدخول</button>
+            <button class="claim-auth-tab" data-panel="registerPanel">حساب جديد</button>
+          </div>
+
+          <!-- Login -->
+          <div id="loginPanel">
+            <div class="claim-msg" id="loginMsg"></div>
+            <input class="claim-input" id="loginEmail" type="email" placeholder="البريد الإلكتروني" inputmode="email" autocomplete="email">
+            <input class="claim-input" id="loginPassword" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+            <button class="claim-btn" id="loginBtn">دخول وربط الحجز</button>
+          </div>
+
+          <!-- Register -->
+          <div id="registerPanel" style="display:none">
+            <div class="claim-msg" id="registerMsg"></div>
+            <input class="claim-input" id="regName"     type="text"     placeholder="الاسم الكامل">
+            <input class="claim-input" id="regEmail"    type="email"    placeholder="البريد الإلكتروني" inputmode="email">
+            <input class="claim-input" id="regPhone"    type="tel"      placeholder="01xxxxxxxxx (نفس رقم الحجز)" inputmode="numeric">
+            <input class="claim-input" id="regPassword" type="password" placeholder="كلمة مرور (6 أحرف+)">
+            <button class="claim-btn" id="registerBtn">إنشاء حساب وربط الحجز</button>
+          </div>
+        </div>
+
+        <!-- Success state (after claim) -->
+        <div id="successSection" style="display:none;text-align:center">
+          <span class="claim-success-icon">🎉</span>
+          <p style="font-weight:900;font-size:1rem;margin-bottom:6px">تم ربط الحجز بحسابك!</p>
+          <p style="color:var(--muted);font-size:.82rem;margin-bottom:20px">يمكنك متابعة حالة الخدمة الآن.</p>
+          <a href="customer-bookings.html">
+            <button class="claim-btn">← عرض حجوزاتي</button>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const token = new URLSearchParams(location.search).get('token') || '';
+const STATUS_LABELS = {
+  new: 'جديد', confirmed: 'مؤكد',
+  in_service: 'قيد التنفيذ', completed: 'تم التسليم', cancelled: 'ملغي'
+};
+
+const showState = (id) => {
+  ['stateLoading','stateError','stateAlreadyMine','stateClaimedOther','stateMain']
+    .forEach(s => document.getElementById(s).style.display = s === id ? '' : 'none');
+};
+
+const showMsg = (el, text, type) => {
+  el.className = `claim-msg claim-msg--${type}`;
+  el.textContent = text;
+  el.style.display = '';
+};
+
+const bookingCard = (b) => `
+  <div class="claim-booking-card">
+    <div class="claim-booking-card__row">
+      <label>رقم الحجز</label>
+      <value style="font-family:monospace;color:var(--yellow)">#${b.id}</value>
+    </div>
+    <div class="claim-booking-card__row">
+      <label>الباقة</label><value>${b.package_name}</value>
+    </div>
+    <div class="claim-booking-card__row">
+      <label>نوع السيارة</label><value>${b.car_type_name}</value>
+    </div>
+    <div class="claim-booking-card__row">
+      <label>الفرع</label><value>${b.branch}</value>
+    </div>
+    <div class="claim-booking-card__row">
+      <label>الحالة</label>
+      <value><span class="claim-status claim-status--${b.status}">${STATUS_LABELS[b.status] || b.status}</span></value>
+    </div>
+    <div class="claim-booking-card__row">
+      <label>الموبايل المسجّل</label>
+      <value style="font-family:monospace;letter-spacing:.05em">${b.masked_phone}</value>
+    </div>
+  </div>`;
+
+let bookingData = null;
+
+/* ── Auth tabs ── */
+document.querySelectorAll('.claim-auth-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.claim-auth-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('loginPanel').style.display    = btn.dataset.panel === 'loginPanel'    ? '' : 'none';
+    document.getElementById('registerPanel').style.display = btn.dataset.panel === 'registerPanel' ? '' : 'none';
+  });
+});
+
+/* ── Claim booking (requires session) ── */
+const doClaim = async () => {
+  const res  = await fetch('api/claim-booking.php', {
+    method: 'POST', credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  return res.json().catch(() => ({}));
+};
+
+const showSuccess = () => {
+  document.getElementById('loggedInSection').style.display = 'none';
+  document.getElementById('authSection').style.display     = 'none';
+  document.getElementById('successSection').style.display  = '';
+};
+
+/* ── Logged-in claim button ── */
+document.getElementById('claimBtn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('claimBtn');
+  const msg = document.getElementById('claimMsg');
+  btn.disabled = true; btn.textContent = '⏳ جاري الربط…';
+  const data = await doClaim();
+  if (data.ok) {
+    showSuccess();
+  } else {
+    showMsg(msg, data.message || 'حدث خطأ', 'error');
+    btn.disabled = false; btn.textContent = 'ربط الحجز بحسابي';
+  }
+});
+
+/* ── Login → then claim ── */
+document.getElementById('loginBtn')?.addEventListener('click', async () => {
+  const btn      = document.getElementById('loginBtn');
+  const msg      = document.getElementById('loginMsg');
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showMsg(msg, 'أدخل البريد وكلمة المرور', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳ جاري التحقق…';
+  try {
+    const res  = await fetch('api/customer-login.php', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ action: 'login', email, password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.ok) { showMsg(msg, data.message || 'فشل تسجيل الدخول', 'error'); return; }
+
+    // Logged in → claim
+    const claim = await doClaim();
+    if (claim.ok) { showSuccess(); }
+    else { showMsg(msg, claim.message || 'تعذّر ربط الحجز', 'error'); }
+  } catch { showMsg(msg, 'خطأ في الاتصال', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'دخول وربط الحجز'; }
+});
+
+/* ── Register → then claim ── */
+document.getElementById('registerBtn')?.addEventListener('click', async () => {
+  const btn      = document.getElementById('registerBtn');
+  const msg      = document.getElementById('registerMsg');
+  const name     = document.getElementById('regName').value.trim();
+  const email    = document.getElementById('regEmail').value.trim();
+  const phone    = document.getElementById('regPhone').value.trim();
+  const password = document.getElementById('regPassword').value;
+
+  if (!name || !email || !phone || !password) {
+    showMsg(msg, 'يجب ملء جميع الحقول', 'error'); return;
+  }
+  if (password.length < 6) {
+    showMsg(msg, 'كلمة المرور 6 أحرف على الأقل', 'error'); return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ جاري الإنشاء…';
+  try {
+    const res  = await fetch('api/customer-login.php', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ action: 'register', name, email, phone, password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.ok) { showMsg(msg, data.message || 'فشل إنشاء الحساب', 'error'); return; }
+
+    // Registered → claim
+    const claim = await doClaim();
+    if (claim.ok) { showSuccess(); }
+    else {
+      // Phone mismatch is the likely error
+      showMsg(msg, claim.message || 'تعذّر ربط الحجز — تأكد أن رقم الموبايل نفس رقم الحجز', 'error');
+    }
+  } catch { showMsg(msg, 'خطأ في الاتصال', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'إنشاء حساب وربط الحجز'; }
+});
+
+/* ── Init ── */
+(async () => {
+  if (token.length !== 32) {
+    document.getElementById('errorMsg').textContent = 'رمز الحجز غير صحيح أو مكسور.';
+    showState('stateError'); return;
+  }
+
+  try {
+    const res  = await fetch(`api/claim-booking.php?token=${encodeURIComponent(token)}`, {
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json' }
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!data.ok) {
+      document.getElementById('errorMsg').textContent = data.message || 'الرمز غير صالح';
+      showState('stateError'); return;
+    }
+
+    bookingData = data.booking;
+
+    if (data.already_claimed && data.claimed_by_me) {
+      document.getElementById('bookingPreviewMine').innerHTML = bookingCard(data.booking);
+      showState('stateAlreadyMine'); return;
+    }
+
+    if (data.already_claimed && !data.claimed_by_me) {
+      showState('stateClaimedOther'); return;
+    }
+
+    // Not yet claimed → show booking + claim form
+    document.getElementById('bookingPreview').innerHTML = bookingCard(data.booking);
+    showState('stateMain');
+
+    if (data.logged_in) {
+      document.getElementById('loggedInSection').style.display = '';
+    } else {
+      document.getElementById('authSection').style.display = '';
+    }
+  } catch {
+    document.getElementById('errorMsg').textContent = 'تعذّر الاتصال بالخادم';
+    showState('stateError');
+  }
+})();
+</script>
+</body>
+</html>

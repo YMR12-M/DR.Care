@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffd21f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>DR.Care | تتبع طلبك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .tracker-page { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; }
+
+    /* ── Mobile improvements ── */
+    @media (max-width: 640px) {
+      .tracker-search { padding: 80px 0 28px; }
+      .tracker-search-inner { padding: 0 16px; }
+      .tracker-form { flex-direction: column; }
+      .tracker-form input, .tracker-form button { width: 100%; }
+      .tracker-card-head { flex-direction: column; align-items: flex-start; padding: 16px; }
+      .tracker-steps { padding: 20px 16px; }
+      .tracker-result { padding: 20px 0 40px; }
+    }
+
+    /* ── Search section ── */
+    .tracker-search {
+      background: var(--panel); border-bottom: 1px solid var(--line);
+      padding: 48px 0 40px; position: relative; overflow: hidden;
+    }
+    .tracker-search::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255,210,31,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .tracker-search-inner { position: relative; text-align: center; max-width: 520px; margin: 0 auto; }
+    .tracker-search .section-kicker { justify-content: center; }
+    .tracker-search h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; letter-spacing: -0.02em; margin: 8px 0 6px; }
+    .tracker-search p  { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
+
+    .tracker-form {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .tracker-form input {
+      flex: 1; min-width: 160px; height: 50px; margin: 0;
+      border-radius: var(--radius); font-family: var(--font-en);
+      font-weight: 700; font-size: 1rem; letter-spacing: 0.03em;
+    }
+    .tracker-form button {
+      height: 50px; padding: 0 24px;
+      background: var(--yellow); color: #0a0800;
+      border: none; border-radius: var(--radius);
+      font-weight: 800; font-size: 0.92rem; cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
+      flex-shrink: 0;
+    }
+    .tracker-form button:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,210,31,0.35); }
+
+    /* ── Result ── */
+    .tracker-result { flex: 1; padding: 40px 0 64px; }
+    .tracker-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-xl); overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .tracker-card-head {
+      padding: 24px 28px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--panel-2);
+    }
+    .tracker-booking-id {
+      font-family: var(--font-en); font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 4px;
+    }
+    .tracker-booking-name { font-size: 1.05rem; font-weight: 900; letter-spacing: -0.01em; }
+
+    /* ── Progress timeline ── */
+    .tracker-timeline {
+      padding: 36px 28px;
+    }
+    .tracker-steps {
+      display: flex; position: relative;
+    }
+    .tracker-steps::before {
+      content: ''; position: absolute; top: 24px; inset-inline: 48px;
+      height: 2px; background: var(--line-2);
+    }
+    .tracker-progress-line {
+      position: absolute; top: 24px; inset-inline-start: 48px;
+      height: 2px; background: var(--yellow);
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+      width: 0%;
+    }
+
+    .tracker-step {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+
+    .tracker-step__dot {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--panel-2); border: 2px solid var(--line-2);
+      display: grid; place-items: center;
+      font-size: 1.1rem; line-height: 1;
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+    }
+
+    .tracker-step.done .tracker-step__dot {
+      background: var(--yellow); border-color: var(--yellow);
+      box-shadow: 0 0 20px rgba(255,210,31,0.35);
+    }
+    .tracker-step.active .tracker-step__dot {
+      background: var(--panel-3); border-color: var(--yellow);
+      box-shadow: 0 0 0 4px rgba(255,210,31,0.15);
+      animation: step-pulse 2s ease-in-out infinite;
+    }
+    .tracker-step.cancelled .tracker-step__dot {
+      background: rgba(240,83,62,0.1); border-color: var(--error);
+    }
+
+    @keyframes step-pulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(255,210,31,0.15); }
+      50%      { box-shadow: 0 0 0 8px rgba(255,210,31,0.08); }
+    }
+
+    .tracker-step__label {
+      font-size: 0.78rem; font-weight: 700; color: var(--muted);
+      text-align: center; line-height: 1.4;
+    }
+    .tracker-step.done .tracker-step__label   { color: var(--white); }
+    .tracker-step.active .tracker-step__label { color: var(--yellow); }
+
+    /* ── Booking details ── */
+    .tracker-details {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; border-top: 1px solid var(--line);
+    }
+    .tracker-detail {
+      padding: 16px 20px; border-inline-start: 1px solid var(--line);
+    }
+    .tracker-detail:first-child { border-inline-start: none; }
+    .tracker-detail label {
+      display: block; font-family: var(--font-en);
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted-2); margin-bottom: 5px;
+    }
+    .tracker-detail value { display: block; font-size: 0.9rem; font-weight: 700; color: var(--white); }
+    .tracker-detail value.gold { color: var(--yellow); font-family: var(--font-en); font-size: 1rem; }
+
+    /* ── Auto-refresh indicator ── */
+    .tracker-refresh-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 20px; border-top: 1px solid var(--line);
+      background: rgba(255,255,255,0.01);
+      font-size: 0.75rem; color: var(--muted-2); font-weight: 600;
+    }
+    .tracker-refresh-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success); display: inline-block; margin-left: 6px;
+      animation: blink-dot 2s ease infinite;
+    }
+    @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── Empty / Error ── */
+    .tracker-empty {
+      padding: 64px 24px; text-align: center; color: var(--muted);
+    }
+    .tracker-empty span { font-size: 3rem; display: block; margin-bottom: 16px; opacity: 0.35; }
+    .tracker-empty p    { font-size: 0.92rem; font-weight: 600; }
+
+    @media (max-width: 600px) {
+      .tracker-details { grid-template-columns: 1fr 1fr; }
+      .tracker-step__label { font-size: 0.7rem; }
+      .tracker-step__dot { width: 40px; height: 40px; font-size: 0.95rem; }
+      .tracker-steps::before,
+      .tracker-progress-line { top: 20px; }
+    }
+  </style>
+</head>
+<body class="tracker-page">
+
+  <!-- HEADER -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" id="trackerBrandLink" href="index.html" aria-label="DR.Care">
+        <span class="brand-mark" aria-hidden="true">DR</span>
+        <span class="brand-text">
+          <strong>DR.Care</strong>
+          <small>تتبع الطلب</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="الروابط">
+        <a href="index.html">الرئيسية</a>
+        <a href="customer-bookings.html">حجوزاتي</a>
+        <a class="nav-cta" href="index.html#booking">حجز جديد</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- SEARCH -->
+  <div class="tracker-search">
+    <div class="container tracker-search-inner">
+      <p class="section-kicker">Live Tracking</p>
+      <h1>تتبع طلبك لحظياً</h1>
+      <p>أدخل رقم الحجز ورقم موبايلك لمتابعة حالة الخدمة في الوقت الفعلي</p>
+
+      <div class="tracker-form">
+        <input type="text" id="trackId" placeholder="رقم الحجز" inputmode="numeric" maxlength="10">
+        <input type="tel"  id="trackPhone" placeholder="رقم الموبايل" inputmode="numeric" maxlength="11" style="font-family:var(--font)">
+        <button type="button" id="trackBtn">تتبع الطلب</button>
+      </div>
+      <p id="trackError" style="color:var(--error);font-size:.82rem;font-weight:700;margin-top:10px;min-height:18px"></p>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="tracker-result" id="trackerResult" style="display:none">
+    <div class="container" style="max-width:720px">
+      <div class="tracker-card" id="trackerCard"></div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    const STEPS = [
+      { key: 'new',        label: 'طلب جديد',      icon: '📋' },
+      { key: 'confirmed',  label: 'تم التأكيد',     icon: '✅' },
+      { key: 'in_service', label: 'قيد التنفيذ',    icon: '🚗' },
+      { key: 'completed',  label: 'تم التسليم',     icon: '🌟' },
+    ];
+    const esc   = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const price = v => `${Number(v).toLocaleString('ar-EG')} جنيه`;
+    const fmtDate = v => v ? new Date(v).toLocaleString('ar-EG', { dateStyle:'medium', timeStyle:'short' }) : '—';
+
+    window.addEventListener('scroll', () => {
+      document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 16);
+    }, { passive: true });
+
+    let trackingId    = null;
+    let trackingPhone = null;
+    let refreshTimer  = null;
+
+    const renderCard = (b) => {
+      const isCancelled = b.status === 'cancelled';
+      const stepIdx     = isCancelled ? -1 : STEPS.findIndex(s => s.key === b.status);
+      const progressPct = isCancelled ? 0 : Math.max(0, (stepIdx / (STEPS.length - 1)) * 100);
+
+      const stepsHtml = STEPS.map((s, i) => {
+        const isDone   = !isCancelled && i < stepIdx;
+        const isActive = !isCancelled && i === stepIdx;
+        const cls      = isCancelled ? '' : isDone ? 'done' : isActive ? 'active' : '';
+        return `
+          <div class="tracker-step ${cls}">
+            <div class="tracker-step__dot">${isDone ? '✓' : s.icon}</div>
+            <p class="tracker-step__label">${s.label}</p>
+          </div>`;
+      }).join('');
+
+      const statusLabel = isCancelled
+        ? '<span style="color:var(--error);font-weight:800">ملغي ✕</span>'
+        : STEPS[stepIdx]
+          ? `<span style="color:var(--yellow);font-weight:800">${STEPS[stepIdx].label}</span>`
+          : '—';
+
+      return `
+        <div class="tracker-card-head">
+          <div>
+            <p class="tracker-booking-id">Booking #${esc(b.id)}</p>
+            <p class="tracker-booking-name">${esc(b.package_name)}</p>
+          </div>
+          <div style="text-align:left">
+            <div style="font-size:.7rem;color:var(--muted-2);margin-bottom:4px">الحالة الحالية</div>
+            ${statusLabel}
+          </div>
+        </div>
+
+        <div class="tracker-timeline">
+          <div class="tracker-steps" style="position:relative">
+            <div class="tracker-progress-line" style="width:${progressPct}%"></div>
+            ${stepsHtml}
+          </div>
+        </div>
+
+        <div class="tracker-details">
+          <div class="tracker-detail"><label>Package</label><value>${esc(b.package_name)}</value></div>
+          <div class="tracker-detail"><label>Car Type</label><value>${esc(b.car_type_name)}</value></div>
+          <div class="tracker-detail"><label>Branch</label><value>${esc(b.branch)}</value></div>
+          <div class="tracker-detail"><label>Appointment</label><value>${fmtDate(b.appointment)}</value></div>
+          <div class="tracker-detail"><label>Payment</label><value>${esc(b.payment_method || '—')}</value></div>
+          <div class="tracker-detail"><label>Total Price</label><value class="gold">${price(b.total_price)}</value></div>
+        </div>
+
+        <div class="tracker-refresh-bar">
+          <span><span class="tracker-refresh-dot"></span>يتحدث تلقائياً كل 15 ثانية</span>
+          <span id="lastUpdate">—</span>
+        </div>
+      `;
+    };
+
+    const fetchStatus = async () => {
+      try {
+        const res  = await fetch(`api/customer-bookings.php?track_id=${trackingId}&track_phone=${encodeURIComponent(trackingPhone)}`, {
+          credentials: 'same-origin', headers: { Accept: 'application/json' }
+        });
+        const data = await res.json().catch(() => ({}));
+
+        const booking = (data.bookings || []).find(b => String(b.id) === String(trackingId));
+        if (!booking && data.ok === false) throw new Error(data.message || 'الحجز غير موجود');
+
+        const card = document.getElementById('trackerCard');
+        if (card && booking) {
+          card.innerHTML = renderCard(booking);
+          const lu = document.getElementById('lastUpdate');
+          if (lu) lu.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+        }
+      } catch (err) {
+        const card = document.getElementById('trackerCard');
+        if (card) card.innerHTML = `<div class="tracker-empty"><span>❌</span><p>${err.message}</p></div>`;
+      }
+    };
+
+    document.getElementById('trackBtn')?.addEventListener('click', async () => {
+      const id    = document.getElementById('trackId')?.value.trim();
+      const phone = document.getElementById('trackPhone')?.value.trim();
+      const errEl = document.getElementById('trackError');
+
+      if (!id || isNaN(Number(id))) { errEl.textContent = 'أدخل رقم الحجز'; return; }
+      if (!phone || !/^01[0125][0-9]{8}$/.test(phone)) { errEl.textContent = 'أدخل رقم موبايل مصري صحيح'; return; }
+      errEl.textContent = '';
+
+      trackingId    = id;
+      trackingPhone = phone;
+
+      document.getElementById('trackerResult').style.display = '';
+      document.getElementById('trackerCard').innerHTML = `
+        <div class="tracker-empty"><span>⏳</span><p>جاري التحقق...</p></div>`;
+
+      await fetchStatus();
+
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(fetchStatus, 15000);
+    });
+
+    /* Pre-fill from URL param */
+    const urlId = new URLSearchParams(location.search).get('id');
+    if (urlId) {
+      const el = document.getElementById('trackId');
+      if (el) el.value = urlId;
+    }
+
+    /* Smart back link: mobile → mobile-bookings, desktop → customer-bookings */
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && window.innerWidth <= 900;
+    const brandLink = document.getElementById('trackerBrandLink');
+    if (isMobile && brandLink) brandLink.href = 'mobile-bookings.html';
+
+    /* Scroll header */
+    window.addEventListener('scroll', () => {
+      document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 16);
+    }, { passive: true });
+  </script>
+</body>
+</html>

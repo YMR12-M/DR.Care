@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#ffd21f">
+  <title>DR.Care | لوحة الإدارة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ═══════════════════════════════════════════════
+       ADMIN SHELL
+    ═══════════════════════════════════════════════ */
+    .admin-shell {
+      padding: 28px 0 64px;
+      display: grid;
+      gap: 18px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       ADMIN HERO
+    ═══════════════════════════════════════════════ */
+    .admin-hero {
+      position: relative;
+      overflow: hidden;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .admin-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 50%, rgba(255,210,31,0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .admin-hero-inner {
+      position: relative;
+      padding: 32px 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .admin-hero-text { flex: 1; min-width: 200px; }
+    .admin-hero-text h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .admin-hero-text p  { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+    .admin-hero-actions {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+
+    .admin-meta-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 14px; border-radius: 50px;
+      background: var(--panel-2); border: 1px solid var(--line-2);
+      font-size: 0.78rem; font-weight: 700; color: var(--muted);
+    }
+    .admin-meta-chip span { color: var(--white); }
+
+    /* ═══════════════════════════════════════════════
+       STATS GRID
+    ═══════════════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(255,210,31,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .stat-card:hover { border-color: var(--line-2); }
+    .stat-card--gold { border-color: var(--yellow-line); }
+    .stat-card--gold::before { background: radial-gradient(circle, rgba(255,210,31,0.12) 0%, transparent 70%); }
+
+    .stat-card__kicker {
+      font-family: var(--font-en);
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted-2);
+    }
+
+    .stat-card__value {
+      font-family: var(--font-en);
+      font-size: 1.9rem; font-weight: 900;
+      letter-spacing: -0.04em; line-height: 1;
+      color: var(--white);
+    }
+    .stat-card--gold .stat-card__value { color: var(--yellow); }
+
+    .stat-card__label {
+      font-size: 0.8rem; color: var(--muted); font-weight: 600;
+    }
+
+    .stat-card__icon {
+      position: absolute; top: 16px; left: 18px;
+      font-size: 1.4rem; opacity: 0.25;
+    }
+
+    /* ═══════════════════════════════════════════════
+       FILTER BAR
+    ═══════════════════════════════════════════════ */
+    .filter-bar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-bar__group {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+
+    .filter-bar__sep {
+      width: 1px; height: 24px; background: var(--line-2); flex-shrink: 0;
+    }
+
+    .filter-btn {
+      height: 34px; padding: 0 14px;
+      border-radius: 50px; border: 1px solid var(--line-2);
+      background: var(--panel-2); color: var(--muted);
+      font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+      white-space: nowrap;
+    }
+    .filter-btn:hover  { background: var(--panel-3); color: var(--white); }
+    .filter-btn.active {
+      background: var(--yellow-soft); color: var(--yellow);
+      border-color: var(--yellow-line);
+    }
+
+    .filter-btn--all.active   { background: var(--panel-3); color: var(--white); border-color: var(--line-2); }
+    .filter-btn--new.active   { background: rgba(255,210,31,0.12); color: var(--yellow); border-color: var(--yellow-line); }
+    .filter-btn--confirmed.active { background: rgba(91,164,245,0.12); color: #5ba4f5; border-color: rgba(91,164,245,0.3); }
+    .filter-btn--in_service.active { background: rgba(255,165,0,0.1); color: #f5a623; border-color: rgba(245,166,35,0.3); }
+    .filter-btn--completed.active { background: rgba(111,207,71,0.1); color: var(--success); border-color: rgba(111,207,71,0.3); }
+    .filter-btn--cancelled.active { background: rgba(240,83,62,0.1); color: var(--error); border-color: rgba(240,83,62,0.3); }
+
+    .search-input {
+      height: 34px; padding: 0 14px;
+      background: var(--panel-2); border: 1px solid var(--line-2);
+      border-radius: 50px; color: var(--white); font-size: 0.82rem;
+      outline: none; min-width: 0;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      font-family: var(--font);
+    }
+    .search-input:focus {
+      border-color: var(--yellow-line);
+      box-shadow: 0 0 0 3px rgba(255,210,31,0.08);
+    }
+    .search-input::placeholder { color: var(--muted-2); }
+
+    select.search-input { padding-left: 28px; cursor: pointer; -webkit-appearance: none; appearance: none; }
+
+    .spacer { flex: 1; min-width: 8px; }
+
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--line-2); background: var(--panel-2);
+      color: var(--muted); display: grid; place-items: center;
+      cursor: pointer; font-size: 0.9rem;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+    .icon-btn:hover { background: var(--panel-3); color: var(--white); border-color: var(--line-2); }
+
+    .results-badge {
+      font-size: 0.75rem; font-weight: 600; color: var(--muted-2);
+      padding: 4px 10px; border-radius: 20px;
+      background: var(--panel-2); border: 1px solid var(--line);
+    }
+
+    /* ═══════════════════════════════════════════════
+       TABLE
+    ═══════════════════════════════════════════════ */
+    .table-wrap {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .bookings-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .bookings-table thead {
+      background: var(--panel-2);
+      border-bottom: 1px solid var(--line-2);
+    }
+
+    .bookings-table th {
+      padding: 13px 16px; text-align: right;
+      font-family: var(--font-en); font-size: 0.65rem;
+      font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted-2);
+      white-space: nowrap;
+    }
+
+    .bookings-table td {
+      padding: 13px 16px; border-bottom: 1px solid var(--line);
+      vertical-align: middle; color: var(--white);
+    }
+
+    .bookings-table tr:last-child td { border-bottom: none; }
+
+    .bookings-table tbody tr {
+      transition: background var(--transition);
+    }
+    .bookings-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+    .booking-id {
+      font-family: var(--font-en); font-size: 0.8rem; font-weight: 900;
+      color: var(--muted-2); letter-spacing: 0.05em;
+    }
+
+    .booking-name { font-weight: 700; color: var(--white); display: block; }
+    .booking-sub  { font-size: 0.72rem; color: var(--muted-2); display: block; margin-top: 2px; }
+
+    .phone-link { color: var(--yellow); font-weight: 700; text-decoration: none; font-size: 0.82rem; }
+    .phone-link:hover { text-decoration: underline; }
+
+    .price-val { font-family: var(--font-en); font-weight: 900; color: var(--yellow); font-size: 0.9rem; }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .status-badge.new        { background: rgba(255,210,31,0.12); color: var(--yellow);  border: 1px solid rgba(255,210,31,0.25); }
+    .status-badge.confirmed  { background: rgba(91,164,245,0.12); color: #5ba4f5;        border: 1px solid rgba(91,164,245,0.3); }
+    .status-badge.in_service { background: rgba(245,166,35,0.12); color: #f5a623;        border: 1px solid rgba(245,166,35,0.3); }
+    .status-badge.completed  { background: rgba(111,207,71,0.12); color: var(--success); border: 1px solid rgba(111,207,71,0.3); }
+    .status-badge.cancelled  { background: rgba(240,83,62,0.1);   color: var(--error);   border: 1px solid rgba(240,83,62,0.25); }
+
+    .status-select {
+      background: var(--panel-2); border: 1px solid var(--line-2);
+      border-radius: 8px; color: var(--white); font-size: 0.8rem;
+      padding: 6px 28px 6px 10px; cursor: pointer; outline: none;
+      font-family: var(--font); min-width: 130px;
+      -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236e6860' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: left 8px center;
+      transition: border-color var(--transition);
+    }
+    .status-select:focus { border-color: var(--yellow-line); }
+
+    .details-btn {
+      height: 32px; padding: 0 14px;
+      border-radius: 8px; border: 1px solid var(--line-2);
+      background: var(--panel-2); color: var(--muted);
+      font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+      white-space: nowrap;
+    }
+    .details-btn:hover { background: var(--yellow-soft); color: var(--yellow); border-color: var(--yellow-line); }
+
+    .table-empty {
+      padding: 56px 24px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      color: var(--muted);
+    }
+    .table-empty span { font-size: 2.5rem; opacity: 0.4; }
+    .table-empty p    { font-size: 0.9rem; font-weight: 600; margin: 0; }
+
+    /* ═══════════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════════ */
+    .toast-bar {
+      position: fixed; bottom: 28px; inset-inline-start: 50%;
+      transform: translateX(50%) translateY(80px);
+      z-index: 200; min-width: 260px; max-width: 420px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px; border-radius: 50px;
+      background: var(--panel-3); border: 1px solid var(--line-2);
+      box-shadow: var(--shadow); font-size: 0.85rem; font-weight: 700;
+      transition: transform 0.35s var(--transition-bounce), opacity 0.25s;
+      pointer-events: none; opacity: 0;
+    }
+    .toast-bar.show { transform: translateX(50%) translateY(0); opacity: 1; pointer-events: auto; }
+    .toast-bar.success { border-color: rgba(111,207,71,0.3); }
+    .toast-bar.error   { border-color: rgba(240,83,62,0.3); }
+    .toast-bar__dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+      background: var(--muted);
+    }
+    .toast-bar.success .toast-bar__dot { background: var(--success); box-shadow: 0 0 8px rgba(111,207,71,0.5); }
+    .toast-bar.error   .toast-bar__dot { background: var(--error); }
+
+    /* ═══════════════════════════════════════════════
+       MODAL
+    ═══════════════════════════════════════════════ */
+    .detail-modal {
+      display: none; position: fixed; inset: 0; z-index: 110;
+      justify-content: center; align-items: center; padding: 20px;
+    }
+    .detail-modal.open { display: flex; }
+
+    .detail-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.78); backdrop-filter: blur(6px);
+    }
+
+    .detail-modal-panel {
+      position: relative; z-index: 1;
+      width: min(720px, 100%); max-height: min(92vh, 800px);
+      overflow: auto; display: flex; flex-direction: column;
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 40px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,210,31,0.08);
+    }
+
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; padding: 24px 26px 20px;
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0;
+      background: var(--panel); z-index: 1;
+    }
+
+    .modal-header__kicker {
+      font-family: var(--font-en); font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow);
+      margin-bottom: 4px;
+    }
+
+    .modal-header h2 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.01em; margin: 0; }
+
+    .modal-header__summary {
+      font-size: 0.8rem; color: var(--muted); margin-top: 3px;
+    }
+
+    .modal-header__price {
+      text-align: left; flex-shrink: 0;
+    }
+    .modal-header__price strong {
+      display: block; font-family: var(--font-en); font-size: 1.4rem;
+      font-weight: 900; color: var(--yellow); line-height: 1;
+    }
+    .modal-header__price small { font-size: 0.72rem; color: var(--muted); }
+
+    .modal-close {
+      position: absolute; top: 16px; left: 16px;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--line-2); background: var(--panel-2);
+      color: var(--muted); font-size: 1.2rem; line-height: 1;
+      cursor: pointer; display: grid; place-items: center;
+      transition: background var(--transition), color var(--transition), transform var(--transition-bounce);
+    }
+    .modal-close:hover { background: var(--panel-3); color: var(--white); transform: scale(1.08); }
+
+    .modal-body { padding: 22px 26px 26px; flex: 1; }
+
+    .modal-info-grid {
+      display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px; margin-bottom: 20px;
+    }
+
+    .modal-cell {
+      background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 12px 14px;
+    }
+    .modal-cell label {
+      display: block; font-family: var(--font-en);
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted-2); margin-bottom: 5px;
+    }
+    .modal-cell value {
+      display: block; font-size: 0.88rem; font-weight: 700; color: var(--white);
+      word-break: break-word;
+    }
+    .modal-cell a { color: var(--yellow); text-decoration: none; }
+    .modal-cell a:hover { text-decoration: underline; }
+    .modal-cell--wide { grid-column: 1 / -1; }
+
+    .modal-section-title {
+      font-family: var(--font-en); font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2);
+      margin-bottom: 10px; margin-top: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .modal-section-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+    .modal-actions {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
+    .quick-action {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: 50px;
+      border: 1px solid var(--line-2); background: var(--panel-2);
+      color: var(--muted); cursor: pointer; font-weight: 700; font-size: 0.82rem;
+      transition: transform var(--transition-bounce), background var(--transition),
+                  border-color var(--transition), color var(--transition);
+      text-decoration: none;
+    }
+    .quick-action:hover { transform: translateY(-1px); background: var(--panel-3); color: var(--white); }
+
+    .quick-action[data-status="new"]        { background: rgba(255,210,31,0.08); color: var(--yellow); border-color: rgba(255,210,31,0.25); }
+    .quick-action[data-status="confirmed"]  { background: rgba(91,164,245,0.08); color: #5ba4f5; border-color: rgba(91,164,245,0.25); }
+    .quick-action[data-status="in_service"] { background: rgba(245,166,35,0.08); color: #f5a623; border-color: rgba(245,166,35,0.25); }
+    .quick-action[data-status="completed"]  { background: rgba(111,207,71,0.08); color: var(--success); border-color: rgba(111,207,71,0.25); }
+    .quick-action[data-status="cancelled"]  { background: rgba(240,83,62,0.07); color: var(--error); border-color: rgba(240,83,62,0.25); }
+    .quick-action[href] { background: var(--panel-2); color: var(--white); }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .modal-info-grid { grid-template-columns: 1fr 1fr; }
+      .admin-hero-inner { flex-direction: column; align-items: flex-start; }
+      .bookings-table th:nth-child(3),
+      .bookings-table td:nth-child(3),
+      .bookings-table th:nth-child(6),
+      .bookings-table td:nth-child(6) { display: none; }
+    }
+  </style>
+</head>
+<body class="admin-page">
+
+  <!-- ── HEADER ── -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="DR.Care الرئيسية">
+        <span class="brand-mark" aria-hidden="true">DR</span>
+        <span class="brand-text">
+          <strong>DR.Care</strong>
+          <small>Operations</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="روابط الإدارة">
+        <a href="index.html">الموقع</a>
+        <a href="CarWash-POS/">POS</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:10px;margin-inline-start:auto;">
+        <div class="admin-meta-chip" id="adminChip" style="display:none">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="adminUsername"></span>
+        </div>
+        <button id="logoutBtn" class="nav-cta" type="button" style="height:36px;font-size:0.8rem;">خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <div class="admin-hero">
+    <div class="container admin-hero-inner">
+      <div class="admin-hero-text">
+        <p class="section-kicker">Operations Dashboard</p>
+        <h1>لوحة إدارة DR.Care</h1>
+        <p>تابع الحجوزات، الإيراد، وحالة كل عميل من أول الطلب لحد التسليم.</p>
+      </div>
+      <div class="admin-hero-actions">
+        <button class="btn btn-ghost" type="button" id="toggleChartsBtn" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          📊 تقارير
+        </button>
+        <button class="btn btn-ghost" type="button" id="toggleCustomersBtn" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          👥 العملاء
+        </button>
+        <button class="btn btn-ghost" type="button" id="toggleReviewsBtn" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          ⭐ التقييمات <span id="reviewsBadge" style="display:none;font-size:.68rem;background:var(--yellow);color:#0a0800;padding:1px 7px;border-radius:50px;font-weight:900"></span>
+        </button>
+        <button class="btn btn-ghost" type="button" id="toggleCouponsBtn" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          🎫 الكوبونات
+        </button>
+        <button class="btn btn-ghost" type="button" id="anniversaryNotifyBtn" title="إرسال إشعارات الذكرى لعملاء اليوم" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          🎂 ذكريات اليوم
+        </button>
+        <button class="btn btn-ghost" type="button" id="refreshBookings" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          تحديث
+        </button>
+        <button class="btn btn-ghost" type="button" id="downloadJson" style="display:flex;align-items:center;gap:6px;height:38px;font-size:0.82rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="container admin-shell">
+
+      <!-- ── STATS ── -->
+      <div class="stats-grid" id="statsGrid" aria-label="ملخص الأداء">
+        <div class="stat-card">
+          <span class="stat-card__icon">👥</span>
+          <p class="stat-card__kicker">Total Customers</p>
+          <div class="stat-card__value" id="totalCustomers">—</div>
+          <p class="stat-card__label">عملاء مسجلين</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon">📋</span>
+          <p class="stat-card__kicker">All Bookings</p>
+          <div class="stat-card__value" id="totalBookings">—</div>
+          <p class="stat-card__label">كل الطلبات</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon">🔔</span>
+          <p class="stat-card__kicker">Pending</p>
+          <div class="stat-card__value" id="newBookings">—</div>
+          <p class="stat-card__label">طلبات جديدة تنتظر</p>
+        </div>
+        <div class="stat-card stat-card--gold">
+          <span class="stat-card__icon">💰</span>
+          <p class="stat-card__kicker">Expected Revenue</p>
+          <div class="stat-card__value" id="expectedRevenue" style="font-size:1.3rem">—</div>
+          <p class="stat-card__label">إيراد إجمالي</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon">📅</span>
+          <p class="stat-card__kicker">Today</p>
+          <div class="stat-card__value" id="todayBookings">—</div>
+          <p class="stat-card__label">طلبات اليوم</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon">📆</span>
+          <p class="stat-card__kicker">This Month</p>
+          <div class="stat-card__value" id="monthBookings">—</div>
+          <p class="stat-card__label">طلبات الشهر</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon">⚡</span>
+          <p class="stat-card__kicker">Today Revenue</p>
+          <div class="stat-card__value" id="todayRevenue" style="font-size:1.2rem">—</div>
+          <p class="stat-card__label">إيراد اليوم</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon">📈</span>
+          <p class="stat-card__kicker">Month Revenue</p>
+          <div class="stat-card__value" id="monthRevenue" style="font-size:1.2rem">—</div>
+          <p class="stat-card__label">إيراد الشهر</p>
+        </div>
+      </div>
+
+      <!-- ── CHARTS PANEL ── -->
+      <div id="chartsPanel" style="display:none;margin-bottom:24px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الحجوزات — آخر 7 أيام</p>
+            <canvas id="chartDays" height="180"></canvas>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">توزيع الحالات</p>
+            <canvas id="chartStatus" height="180"></canvas>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الإيراد حسب الفرع (جنيه)</p>
+            <canvas id="chartBranch" height="180"></canvas>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">أكثر الباقات طلباً</p>
+            <canvas id="chartPackages" height="180"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CUSTOMERS PANEL ── -->
+      <div id="customersPanel" style="display:none;margin-bottom:24px">
+        <div class="filter-bar" style="margin-bottom:12px">
+          <strong style="font-size:.9rem">👥 العملاء المسجلين</strong>
+          <div class="spacer"></div>
+          <input type="search" id="customerSearch" class="search-input" placeholder="بحث باسم أو إيميل..." style="width:min(220px,100%)">
+          <span class="results-badge" id="customerCount"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="bookings-table" id="customersTable">
+            <thead>
+              <tr>
+                <th>العميل</th>
+                <th>الإيميل</th>
+                <th>الموبايل</th>
+                <th>الحجوزات</th>
+                <th>إجمالي المصروف</th>
+                <th>تاريخ الانضمام</th>
+                <th>تواصل</th>
+              </tr>
+            </thead>
+            <tbody id="customersBody">
+              <tr><td colspan="7"><div class="table-empty"><span>👥</span><p>جاري التحميل...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── FILTER BAR ── -->
+      <div class="filter-bar" role="toolbar" aria-label="أدوات الفلترة">
+        <div class="filter-bar__group" id="filterButtons" role="group" aria-label="فلترة بالحالة">
+          <button class="filter-btn filter-btn--all active" type="button" data-filter="all">الكل</button>
+          <button class="filter-btn filter-btn--new" type="button" data-filter="new">جديد</button>
+          <button class="filter-btn filter-btn--confirmed" type="button" data-filter="confirmed">مؤكد</button>
+          <button class="filter-btn filter-btn--in_service" type="button" data-filter="in_service">قيد التنفيذ</button>
+          <button class="filter-btn filter-btn--completed" type="button" data-filter="completed">تم التسليم</button>
+          <button class="filter-btn filter-btn--cancelled" type="button" data-filter="cancelled">ملغي</button>
+        </div>
+
+        <div class="filter-bar__sep"></div>
+
+        <select id="branchFilter" class="search-input" aria-label="فلترة حسب الفرع">
+          <option value="all">كل الفروع</option>
+        </select>
+        <select id="paymentFilter" class="search-input" aria-label="فلترة حسب الدفع">
+          <option value="all">كل طرق الدفع</option>
+        </select>
+
+        <div class="filter-bar__sep"></div>
+
+        <div class="filter-bar__group" id="datePresets" role="group" aria-label="فلترة سريعة بالتاريخ">
+          <button class="filter-btn" type="button" data-preset="today">اليوم</button>
+          <button class="filter-btn" type="button" data-preset="week">7 أيام</button>
+          <button class="filter-btn" type="button" data-preset="month">هذا الشهر</button>
+        </div>
+
+        <input type="date" id="dateFrom" class="search-input" aria-label="من تاريخ" style="width:140px" title="من تاريخ">
+        <input type="date" id="dateTo"   class="search-input" aria-label="إلى تاريخ" style="width:140px" title="إلى تاريخ">
+        <button id="clearDateRange" class="filter-btn" type="button" title="مسح الفترة" aria-label="مسح فلتر التاريخ" style="display:none;padding:0 10px">✕</button>
+
+        <div class="spacer"></div>
+
+        <input type="search" id="searchInput" class="search-input" placeholder="بحث..." aria-label="بحث" style="width:min(200px,100%)">
+
+        <span class="results-badge" id="resultsCount" aria-live="polite"></span>
+      </div>
+
+      <!-- ── COUPONS PANEL ── -->
+      <div id="couponsPanel" style="display:none">
+        <div class="filter-bar" style="flex-wrap:wrap;gap:14px">
+          <strong style="font-size:.9rem">إدارة الكوبونات</strong>
+          <div class="spacer"></div>
+          <button class="btn-primary" type="button" id="showCouponFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ كوبون جديد</button>
+        </div>
+
+        <!-- Create coupon form -->
+        <div id="couponCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+          <p style="font-weight:800;margin-bottom:16px">إنشاء كوبون جديد</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">كود الخصم
+              <input id="cc_code" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px;text-transform:uppercase" placeholder="SUMMER20">
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">نوع الخصم
+              <select id="cc_type" class="search-input" style="width:100%;height:40px;margin-top:6px">
+                <option value="percent">نسبة مئوية %</option>
+                <option value="fixed">مبلغ ثابت</option>
+              </select>
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">القيمة
+              <input id="cc_value" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="20">
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الحد الأدنى للطلب (ج)
+              <input id="cc_min" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="0" value="0">
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">أقصى استخدام (فارغ = غير محدود)
+              <input id="cc_max_uses" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="∞">
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">تاريخ الانتهاء (اختياري)
+              <input id="cc_expires" type="datetime-local" class="search-input" style="width:100%;height:40px;margin-top:6px">
+            </label>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button type="button" id="createCouponBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">إنشاء الكوبون</button>
+            <button type="button" id="cancelCouponFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+          </div>
+          <p id="couponFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+        </div>
+
+        <!-- Coupons table -->
+        <div class="table-wrap">
+          <table class="bookings-table" id="couponsTable">
+            <thead>
+              <tr>
+                <th>الكود</th>
+                <th>النوع</th>
+                <th>القيمة</th>
+                <th>الحد الأدنى</th>
+                <th>الاستخدام</th>
+                <th>الانتهاء</th>
+                <th>الحالة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="couponsBody">
+              <tr><td colspan="8"><div class="table-empty"><span>🎫</span><p>لا توجد كوبونات</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── REVIEWS PANEL ── -->
+      <div id="reviewsPanel" style="display:none;margin-bottom:24px">
+        <div class="filter-bar" style="margin-bottom:16px">
+          <strong style="font-size:.9rem">⭐ التقييمات</strong>
+          <div class="spacer"></div>
+          <span id="reviewsSummary" style="font-size:.82rem;color:var(--muted)"></span>
+        </div>
+        <div id="reviewsList" style="display:grid;gap:12px">
+          <div style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem">جاري تحميل التقييمات...</div>
+        </div>
+      </div>
+
+      <!-- ── BOOKING CARDS ── -->
+      <div class="bk-toolbar" role="toolbar" aria-label="إحصائية العرض">
+        <span class="results-badge" id="resultsCount" aria-live="polite"></span>
+        <div class="spacer"></div>
+        <label class="bk-compact-toggle" title="وضع مضغوط">
+          <input type="checkbox" id="compactMode"> مضغوط
+        </label>
+      </div>
+      <div class="bk-list" id="bookingsBody" role="list" aria-label="قائمة الطلبات">
+        <div class="table-empty"><span>🔐</span><p>جاري التحقق من الجلسة...</p></div>
+      </div>
+
+      <!-- ── MODAL ── -->
+      <div class="detail-modal" id="bookingDetailsModal" aria-hidden="true">
+        <div class="detail-modal-backdrop" data-close-modal></div>
+        <div class="detail-modal-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+          <button type="button" class="modal-close" id="modalCloseBtn" aria-label="إغلاق">✕</button>
+          <div id="bookingDetailsContent"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── TOAST ── -->
+  <div class="toast-bar" id="toastBar" role="status" aria-live="polite">
+    <span class="toast-bar__dot"></span>
+    <span id="toastText"></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="admin.js"></script>
+  <script src="idb.js"></script>
+</body>
+</html>

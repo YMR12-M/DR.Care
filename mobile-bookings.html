@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffd21f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DR.Care">
+  <title>DR.Care | حجوزاتي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="mobile.css">
+  <style>
+  /* ═══════════════════════════
+     PAGE SHELL
+  ═══════════════════════════ */
+  .mbx-page {
+    padding: 72px 0 calc(56px + env(safe-area-inset-bottom,0px));
+    min-height: 100vh;
+  }
+
+  /* ═══════════════════════════
+     AUTH — login / register
+  ═══════════════════════════ */
+  .mbx-auth {
+    max-width: 400px; margin: 24px auto; padding: 0 16px;
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .mbx-auth.hiding { opacity:0; transform:translateY(-16px); pointer-events:none; }
+
+  .mbx-auth-logo { text-align:center; margin-bottom:28px; }
+  .mbx-auth-logo__mark {
+    width:68px; height:68px; border-radius:20px;
+    background:var(--yellow); color:#0a0800;
+    font-family:'Montserrat',sans-serif; font-size:1.4rem; font-weight:900;
+    display:inline-grid; place-items:center;
+    box-shadow:0 10px 32px rgba(255,210,31,.4); margin-bottom:14px;
+  }
+  .mbx-auth-logo h1 { font-size:1.5rem; font-weight:800; margin:0 0 4px; color:var(--fg); }
+  .mbx-auth-logo p  { font-size:.85rem; color:var(--muted); margin:0; }
+
+  .mbx-auth-tabs {
+    display:flex; background:var(--panel-2);
+    border:1px solid var(--line-1); border-radius:14px;
+    padding:4px; gap:4px; margin-bottom:20px;
+  }
+  .mbx-auth-tab {
+    flex:1; padding:10px; border-radius:10px;
+    font-size:.9rem; font-weight:700; color:var(--muted);
+    background:transparent; border:none; cursor:pointer;
+    transition:background var(--transition),color var(--transition);
+    touch-action:manipulation;
+  }
+  .mbx-auth-tab.active { background:var(--panel-3); color:var(--fg); }
+  .mbx-form-panel { display:none; }
+  .mbx-form-panel.show { display:block; }
+
+  .mbx-field {
+    background:var(--panel-2); border:1px solid var(--line-1);
+    border-radius:14px; padding:14px 16px; margin-bottom:12px;
+    transition:border-color .2s;
+  }
+  .mbx-field:focus-within { border-color:var(--yellow-line); }
+  .mbx-field label { display:block; font-size:.72rem; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  .mbx-field input {
+    width:100%; background:transparent; border:none; outline:none;
+    font-size:1rem; font-family:inherit; color:var(--fg); padding:0;
+  }
+  .mbx-field input::placeholder { color:var(--muted); opacity:.6; }
+
+  .mbx-auth-msg {
+    font-size:.82rem; font-weight:600; padding:10px 14px;
+    border-radius:10px; margin-bottom:14px; display:none;
+  }
+  .mbx-auth-msg.show { display:block; }
+  .mbx-auth-msg.error   { background:rgba(240,83,62,.1); color:var(--error); border:1px solid rgba(240,83,62,.25); }
+  .mbx-auth-msg.success { background:rgba(52,199,89,.1);  color:#34c759;     border:1px solid rgba(52,199,89,.3); }
+  .mbx-auth-back { text-align:center; margin-top:20px; font-size:.82rem; color:var(--muted); }
+  .mbx-auth-back a { color:var(--muted); text-decoration:none; }
+
+  /* ═══════════════════════════
+     BOOKINGS SECTION
+  ═══════════════════════════ */
+  .mbx-bookings {
+    display:none; opacity:0; transform:translateY(20px);
+    transition:opacity .45s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .mbx-bookings.visible { display:block; }
+  .mbx-bookings.shown   { opacity:1; transform:translateY(0); }
+
+  /* ─── Hero ─── */
+  .mbx-hero {
+    position:relative; overflow:hidden;
+    padding:28px 16px 24px;
+    background:var(--panel-2);
+    border-bottom:1px solid var(--line-1);
+  }
+  .mbx-hero__glow {
+    position:absolute; top:-60px; right:-40px;
+    width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle,rgba(255,210,31,.18) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .mbx-hero__top {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+  }
+  .mbx-hero__avatar-wrap { position:relative; flex-shrink:0; }
+  .mbx-hero__avatar {
+    width:58px; height:58px; border-radius:50%;
+    background:var(--yellow); color:#0a0800;
+    font-size:1.4rem; font-weight:900; font-family:'Montserrat',sans-serif;
+    display:grid; place-items:center;
+    box-shadow:0 0 0 3px rgba(255,210,31,.25), 0 8px 28px rgba(255,210,31,.3);
+  }
+  .mbx-hero__avatar-ring {
+    position:absolute; inset:-4px; border-radius:50%;
+    border:2px solid var(--yellow-line);
+    animation:mbx-ring 3s linear infinite;
+  }
+  @keyframes mbx-ring {
+    0%   { border-color:rgba(255,210,31,.5); }
+    50%  { border-color:rgba(255,210,31,.1); }
+    100% { border-color:rgba(255,210,31,.5); }
+  }
+  .mbx-hero__info { flex:1; min-width:0; }
+  .mbx-hero__name { font-size:1rem; font-weight:800; color:var(--fg); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mbx-hero__email { font-size:.78rem; color:var(--muted); display:block; }
+  .mbx-hero__badge {
+    display:inline-flex; align-items:center; gap:4px; margin-top:4px;
+    font-size:.62rem; font-weight:700; color:var(--yellow);
+    background:rgba(255,210,31,.1); padding:3px 8px; border-radius:50px;
+    border:1px solid rgba(255,210,31,.25); letter-spacing:.04em;
+  }
+
+  /* ─── Stats row ─── */
+  .mbx-stats {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  }
+  .mbx-stat {
+    background:var(--panel-3); border:1px solid var(--line-1);
+    border-radius:12px; padding:10px 8px; text-align:center;
+  }
+  .mbx-stat strong {
+    display:block; font-family:'Montserrat',sans-serif;
+    font-size:1.35rem; font-weight:900; color:var(--fg); line-height:1;
+  }
+  .mbx-stat span { font-size:.6rem; color:var(--muted); font-weight:700; margin-top:4px; display:block; text-transform:uppercase; letter-spacing:.04em; }
+  .mbx-stat--active strong { color:#5ba4f5; }
+  .mbx-stat--gold   strong { color:var(--yellow); font-size:1rem; }
+
+  /* ─── Action strip ─── */
+  .mbx-action-strip {
+    display:flex; gap:8px; padding:14px 16px 0; flex-wrap:wrap;
+  }
+
+  /* ─── Notification bar ─── */
+  .mbx-notif {
+    display:none; align-items:center; gap:10px;
+    margin:12px 16px 0;
+    background:rgba(255,210,31,.07); border:1px solid rgba(255,210,31,.2);
+    border-radius:12px; padding:12px 14px;
+  }
+  .mbx-notif.show { display:flex; }
+  .mbx-notif__icon { font-size:1.2rem; flex-shrink:0; }
+  .mbx-notif__text { flex:1; }
+  .mbx-notif__text strong { display:block; font-size:.82rem; color:var(--fg); }
+  .mbx-notif__text small  { font-size:.72rem; color:var(--muted); }
+
+  /* ─── Filter tabs ─── */
+  .mbx-filter-wrap { padding:14px 16px 0; }
+  .mbx-filter-tabs {
+    display:flex; background:var(--panel-2);
+    border:1px solid var(--line-1); border-radius:14px;
+    padding:4px; gap:4px;
+  }
+  .mbx-filter-tab {
+    flex:1; padding:9px 6px; border-radius:10px;
+    font-size:.78rem; font-weight:700; color:var(--muted);
+    background:transparent; border:none; cursor:pointer;
+    transition:background var(--transition),color var(--transition);
+    touch-action:manipulation; display:flex; align-items:center;
+    justify-content:center; gap:5px; white-space:nowrap;
+  }
+  .mbx-filter-tab.active { background:var(--panel-3); color:var(--fg); }
+  .mbx-filter-count {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:18px; height:18px; padding:0 5px;
+    background:var(--panel-4); border-radius:20px;
+    font-size:.65rem; font-weight:800; color:var(--muted);
+  }
+  .mbx-filter-tab.active .mbx-filter-count { background:var(--yellow-soft); color:var(--yellow); }
+
+  /* ─── List ─── */
+  .mbx-list-wrap { padding:14px 16px 0; }
+  .mbx-list-title {
+    font-size:.72rem; font-weight:800; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px;
+  }
+  .mbx-list { display:flex; flex-direction:column; gap:10px; }
+
+  /* ─── Booking card ─── */
+  .mbx-card {
+    position:relative; overflow:hidden;
+    background:var(--panel-2); border:1px solid var(--line-1);
+    border-radius:18px;
+    transition:border-color var(--transition), box-shadow var(--transition);
+  }
+  .mbx-card:hover { border-color:var(--line-2); }
+
+  /* Status stripe */
+  .mbx-card__stripe {
+    position:absolute; top:0; bottom:0; inset-inline-start:0; width:4px;
+  }
+  .mbx-card--new        .mbx-card__stripe { background:var(--yellow); }
+  .mbx-card--confirmed  .mbx-card__stripe { background:#5ba4f5; }
+  .mbx-card--in_service .mbx-card__stripe { background:#f5a623; }
+  .mbx-card--completed  .mbx-card__stripe { background:var(--success); }
+  .mbx-card--cancelled  .mbx-card__stripe { background:var(--error); opacity:.4; }
+
+  /* Pulse on new */
+  .mbx-card--new { animation:mbx-card-pulse 2.5s ease infinite; }
+  @keyframes mbx-card-pulse {
+    0%,100% { box-shadow:none; }
+    50%      { box-shadow:0 0 0 3px rgba(255,210,31,.1); }
+  }
+
+  .mbx-card__inner { padding:14px 14px 14px 18px; }
+
+  /* Card top row */
+  .mbx-card__top {
+    display:flex; align-items:center; gap:8px; margin-bottom:8px;
+  }
+  .mbx-card__id {
+    font-family:'Montserrat',sans-serif; font-size:.72rem; font-weight:800;
+    color:var(--muted-2); flex-shrink:0;
+  }
+  .mbx-card__pkg {
+    font-size:.92rem; font-weight:800; color:var(--fg);
+    flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .mbx-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 9px; border-radius:50px;
+    font-size:.65rem; font-weight:800; flex-shrink:0;
+  }
+  .mbx-badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+  .mbx-badge--new        { background:rgba(255,210,31,.12); color:var(--yellow);  }
+  .mbx-badge--confirmed  { background:rgba(91,164,245,.12); color:#5ba4f5;        }
+  .mbx-badge--in_service { background:rgba(245,166,35,.12); color:#f5a623;        }
+  .mbx-badge--completed  { background:rgba(111,207,71,.1);  color:var(--success); }
+  .mbx-badge--cancelled  { background:rgba(240,83,62,.08);  color:var(--error);   }
+
+  /* Appointment highlight */
+  .mbx-card__appt {
+    display:flex; align-items:center; gap:6px;
+    background:rgba(91,164,245,.08); border:1px solid rgba(91,164,245,.2);
+    border-radius:10px; padding:8px 10px; margin-bottom:10px;
+    font-size:.8rem; font-weight:700; color:#5ba4f5;
+  }
+  .mbx-card__appt svg { flex-shrink:0; }
+
+  /* Info grid */
+  .mbx-card__grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:8px; margin-bottom:10px;
+  }
+  .mbx-card__cell label { display:block; font-size:.65rem; color:var(--muted); margin-bottom:2px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .mbx-card__cell value { display:block; font-size:.85rem; font-weight:700; color:var(--fg); }
+  .mbx-card__cell.span-2 { grid-column:1/-1; }
+  .mbx-card__price value { color:var(--yellow); font-size:.95rem; }
+
+  /* Card footer */
+  .mbx-card__footer {
+    border-top:1px solid var(--line-1); padding:10px 14px 10px 18px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  .mbx-tracker {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:.72rem; font-weight:700; color:var(--muted);
+    padding:5px 10px; border-radius:50px;
+    border:1px solid var(--line-1); background:var(--panel-3);
+    text-decoration:none;
+    transition:color var(--transition),border-color var(--transition);
+  }
+  .mbx-tracker:hover { color:var(--yellow); border-color:var(--yellow-line); }
+
+  /* Review section */
+  .mbx-review-done {
+    display:flex; align-items:center; gap:6px;
+    font-size:.78rem; font-weight:700; color:var(--muted);
+  }
+  .mbx-stars { color:var(--yellow); letter-spacing:1px; }
+
+  .mbx-review-form {
+    border-top:1px solid var(--line-1); padding:14px 14px 14px 18px;
+    display:none; flex-direction:column; gap:10px;
+    background:rgba(255,255,255,.02);
+  }
+  .mbx-review-form.open { display:flex; }
+  .mbx-stars-input { display:flex; gap:4px; flex-direction:row-reverse; }
+  .mbx-stars-input input { display:none; }
+  .mbx-stars-input label {
+    font-size:1.8rem; cursor:pointer; color:var(--line-1);
+    transition:color .1s; touch-action:manipulation;
+  }
+  .mbx-stars-input input:checked ~ label,
+  .mbx-stars-input label:hover,
+  .mbx-stars-input label:hover ~ label { color:var(--yellow); }
+  .mbx-review-ta {
+    width:100%; background:var(--panel-3); border:1px solid var(--line-1);
+    border-radius:12px; color:var(--fg); font-family:inherit;
+    font-size:.88rem; padding:10px 12px; resize:none; min-height:68px;
+    outline:none; transition:border-color var(--transition);
+  }
+  .mbx-review-ta:focus { border-color:var(--yellow-line); }
+  .mbx-review-ta::placeholder { color:var(--muted); }
+
+  /* Reschedule form */
+  .mbx-reschedule-form {
+    border-top:1px solid var(--line-1); padding:14px 14px 14px 18px;
+    display:none; flex-direction:column; gap:10px;
+    background:rgba(255,255,255,.02);
+  }
+  .mbx-reschedule-form.open { display:flex; }
+  .mbx-reschedule-form label { font-size:.75rem; font-weight:700; color:var(--muted); }
+  .mbx-reschedule-form input[type="datetime-local"] {
+    width:100%; background:var(--panel-3); border:1px solid var(--line-1);
+    border-radius:12px; color:var(--fg); font-family:inherit; font-size:.9rem;
+    padding:10px 12px; outline:none; transition:border-color .2s;
+  }
+  .mbx-reschedule-form input:focus { border-color:var(--yellow-line); }
+  .mbx-reschedule-msg { font-size:.78rem; font-weight:600; display:none; padding:8px 10px; border-radius:8px; }
+  .mbx-reschedule-msg.show.ok    { display:block; background:rgba(52,199,89,.1); color:#34c759; border:1px solid rgba(52,199,89,.3); }
+  .mbx-reschedule-msg.show.error { display:block; background:rgba(240,83,62,.1); color:var(--error); border:1px solid rgba(240,83,62,.25); }
+
+  /* Actions bar */
+  .mbx-actions-bar {
+    border-top:1px solid var(--line-1); padding:10px 14px 10px 18px;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+
+  /* Empty & loading */
+  .mbx-empty {
+    text-align:center; padding:52px 16px; color:var(--muted);
+  }
+  .mbx-empty__icon { font-size:3rem; margin-bottom:14px; display:block; opacity:.5; }
+  .mbx-empty p { font-size:.9rem; margin-bottom:20px; font-weight:600; }
+
+  .mbx-loading {
+    display:flex; align-items:center; justify-content:center;
+    gap:10px; padding:52px 16px; color:var(--muted); font-size:.9rem;
+  }
+  .mbx-dot {
+    width:7px; height:7px; border-radius:50%;
+    background:var(--yellow); opacity:.4;
+    animation:mbx-bounce 1.2s ease infinite;
+  }
+  .mbx-dot:nth-child(2) { animation-delay:.2s; }
+  .mbx-dot:nth-child(3) { animation-delay:.4s; }
+  @keyframes mbx-bounce { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+  </style>
+</head>
+<body>
+
+  <!-- STICKY HEADER -->
+  <header class="m-header" id="mHeader">
+    <div class="m-header__inner">
+      <a class="m-brand" href="mobile.html" aria-label="DR.Care الرئيسية">
+        <span class="m-brand__mark" aria-hidden="true">DR</span>
+        <span class="m-brand__text">
+          <strong>DR.Care</strong>
+          <small id="headerSub">حسابي</small>
+        </span>
+      </a>
+      <div class="m-header__actions">
+        <button class="m-btn m-btn--ghost m-btn--sm" id="logoutBtn" style="display:none">خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mbx-page">
+
+    <!-- ══ AUTH ══ -->
+    <section class="mbx-auth" id="authSection" aria-label="تسجيل الدخول">
+      <div class="mbx-auth-logo">
+        <div class="mbx-auth-logo__mark">DR</div>
+        <h1>DR.Care</h1>
+        <p>حسابك الشخصي</p>
+      </div>
+      <div class="mbx-auth-tabs" role="tablist">
+        <button class="mbx-auth-tab active" data-tab="login" role="tab" aria-selected="true">تسجيل دخول</button>
+        <button class="mbx-auth-tab" data-tab="register" role="tab" aria-selected="false">حساب جديد</button>
+      </div>
+
+      <div class="mbx-form-panel show" id="loginPanel">
+        <div class="mbx-auth-msg" id="loginMsg" role="alert" aria-live="polite"></div>
+        <div class="mbx-field"><label for="loginEmail">البريد الإلكتروني</label><input type="email" id="loginEmail" placeholder="your@email.com" inputmode="email" autocomplete="email" required></div>
+        <div class="mbx-field"><label for="loginPassword">كلمة المرور</label><input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required></div>
+        <button class="m-btn m-btn--primary m-btn--lg" style="width:100%" id="loginBtn" type="button">تسجيل الدخول</button>
+      </div>
+
+      <div class="mbx-form-panel" id="registerPanel">
+        <div class="mbx-auth-msg" id="registerMsg" role="alert" aria-live="polite"></div>
+        <div class="mbx-field"><label for="regName">الاسم الكامل</label><input type="text" id="regName" placeholder="أحمد محمد" autocomplete="name" autocorrect="off" required></div>
+        <div class="mbx-field"><label for="regEmail">البريد الإلكتروني</label><input type="email" id="regEmail" placeholder="your@email.com" inputmode="email" autocomplete="email" required></div>
+        <div class="mbx-field"><label for="regPhone">رقم الموبايل</label><input type="tel" id="regPhone" placeholder="01012345678" inputmode="numeric" autocomplete="tel" required></div>
+        <div class="mbx-field"><label for="regPassword">كلمة المرور</label><input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password" required></div>
+        <div class="mbx-field"><label for="regConfirm">تأكيد كلمة المرور</label><input type="password" id="regConfirm" placeholder="••••••••" autocomplete="new-password" required></div>
+        <button class="m-btn m-btn--primary m-btn--lg" style="width:100%" id="registerBtn" type="button">إنشاء حساب</button>
+      </div>
+      <p class="mbx-auth-back"><a href="mobile.html">← العودة للموقع</a></p>
+    </section>
+
+    <!-- ══ BOOKINGS ══ -->
+    <section class="mbx-bookings" id="bookingsSection" aria-label="حجوزاتي">
+
+      <!-- Hero -->
+      <div class="mbx-hero">
+        <div class="mbx-hero__glow" aria-hidden="true"></div>
+        <div class="mbx-hero__top">
+          <div class="mbx-hero__avatar-wrap">
+            <div class="mbx-hero__avatar" id="customerAvatar">—</div>
+            <div class="mbx-hero__avatar-ring" aria-hidden="true"></div>
+          </div>
+          <div class="mbx-hero__info">
+            <strong class="mbx-hero__name" id="customerName">—</strong>
+            <small class="mbx-hero__email" id="customerEmail">—</small>
+            <span class="mbx-hero__badge">★ عضو DR.Care</span>
+          </div>
+        </div>
+        <div class="mbx-stats" id="summaryStrip" style="display:none">
+          <div class="mbx-stat">
+            <strong id="sumTotal">—</strong>
+            <span>حجز</span>
+          </div>
+          <div class="mbx-stat mbx-stat--active">
+            <strong id="sumActive">—</strong>
+            <span>نشط</span>
+          </div>
+          <div class="mbx-stat mbx-stat--gold">
+            <strong id="sumSpent">—</strong>
+            <span>مصروف</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification bar -->
+      <div class="mbx-notif" id="notifBar" role="complementary">
+        <span class="mbx-notif__icon">🔔</span>
+        <div class="mbx-notif__text">
+          <strong>فعّل الإشعارات</strong>
+          <small>اعرف حالة طلبك فور تغييرها</small>
+        </div>
+        <button class="m-btn m-btn--primary m-btn--sm" id="notifBtn" type="button">تفعيل</button>
+      </div>
+
+      <!-- Email verify banner -->
+      <div id="verifyBanner" style="display:none;margin:0 12px 4px;background:rgba(255,210,31,.08);border:1px solid rgba(255,210,31,.22);border-radius:14px;padding:12px 14px;gap:10px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:1.1rem;flex-shrink:0">📧</span>
+        <div style="flex:1;min-width:140px">
+          <strong style="display:block;font-size:.82rem;color:var(--yellow)">فعّل بريدك الإلكتروني</strong>
+          <small style="font-size:.72rem;color:var(--muted)">تحقق من بريدك وانقر رابط التفعيل</small>
+        </div>
+        <button id="resendVerifyBtn" class="m-btn m-btn--ghost m-btn--sm" style="font-size:.72rem;flex-shrink:0">إرسال مرة أخرى</button>
+        <button id="dismissVerifyBanner" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;padding:2px 4px;flex-shrink:0" aria-label="إغلاق">✕</button>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="mbx-action-strip">
+        <a class="m-btn m-btn--primary m-btn--sm" href="mobile.html#booking">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          حجز جديد
+        </a>
+        <a class="m-btn m-btn--ghost m-btn--sm" href="mobile-profile.html">حسابي</a>
+        <a class="m-btn m-btn--ghost m-btn--sm" href="https://wa.me/201005552026" target="_blank" rel="noopener" style="color:#25d366;border-color:rgba(37,211,102,.35)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          واتساب
+        </a>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="mbx-filter-wrap">
+        <div class="mbx-filter-tabs" role="tablist">
+          <button class="mbx-filter-tab active" data-filter="all" role="tab">الكل <span class="mbx-filter-count" id="countAll">—</span></button>
+          <button class="mbx-filter-tab" data-filter="active" role="tab">نشطة <span class="mbx-filter-count" id="countActive">—</span></button>
+          <button class="mbx-filter-tab" data-filter="completed" role="tab">مكتملة <span class="mbx-filter-count" id="countCompleted">—</span></button>
+        </div>
+      </div>
+
+      <!-- List -->
+      <div class="mbx-list-wrap">
+        <p class="mbx-list-title">حجوزاتك</p>
+        <div class="mbx-list" id="bookingsList">
+          <div class="mbx-loading">
+            <div class="mbx-dot"></div><div class="mbx-dot"></div><div class="mbx-dot"></div>
+            <span>جاري التحميل...</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+  'use strict';
+
+  /* ── CSRF ── */
+  let _csrf = '';
+  fetch('api/csrf.php', { credentials:'same-origin' })
+    .then(r => r.json()).then(d => { _csrf = d.token || ''; }).catch(() => {});
+  const csrfFetch = (url, opts={}) => {
+    const h = { 'Content-Type':'application/json', ...(opts.headers||{}) };
+    if (_csrf) h['X-CSRF-Token'] = _csrf;
+    return fetch(url, { credentials:'same-origin', ...opts, headers:h });
+  };
+
+  const STATUS_LABELS = { new:'جديد', confirmed:'مؤكد', in_service:'قيد التنفيذ', completed:'تم التسليم', cancelled:'ملغي' };
+  const ACTIVE_STATUSES = new Set(['new','confirmed','in_service']);
+  const esc      = v => String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const price    = v => `${Number(v).toLocaleString('ar-EG')} جنيه`;
+  const fmtDate  = v => v ? new Date(v).toLocaleDateString('ar-EG',{year:'numeric',month:'short',day:'numeric'}) : '—';
+  const fmtAppt  = v => v ? new Date(v).toLocaleDateString('ar-EG',{weekday:'short',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}) : null;
+  const starsHtml= n => '★'.repeat(n)+'☆'.repeat(5-n);
+
+  let allBookings   = [];
+  let currentFilter = 'all';
+
+  const authSection     = document.getElementById('authSection');
+  const bookingsSection = document.getElementById('bookingsSection');
+  const logoutBtn       = document.getElementById('logoutBtn');
+
+  window.addEventListener('scroll', () => {
+    document.getElementById('mHeader')?.classList.toggle('is-scrolled', window.scrollY > 10);
+  }, { passive:true });
+
+  /* ── Show bookings ── */
+  const showBookings = (user) => {
+    document.getElementById('customerName').textContent   = user.name  || 'العميل';
+    document.getElementById('customerEmail').textContent  = user.email || '—';
+    document.getElementById('customerAvatar').textContent = (user.name?.charAt(0)||'—').toUpperCase();
+    document.getElementById('headerSub').textContent      = 'حجوزاتي';
+    logoutBtn.style.display = '';
+    authSection.classList.add('hiding');
+    setTimeout(() => {
+      authSection.style.display = 'none';
+      bookingsSection.classList.add('visible');
+      requestAnimationFrame(() => bookingsSection.classList.add('shown'));
+      loadBookings();
+      initNotifBar();
+    }, 350);
+  };
+
+  /* ── Filters ── */
+  document.querySelectorAll('.mbx-filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mbx-filter-tab').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-selected'); });
+      btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+      currentFilter = btn.dataset.filter;
+      renderList();
+    });
+  });
+
+  const getFiltered = () => {
+    if (currentFilter==='active')    return allBookings.filter(b=>ACTIVE_STATUSES.has(b.status));
+    if (currentFilter==='completed') return allBookings.filter(b=>b.status==='completed'||b.status==='cancelled');
+    return allBookings;
+  };
+
+  /* ── Render ── */
+  const renderList = () => {
+    const list     = document.getElementById('bookingsList');
+    const filtered = getFiltered();
+
+    if (!filtered.length) {
+      const empty = allBookings.length===0;
+      list.innerHTML = `
+        <div class="mbx-empty">
+          <span class="mbx-empty__icon">${empty?'📋':'🔍'}</span>
+          <p>${empty?'لا توجد حجوزات حتى الآن':'لا توجد نتائج في هذا التبويب'}</p>
+          ${empty?`<a class="m-btn m-btn--primary" href="mobile.html#booking">احجز الآن</a>`:''}
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(b => {
+      const isActive      = ACTIVE_STATUSES.has(b.status);
+      const isCompleted   = b.status==='completed';
+      const isCancellable = b.status==='new'||b.status==='confirmed';
+      const appt          = fmtAppt(b.appointment);
+
+      const apptRow = (isActive && appt) ? `
+        <div class="mbx-card__appt">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          الموعد: ${appt}
+        </div>` : '';
+
+      const trackerLink = isActive ? `
+        <a class="mbx-tracker" href="booking-tracker.html?id=${esc(b.id)}" target="_blank">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          تتبع لحظي
+        </a>` : '';
+
+      const actionsBar = isCancellable ? `
+        <div class="mbx-actions-bar">
+          <button class="m-btn m-btn--ghost m-btn--sm" data-reschedule-btn="${esc(b.id)}" type="button">📅 تعديل الموعد</button>
+          <button class="m-btn m-btn--ghost m-btn--sm" data-cancel-booking="${esc(b.id)}" type="button" style="color:var(--error);border-color:rgba(240,83,62,.3)">إلغاء</button>
+        </div>
+        <div class="mbx-reschedule-form" id="reschedule-form-${esc(b.id)}">
+          <label>الموعد الجديد</label>
+          <input type="datetime-local" id="reschedule-date-${esc(b.id)}">
+          <p class="mbx-reschedule-msg" id="reschedule-msg-${esc(b.id)}"></p>
+          <div style="display:flex;gap:8px">
+            <button class="m-btn m-btn--primary" style="flex:1;min-height:40px" data-confirm-reschedule="${esc(b.id)}" type="button">تأكيد</button>
+            <button class="m-btn m-btn--ghost" style="min-height:40px" data-close-reschedule="${esc(b.id)}" type="button">إلغاء</button>
+          </div>
+        </div>` : '';
+
+      const reviewSection = isCompleted
+        ? b.review
+          ? `<div class="mbx-card__footer"><div class="mbx-review-done"><span class="mbx-stars">${starsHtml(b.review.rating)}</span> تم التقييم</div></div>`
+          : `<div class="mbx-card__footer">
+               <button class="m-btn m-btn--ghost m-btn--sm" data-review-btn="${esc(b.id)}" type="button">⭐ قيّم الخدمة</button>
+             </div>
+             <div class="mbx-review-form" id="review-form-${esc(b.id)}">
+               <div class="mbx-stars-input">
+                 ${[5,4,3,2,1].map(i=>`<input type="radio" name="rating-${esc(b.id)}" id="star-${esc(b.id)}-${i}" value="${i}"><label for="star-${esc(b.id)}-${i}" title="${i} نجوم">★</label>`).join('')}
+               </div>
+               <textarea class="mbx-review-ta" id="comment-${esc(b.id)}" placeholder="شارك تجربتك مع DR.Care..." maxlength="500"></textarea>
+               <div style="display:flex;gap:8px">
+                 <button class="m-btn m-btn--primary" style="flex:1;min-height:40px" data-submit-review="${esc(b.id)}" type="button">إرسال</button>
+                 <button class="m-btn m-btn--ghost" style="min-height:40px" data-cancel-review="${esc(b.id)}" type="button">إلغاء</button>
+               </div>
+             </div>` : '';
+
+      const hasFooter = isActive || reviewSection;
+
+      return `
+        <div class="mbx-card mbx-card--${esc(b.status)} reveal" id="booking-${esc(b.id)}">
+          <div class="mbx-card__stripe" aria-hidden="true"></div>
+          <div class="mbx-card__inner">
+            <div class="mbx-card__top">
+              <span class="mbx-card__id">#${esc(b.id)}</span>
+              <span class="mbx-card__pkg">${esc(b.package_name)}</span>
+              <span class="mbx-badge mbx-badge--${esc(b.status)}">${STATUS_LABELS[b.status]||esc(b.status)}</span>
+            </div>
+            ${apptRow}
+            <div class="mbx-card__grid">
+              <div class="mbx-card__cell"><label>نوع العربية</label><value>${esc(b.car_type_name)}</value></div>
+              <div class="mbx-card__cell"><label>الفرع</label><value>${esc(b.branch)}</value></div>
+              <div class="mbx-card__cell mbx-card__price"><label>السعر</label><value>${price(b.total_price)}</value></div>
+              <div class="mbx-card__cell"><label>الدفع</label><value>${esc(b.payment_method||'—')}</value></div>
+              ${b.plate_number?`<div class="mbx-card__cell"><label>اللوحة</label><value>${esc(b.plate_number)}</value></div>`:''}
+              ${b.notes?`<div class="mbx-card__cell span-2"><label>ملاحظات</label><value style="font-weight:500;color:var(--muted)">${esc(b.notes)}</value></div>`:''}
+            </div>
+          </div>
+          ${hasFooter?`<div class="mbx-card__footer">${trackerLink}${reviewSection?'':''}</div>`:''}
+          ${reviewSection}
+          ${actionsBar}
+        </div>`;
+    }).join('');
+
+    /* reveal */
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);} });
+    },{threshold:.08});
+    list.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  };
+
+  /* ── Interactions (delegated) ── */
+  const minAppt = () => { const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()+15); return d.toISOString().slice(0,16); };
+
+  document.getElementById('bookingsList').addEventListener('click', async e => {
+    /* Cancel booking */
+    const cancelBookingBtn = e.target.closest('[data-cancel-booking]');
+    if (cancelBookingBtn) {
+      const id = cancelBookingBtn.dataset.cancelBooking;
+      if (!confirm('هل أنت متأكد من إلغاء الحجز؟')) return;
+      cancelBookingBtn.disabled=true; cancelBookingBtn.textContent='...';
+      try {
+        const res  = await csrfFetch('api/customer-bookings.php',{method:'PATCH',body:JSON.stringify({id:Number(id),action:'cancel'})});
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok||!data.ok){alert(data.message||'حدث خطأ');return;}
+        if(navigator.vibrate)navigator.vibrate([50,50,50]);
+        await loadBookings();
+      } catch{alert('خطأ في الاتصال');}
+      finally{cancelBookingBtn.disabled=false;cancelBookingBtn.textContent='إلغاء';}
+      return;
+    }
+
+    /* Open reschedule */
+    const rescheduleBtn = e.target.closest('[data-reschedule-btn]');
+    if (rescheduleBtn) {
+      const id=rescheduleBtn.dataset.rescheduleBtn;
+      const form=document.getElementById(`reschedule-form-${id}`);
+      const inp=document.getElementById(`reschedule-date-${id}`);
+      if(inp)inp.min=minAppt();
+      form?.classList.toggle('open');
+      return;
+    }
+
+    /* Close reschedule */
+    const closeR = e.target.closest('[data-close-reschedule]');
+    if (closeR) { document.getElementById(`reschedule-form-${closeR.dataset.closeReschedule}`)?.classList.remove('open'); return; }
+
+    /* Confirm reschedule */
+    const confirmR = e.target.closest('[data-confirm-reschedule]');
+    if (confirmR) {
+      const id=confirmR.dataset.confirmReschedule;
+      const appt=document.getElementById(`reschedule-date-${id}`)?.value;
+      const msg=document.getElementById(`reschedule-msg-${id}`);
+      const showM=(t,type)=>{msg.textContent=t;msg.className=`mbx-reschedule-msg show ${type}`;};
+      if(!appt){showM('اختار الموعد الجديد','error');return;}
+      confirmR.disabled=true;confirmR.textContent='...';
+      try {
+        const res=await csrfFetch('api/customer-bookings.php',{method:'PATCH',body:JSON.stringify({id:Number(id),action:'reschedule',appointment:appt})});
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok||!data.ok){showM(data.message||'حدث خطأ','error');return;}
+        showM('تم تعديل الموعد ✓','ok');
+        if(navigator.vibrate)navigator.vibrate([50,50,50]);
+        setTimeout(()=>loadBookings(),1200);
+      }catch{showM('خطأ في الاتصال','error');}
+      finally{confirmR.disabled=false;confirmR.textContent='تأكيد';}
+      return;
+    }
+
+    /* Review open */
+    const reviewBtn=e.target.closest('[data-review-btn]');
+    if(reviewBtn){const id=reviewBtn.dataset.reviewBtn;document.getElementById(`review-form-${id}`)?.classList.toggle('open');reviewBtn.style.display='none';return;}
+
+    /* Review cancel */
+    const cancelR=e.target.closest('[data-cancel-review]');
+    if(cancelR){
+      const id=cancelR.dataset.cancelReview;
+      document.getElementById(`review-form-${id}`)?.classList.remove('open');
+      const btn=document.querySelector(`[data-review-btn="${id}"]`);if(btn)btn.style.display='';
+      return;
+    }
+
+    /* Review submit */
+    const submitR=e.target.closest('[data-submit-review]');
+    if(submitR){
+      const id=submitR.dataset.submitReview;
+      const ratingEl=document.querySelector(`input[name="rating-${id}"]:checked`);
+      const comment=(document.getElementById(`comment-${id}`)?.value||'').trim();
+      if(!ratingEl){if(navigator.vibrate)navigator.vibrate(200);return;}
+      submitR.disabled=true;submitR.textContent='...';
+      try {
+        const res=await csrfFetch('api/reviews.php',{method:'POST',body:JSON.stringify({booking_id:Number(id),rating:Number(ratingEl.value),comment})});
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok||!data.ok){alert(data.message||'حدث خطأ');return;}
+        const card=document.getElementById(`booking-${id}`);
+        const bar=card?.querySelector('.mbx-card__footer');
+        const form=document.getElementById(`review-form-${id}`);
+        if(bar)bar.innerHTML=`<div class="mbx-review-done"><span class="mbx-stars">${starsHtml(Number(ratingEl.value))}</span> شكراً على تقييمك!</div>`;
+        if(form)form.remove();
+        if(navigator.vibrate)navigator.vibrate([50,50,50]);
+      }catch{alert('خطأ في الاتصال');}
+      finally{submitR.disabled=false;submitR.textContent='إرسال';}
+      return;
+    }
+  });
+
+  /* ── Load bookings ── */
+  const loadBookings = async () => {
+    const list=document.getElementById('bookingsList');
+    list.innerHTML='<div class="mbx-loading"><div class="mbx-dot"></div><div class="mbx-dot"></div><div class="mbx-dot"></div><span>جاري التحميل...</span></div>';
+    try {
+      const res=await fetch('api/customer-bookings.php',{credentials:'same-origin'});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data.ok){list.innerHTML=`<div class="mbx-empty"><span class="mbx-empty__icon">⚠️</span><p>${esc(data.message||'خطأ')}</p></div>`;return;}
+      allBookings=data.bookings||[];
+
+      await Promise.all(allBookings.filter(b=>b.status==='completed').map(b=>
+        fetch(`api/reviews.php?booking_id=${b.id}`,{credentials:'same-origin'})
+          .then(r=>r.json()).then(d=>{if(d.review)b.review=d.review;}).catch(()=>{})
+      ));
+
+      const active   =allBookings.filter(b=>ACTIVE_STATUSES.has(b.status));
+      const completed=allBookings.filter(b=>b.status==='completed');
+      const spent    =allBookings.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+Number(b.total_price||0),0);
+
+      document.getElementById('countAll').textContent       = allBookings.length;
+      document.getElementById('countActive').textContent    = active.length;
+      document.getElementById('countCompleted').textContent = completed.length;
+      document.getElementById('sumTotal').textContent       = allBookings.length;
+      document.getElementById('sumActive').textContent      = active.length;
+      document.getElementById('sumSpent').textContent       = spent>0?`${Number(spent).toLocaleString('ar-EG')} ج`:'—';
+      if(allBookings.length)document.getElementById('summaryStrip').style.display='';
+
+      renderList();
+    }catch{list.innerHTML='<div class="mbx-empty"><span class="mbx-empty__icon">❌</span><p>خطأ في الاتصال</p></div>';}
+  };
+
+  /* ── Push notifications ── */
+  const VAPID='BNlzhcWCcY69QxDJcesUQybT8K-NVh4ka4EjwbaHdjW4ibISDgZ1_E4EhkE81yDuJ1CKzerVVHSs3jA7nY4kT3U';
+  const initNotifBar = async () => {
+    const bar=document.getElementById('notifBar');
+    const btn=document.getElementById('notifBtn');
+    if(!('Notification'in window)||!('serviceWorker'in navigator))return;
+    if(Notification.permission==='granted'||Notification.permission==='denied'){return;}
+    bar.classList.add('show');
+    btn.addEventListener('click',async()=>{
+      const p=await Notification.requestPermission();
+      if(p!=='granted'){btn.textContent='محظور';btn.disabled=true;return;}
+      try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:VAPID});await fetch('api/push-subscribe.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});}catch{}
+      bar.style.display='none';
+    });
+  };
+
+  /* ── Session check ── */
+  const verifyBanner   = document.getElementById('verifyBanner');
+  const resendVerifyBtn = document.getElementById('resendVerifyBtn');
+  const dismissVerifyBanner = document.getElementById('dismissVerifyBanner');
+
+  dismissVerifyBanner?.addEventListener('click', () => {
+    if (verifyBanner) verifyBanner.style.display = 'none';
+  });
+
+  resendVerifyBtn?.addEventListener('click', async () => {
+    resendVerifyBtn.disabled = true;
+    resendVerifyBtn.textContent = 'جاري الإرسال...';
+    try {
+      const res  = await fetch('api/customer-login.php', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ action: 'resend_verification' })
+      });
+      const data = await res.json().catch(() => ({}));
+      resendVerifyBtn.textContent = data.ok ? 'تم الإرسال ✓' : 'حاول مرة أخرى';
+    } catch {
+      resendVerifyBtn.textContent = 'خطأ في الاتصال';
+    } finally {
+      setTimeout(() => { resendVerifyBtn.disabled = false; resendVerifyBtn.textContent = 'إرسال مرة أخرى'; }, 4000);
+    }
+  });
+
+  const checkSession = async () => {
+    try {
+      const res=await fetch('api/customer-login.php?action=check',{credentials:'same-origin'});
+      const data=await res.json().catch(()=>({}));
+      if(data.authenticated){
+        showBookings(data);
+        if(verifyBanner && !data.email_verified) verifyBanner.style.display='flex';
+      }
+    }catch{}
+  };
+
+  /* ── Auth tabs ── */
+  document.querySelectorAll('.mbx-auth-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.mbx-auth-tab').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});
+      document.querySelectorAll('.mbx-form-panel').forEach(p=>p.classList.remove('show'));
+      btn.classList.add('active');btn.setAttribute('aria-selected','true');
+      document.getElementById(btn.dataset.tab==='login'?'loginPanel':'registerPanel').classList.add('show');
+    });
+  });
+
+  const showMsg=(el,text,type)=>{el.textContent=text;el.className=`mbx-auth-msg show ${type}`;};
+
+  /* ── Login ── */
+  document.getElementById('loginBtn').addEventListener('click',async()=>{
+    const email=document.getElementById('loginEmail').value.trim();
+    const password=document.getElementById('loginPassword').value;
+    const msg=document.getElementById('loginMsg');
+    const btn=document.getElementById('loginBtn');
+    if(!email||!password){showMsg(msg,'يجب ملء جميع الحقول','error');return;}
+    btn.disabled=true;btn.textContent='جاري التحقق...';btn.classList.add('m-btn--loading');
+    try{
+      const res=await fetch('api/customer-login.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({email,password,action:'login'})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data.ok){showMsg(msg,data.message||'فشل تسجيل الدخول','error');return;}
+      showMsg(msg,'تم تسجيل الدخول ✓','success');
+      setTimeout(()=>showBookings(data.user||{name:data.name,email}),600);
+    }catch{showMsg(msg,'خطأ في الاتصال','error');if(navigator.vibrate)navigator.vibrate(200);}
+    finally{btn.disabled=false;btn.textContent='تسجيل الدخول';btn.classList.remove('m-btn--loading');}
+  });
+
+  /* ── Register ── */
+  document.getElementById('registerBtn').addEventListener('click',async()=>{
+    const name=document.getElementById('regName').value.trim();
+    const email=document.getElementById('regEmail').value.trim();
+    const phone=document.getElementById('regPhone').value.trim();
+    const password=document.getElementById('regPassword').value;
+    const confirm=document.getElementById('regConfirm').value;
+    const msg=document.getElementById('registerMsg');
+    const btn=document.getElementById('registerBtn');
+    if(!name||!email||!phone||!password||!confirm){showMsg(msg,'يجب ملء جميع الحقول','error');return;}
+    if(password!==confirm){showMsg(msg,'كلمات المرور غير متطابقة','error');return;}
+    if(!/^01[0125][0-9]{8}$/.test(phone)){showMsg(msg,'رقم الموبايل غير صحيح','error');return;}
+    btn.disabled=true;btn.textContent='جاري الإنشاء...';btn.classList.add('m-btn--loading');
+    try{
+      const res=await fetch('api/customer-login.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({name,email,phone,password,action:'register'})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data.ok){showMsg(msg,data.message||'فشل إنشاء الحساب','error');return;}
+      showMsg(msg,'تم إنشاء الحساب ✓','success');
+      setTimeout(()=>showBookings({name,email}),600);
+    }catch{showMsg(msg,'خطأ في الاتصال','error');if(navigator.vibrate)navigator.vibrate(200);}
+    finally{btn.disabled=false;btn.textContent='إنشاء حساب';btn.classList.remove('m-btn--loading');}
+  });
+
+  /* ── Logout ── */
+  logoutBtn.addEventListener('click',async()=>{
+    if(!confirm('هل تريد تسجيل الخروج؟'))return;
+    await fetch('api/customer-login.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout'})}).catch(()=>{});
+    window.location.href='mobile-bookings.html';
+  });
+
+  checkSession();
+  </script>
+</body>
+</html>

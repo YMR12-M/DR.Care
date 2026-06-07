@@ -1,0 +1,17 @@
+{
+  "name": "drcare-frontend",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint script.js admin.js mobile.js idb.js sw.js CarWash-POS/script.js --max-warnings 10",
+    "format": "prettier --write .",
+    "test": "bash scripts/run-tests.sh",
+    "test:php": "composer test:php",
+    "test:python": "python3 -m unittest discover -s tests -p 'test_*.py' -v",
+    "test:java": "bash tests/test_pricing_java.sh"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0"
+  }
+}
