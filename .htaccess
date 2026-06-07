@@ -1,0 +1,17 @@
+Options -Indexes
+
+# Block access to sensitive files
+<FilesMatch "\.(env|pem|key|crt|db|sqlite|json|lock|phar|sh|py|xml)$">
+    Require all denied
+</FilesMatch>
+
+# Allow manifest.json and package.json for PWA
+<Files "manifest.json">
+    Require all granted
+</Files>
+
+RewriteEngine On
+
+# Force HTTPS (Render sets X-Forwarded-Proto)
+RewriteCond %{HTTP:X-Forwarded-Proto} =http
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

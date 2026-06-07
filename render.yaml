@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: drcare
+    runtime: docker
+    plan: starter
+    disk:
+      name: drcare-data
+      mountPath: /var/www/html/data
+      sizeGB: 1
+    envVars:
+      - key: DRCARE_SKIP_ENV_FILE
+        value: "1"
+      - key: DRCARE_APP_ORIGIN
+        sync: false
+      - key: DRCARE_DEFAULT_ADMIN_AUTO_CREATE
+        value: "1"
+      - key: DRCARE_DEFAULT_ADMIN_USER
+        sync: false
+      - key: DRCARE_DEFAULT_ADMIN_PASS
+        sync: false
+      - key: DRCARE_NOTIFICATION_EMAIL
+        sync: false
+      - key: POS_TOKEN
+        sync: false
+      - key: MAILER_SMTP_HOST
+        sync: false
+      - key: MAILER_SMTP_PORT
+        value: "587"
+      - key: MAILER_SMTP_USERNAME
+        sync: false
+      - key: MAILER_SMTP_PASSWORD
+        sync: false
