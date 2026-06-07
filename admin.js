@@ -6,6 +6,25 @@
 
 /* ── CSRF token ── */
 let _adminCsrf = '';
+async function saveAppointment(bookingId) {
+  const input = document.getElementById(`appt-input-${bookingId}`);
+  if (!input) return;
+  const btn = input.nextElementSibling;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await fetchAdminCsrf();
+    const res  = await adminFetch('api/bookings.php', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: bookingId, appointment: input.value || null })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok) { showToast('تم حفظ الموعد ✓', 'success'); fetchBookings(); }
+    else showToast(data.message || 'حدث خطأ', 'error');
+  } catch { showToast('خطأ في الاتصال', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'حفظ الموعد'; }
+}
+
 const fetchAdminCsrf = async () => {
   try {
     const r = await fetch('api/csrf.php', { credentials: 'same-origin' });
@@ -295,9 +314,15 @@ const showBookingDetails = (booking) => {
           <label>رقم اللوحة</label>
           <value>${escapeHtml(booking.plate_number || '—')}</value>
         </div>
-        <div class="modal-cell">
+        <div class="modal-cell" style="grid-column:1/-1">
           <label>الموعد</label>
-          <value>${fmtDate(booking.appointment)}</value>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
+            <input type="datetime-local" id="appt-input-${booking.id}"
+              value="${booking.appointment ? booking.appointment.slice(0,16) : ''}"
+              style="flex:1;min-width:180px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:0.9rem">
+            <button onclick="saveAppointment(${booking.id})" class="btn-sm btn-primary">حفظ الموعد</button>
+            ${booking.appointment ? `<span style="color:var(--muted);font-size:0.8rem">${fmtDate(booking.appointment)}</span>` : '<span style="color:var(--muted);font-size:0.8rem">لم يُحدد بعد</span>'}
+          </div>
         </div>
         <div class="modal-cell">
           <label>طريقة الدفع</label>

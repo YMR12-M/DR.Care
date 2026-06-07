@@ -205,6 +205,17 @@ if ($method === 'PATCH') {
     $detail['payment_status'] = ['from' => $existing['payment_status'] ?? 'pending', 'to' => $input['payment_status']];
   }
 
+  if (array_key_exists('appointment', $input)) {
+    $appt = $input['appointment'];
+    if ($appt !== null && $appt !== '') {
+      $date = DateTime::createFromFormat('Y-m-d\TH:i', $appt);
+      if (!$date) jsonResponse(['ok' => false, 'message' => 'صيغة الموعد غير صالحة'], 400);
+    }
+    $sets[] = 'appointment = :appointment';
+    $params[':appointment'] = ($appt === '' ? null : $appt);
+    $detail['appointment'] = $appt;
+  }
+
   if (empty($sets)) jsonResponse(['ok' => false, 'message' => 'لا يوجد تعديل محدد'], 400);
 
   $pdo->prepare('UPDATE bookings SET ' . implode(', ', $sets) . ' WHERE id = :id')->execute($params);

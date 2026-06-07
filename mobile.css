@@ -785,6 +785,15 @@ button, input, select, textarea { font: inherit; }
   min-height: 88px;
   resize: vertical;
 }
+.m-form__info-note {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
 
 .m-form__label select {
   appearance: none;

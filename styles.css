@@ -1545,6 +1545,15 @@ select {
   display: flex; align-items: center; gap: 10px;
 }
 .form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.form-info-note {
+  grid-column: 1 / -1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
 
 .booking-features {
   display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px;
