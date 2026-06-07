@@ -144,11 +144,7 @@
             </div>
           </div>
           <div class="hero-panel-footer">
-            <span>متاح في القاهرة الجديدة</span>
-            <span class="hero-panel-dot">·</span>
-            <span>مدينة نصر</span>
-            <span class="hero-panel-dot">·</span>
-            <span>الشيخ زايد</span>
+            <span>متاح في قليوب شارع الملحاني</span>
           </div>
         </div>
       </div>
@@ -167,8 +163,8 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </div>
           <div class="strip-text">
-            <strong>3 فروع</strong>
-            <small>القاهرة الجديدة · مدينة نصر · الشيخ زايد</small>
+            <strong>فرع قليوب</strong>
+            <small>شارع الملحاني</small>
           </div>
         </div>
         <div class="strip-item">
@@ -435,33 +431,17 @@
         <div class="section-heading reveal">
           <p class="section-kicker">Our Branches</p>
           <h2 id="branchesTitle">فروعنا على الخريطة</h2>
-          <p class="section-copy">3 فروع في القاهرة الكبرى — اختار الأقرب ليك.</p>
+          <p class="section-copy">فرعنا في قليوب — شارع الملحاني.</p>
         </div>
         <div class="branches-layout reveal">
           <div class="branches-list">
             <div class="branch-card active" data-branch-desktop="0">
               <div class="branch-card__dot"></div>
               <div class="branch-card__info">
-                <strong>القاهرة الجديدة</strong>
+                <strong>قليوب شارع الملحاني</strong>
                 <small>يومياً 9ص – 12م</small>
               </div>
-              <a class="branch-card__nav" href="https://maps.google.com/?q=القاهرة+الجديدة+مصر" target="_blank" rel="noopener">فتح الخريطة ↗</a>
-            </div>
-            <div class="branch-card" data-branch-desktop="1">
-              <div class="branch-card__dot"></div>
-              <div class="branch-card__info">
-                <strong>مدينة نصر</strong>
-                <small>يومياً 9ص – 12م</small>
-              </div>
-              <a class="branch-card__nav" href="https://maps.google.com/?q=مدينة+نصر+القاهرة+مصر" target="_blank" rel="noopener">فتح الخريطة ↗</a>
-            </div>
-            <div class="branch-card" data-branch-desktop="2">
-              <div class="branch-card__dot"></div>
-              <div class="branch-card__info">
-                <strong>الشيخ زايد</strong>
-                <small>يومياً 9ص – 12م</small>
-              </div>
-              <a class="branch-card__nav" href="https://maps.google.com/?q=الشيخ+زايد+الجيزة+مصر" target="_blank" rel="noopener">فتح الخريطة ↗</a>
+              <a class="branch-card__nav" href="https://maps.google.com/?q=قليوب+شارع+الملحاني+مصر" target="_blank" rel="noopener">فتح الخريطة ↗</a>
             </div>
             <a class="btn btn-ghost" href="tel:01005552026" style="margin-top:8px;justify-content:center">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -687,12 +667,10 @@
     const el = document.getElementById('drcare-map-desktop');
     if (!el) return;
     const BRANCHES = [
-      { name: 'القاهرة الجديدة', lat: 30.0131, lng: 31.4961 },
-      { name: 'مدينة نصر',       lat: 30.0574, lng: 31.3243 },
-      { name: 'الشيخ زايد',      lat: 30.0459, lng: 30.9418 }
+      { name: 'قليوب شارع الملحاني', lat: 30.1877, lng: 31.2041 }
     ];
     const map = L.map(el, { zoomControl: true, attributionControl: false })
-      .setView([30.0274, 31.2357], 9);
+      .setView([30.1877, 31.2041], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
     const icon = L.divIcon({
       html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#ffd21f;transform:rotate(-45deg);border:3px solid #0a0800;box-shadow:0 4px 12px rgba(255,210,31,.6)"></div>`,

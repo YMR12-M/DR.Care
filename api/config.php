@@ -13,6 +13,6 @@ return [
     ['code' => 'van',    'name' => 'فان',      'extra' => 90],
     ['code' => 'pickup', 'name' => 'نقل خفيف','extra' => 120]
   ],
-  'branches' => ['القاهرة الجديدة', 'مدينة نصر', 'الشيخ زايد'],
+  'branches' => ['قليوب شارع الملحاني'],
   'paymentMethods' => ['كاش', 'Instapay', 'Vodafone Cash', 'بطاقة بنكية']
 ];
