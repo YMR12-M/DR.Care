@@ -288,7 +288,9 @@ TEXT;
 /* ── HTTPS Enforcement (production only) ── */
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $isLocal = preg_match('/^(localhost|127\.|192\.168\.|10\.|::1)/i', $host);
-if (!$isLocal && empty($_SERVER['HTTPS'])) {
+$isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
+        || (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+if (!$isLocal && !$isHttps) {
   header('Location: https://' . $host . ($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
   exit;
 }
