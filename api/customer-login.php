@@ -12,10 +12,10 @@ function sendVerificationEmail(string $email, string $name, string $token): void
   $appOrigin = getEnvValue('DRCARE_APP_ORIGIN', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
   $url       = rtrim($appOrigin, '/') . '/verify-email.html?token=' . urlencode($token);
   $body      = <<<TEXT
-مرحباً $name،
+مرحباً {$name}،
 
 أهلاً بك في DR.Care! لتفعيل بريدك الإلكتروني اضغط على الرابط التالي (صالح 24 ساعة):
-$url
+{$url}
 
 إذا لم تسجل في DR.Care، تجاهل هذه الرسالة.
 
