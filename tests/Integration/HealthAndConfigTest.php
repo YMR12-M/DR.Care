@@ -30,11 +30,11 @@ final class HealthAndConfigTest extends ApiTestCase
 
     public function testPricingEndpointCalculatesPrice(): void
     {
-        $response = self::$client->get('/api/pricing.php?package=full&car_type=suv');
+        $response = self::$client->get('/api/pricing.php?package=inside-out&car_type=suv');
 
         $this->assertSame(200, $response['status']);
         $this->assertTrue($response['body']['ok'] ?? false);
-        $this->assertSame(340, $response['body']['price']);
+        $this->assertSame(210, $response['body']['price']);
     }
 
     public function testPricingRejectsMissingParams(): void

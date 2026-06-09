@@ -48,11 +48,11 @@ final class AdminAndCouponsTest extends ApiTestCase
         $validate = self::$client->post('/api/coupons.php', [
             'action' => 'validate',
             'code' => 'TEST20',
-            'subtotal' => 340,
+            'subtotal' => 210,
         ]);
         $this->assertSame(200, $validate['status']);
-        $this->assertEquals(68.0, $validate['body']['discount']);
-        $this->assertEquals(272.0, $validate['body']['new_total']);
+        $this->assertEquals(42.0, $validate['body']['discount']);
+        $this->assertEquals(168.0, $validate['body']['new_total']);
 
         $customer = new HttpClient(self::baseUrl());
         $email = $this->uniqueEmail();
@@ -63,15 +63,15 @@ final class AdminAndCouponsTest extends ApiTestCase
             'name' => 'عميل كوبون',
             'email' => $email,
             'phone' => '01022223333',
-            'servicePackage' => 'full',
+            'servicePackage' => 'inside-out',
             'carType' => 'suv',
-            'branch' => 'مدينة نصر',
+            'branch' => 'قليوب — شارع العروبة',
             'paymentMethod' => 'كاش',
             'couponCode' => 'TEST20',
         ], ['X-CSRF-Token' => $token]);
 
         $this->assertSame(201, $booking['status']);
-        $this->assertSame(272, $booking['body']['booking']['total'] ?? null);
+        $this->assertSame(168, $booking['body']['booking']['total'] ?? null);
 
         $pdo = new PDO('sqlite:' . self::dbPath());
         $used = (int) $pdo->query("SELECT used_count FROM coupons WHERE code = 'TEST20'")->fetchColumn();

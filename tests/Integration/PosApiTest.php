@@ -33,22 +33,22 @@ final class PosApiTest extends ApiTestCase
             'token' => self::POS_TOKEN,
             'name' => 'عميل POS',
             'phone' => '01044445555',
-            'packageCode' => 'quick',
+            'packageCode' => 'outside',
             'carType' => 'sedan',
-            'branch' => 'الشيخ زايد',
+            'branch' => 'قليوب — شارع العروبة',
             'paymentMethod' => 'كاش',
             'plateNumber' => 'س ي 9999',
         ]);
 
         $this->assertSame(200, $create['status'], $create['raw'] ?? '');
         $this->assertTrue($create['body']['ok'] ?? false);
-        $this->assertSame(150, $create['body']['booking']['total_price'] ?? null);
+        $this->assertSame(100, $create['body']['booking']['total_price'] ?? null);
         $this->assertSame('new', $create['body']['booking']['status'] ?? null);
 
         $today = self::$client->get('/api/pos.php?action=today', $this->posHeaders());
         $this->assertSame(200, $today['status'], $today['raw'] ?? '');
         $this->assertNotEmpty($today['body']['bookings']);
-        $this->assertGreaterThanOrEqual(150, $today['body']['revenue'] ?? 0);
+        $this->assertGreaterThanOrEqual(100, $today['body']['revenue'] ?? 0);
     }
 
     public function testPosSearchFindsBooking(): void
@@ -57,10 +57,10 @@ final class PosApiTest extends ApiTestCase
             'token' => self::POS_TOKEN,
             'name' => 'بحث POS',
             'phone' => '01066667777',
-            'packageCode' => 'full',
+            'packageCode' => 'inside-out',
             'carType' => 'sedan',
-            'branch' => 'مدينة نصر',
-            'paymentMethod' => 'Instapay',
+            'branch' => 'قليوب — شارع العروبة',
+            'paymentMethod' => 'كاش',
         ]);
 
         $search = self::$client->get(

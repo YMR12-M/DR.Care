@@ -28,7 +28,7 @@ final class BookingFlowTest extends ApiTestCase
 
         $this->assertSame(201, $response['status'], $response['raw'] ?? '');
         $this->assertTrue($response['body']['ok'] ?? false);
-        $this->assertSame(340, $response['body']['booking']['total'] ?? null);
+        $this->assertSame(210, $response['body']['booking']['total'] ?? null);
 
         $list = $client->get('/api/customer-bookings.php');
         $this->assertSame(200, $list['status']);
@@ -93,10 +93,11 @@ final class BookingFlowTest extends ApiTestCase
         $this->assertSame(200, $list['status']);
         $this->assertNotEmpty($list['body']['bookings']);
 
+        $csrf = $this->csrfToken($admin);
         $patch = $admin->patch('/api/bookings.php', [
             'id' => $bookingId,
             'status' => 'confirmed',
-        ]);
+        ], ['X-CSRF-Token' => $csrf]);
         $this->assertSame(200, $patch['status']);
         $this->assertTrue($patch['body']['ok'] ?? false);
 

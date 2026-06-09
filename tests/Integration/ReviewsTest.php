@@ -27,10 +27,11 @@ final class ReviewsTest extends ApiTestCase
         $this->assertSame(400, $early['status']);
 
         $this->loginAdmin(self::$adminClient);
+        $adminCsrf = $this->csrfToken(self::$adminClient);
         self::$adminClient->patch('/api/bookings.php', [
             'id' => $bookingId,
             'status' => 'completed',
-        ]);
+        ], ['X-CSRF-Token' => $adminCsrf]);
 
         $review = $customer->post('/api/reviews.php', [
             'booking_id' => $bookingId,
