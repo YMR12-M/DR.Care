@@ -6,23 +6,46 @@
 
 /* ── CSRF token ── */
 let _adminCsrf = '';
-async function saveAppointment(bookingId) {
-  const input = document.getElementById(`appt-input-${bookingId}`);
-  if (!input) return;
-  const btn = input.nextElementSibling;
+async function loadSlotsForBooking(bookingId) {
+  const select = document.getElementById(`slot-select-${bookingId}`);
+  if (!select) return;
+  select.innerHTML = '<option value="">جاري التحميل...</option>';
+  try {
+    const res  = await adminFetch('api/slots.php?admin=1');
+    const data = await res.json().catch(() => ({}));
+    const slots = (data.all_slots || []).filter(s => s.is_active);
+    if (!slots.length) {
+      select.innerHTML = '<option value="">لا توجد مواعيد متاحة</option>';
+      return;
+    }
+    select.innerHTML = '<option value="">اختر موعداً...</option>' + slots.map(s => {
+      const dt    = new Date(s.slot_date + 'T' + s.slot_time);
+      const label = dt.toLocaleDateString('ar-EG', { weekday: 'short', month: 'short', day: 'numeric' }) + ' — ' + s.slot_time;
+      const avail = s.max_bookings - s.booked_count;
+      return `<option value="${s.slot_date}T${s.slot_time}">${label} (${avail} متاح)</option>`;
+    }).join('');
+  } catch { select.innerHTML = '<option value="">خطأ في التحميل</option>'; }
+}
+
+async function assignSlotToBooking(bookingId) {
+  const select = document.getElementById(`slot-select-${bookingId}`);
+  const btn    = document.getElementById(`slot-btn-${bookingId}`);
+  if (!select || !btn) return;
+  const appt = select.value;
+  if (!appt) { showToast('اختر موعداً أولاً', 'error'); return; }
   btn.disabled = true; btn.textContent = '...';
   try {
     await fetchAdminCsrf();
     const res  = await adminFetch('api/bookings.php', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: bookingId, appointment: input.value || null })
+      body: JSON.stringify({ id: bookingId, appointment: appt })
     });
     const data = await res.json().catch(() => ({}));
-    if (data.ok) { showToast('تم حفظ الموعد ✓', 'success'); fetchBookings(); }
+    if (data.ok) { showToast('تم تحديد الموعد ✓', 'success'); fetchBookings(); }
     else showToast(data.message || 'حدث خطأ', 'error');
   } catch { showToast('خطأ في الاتصال', 'error'); }
-  finally { btn.disabled = false; btn.textContent = 'حفظ الموعد'; }
+  finally { btn.disabled = false; btn.textContent = 'تحديد الموعد'; }
 }
 
 const fetchAdminCsrf = async () => {
@@ -316,12 +339,13 @@ const showBookingDetails = (booking) => {
         </div>
         <div class="modal-cell" style="grid-column:1/-1">
           <label>الموعد</label>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
-            <input type="datetime-local" id="appt-input-${booking.id}"
-              value="${booking.appointment ? booking.appointment.slice(0,16) : ''}"
-              style="flex:1;min-width:180px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:0.9rem">
-            <button onclick="saveAppointment(${booking.id})" class="btn-sm btn-primary">حفظ الموعد</button>
-            ${booking.appointment ? `<span style="color:var(--muted);font-size:0.8rem">${fmtDate(booking.appointment)}</span>` : '<span style="color:var(--muted);font-size:0.8rem">لم يُحدد بعد</span>'}
+          <value style="display:block;margin-bottom:8px">${booking.appointment ? fmtDate(booking.appointment) : 'لم يُحدد بعد'}</value>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select id="slot-select-${booking.id}"
+              style="flex:1;min-width:200px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:0.9rem">
+              <option value="">جاري التحميل...</option>
+            </select>
+            <button id="slot-btn-${booking.id}" onclick="assignSlotToBooking(${booking.id})" class="btn-sm btn-primary">تحديد الموعد</button>
           </div>
         </div>
         <div class="modal-cell">
@@ -393,6 +417,7 @@ const showBookingDetails = (booking) => {
   bookingDetailsModal.dataset.currentBookingId = booking.id;
   bookingDetailsModal.classList.add('open');
   bookingDetailsModal.setAttribute('aria-hidden', 'false');
+  loadSlotsForBooking(booking.id);
 };
 
 // ─── Full Render ────────────────────────────────────

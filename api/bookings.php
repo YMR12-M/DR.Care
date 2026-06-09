@@ -257,6 +257,9 @@ if ($method === 'PATCH') {
     $sets[] = 'status = :status';
     $params[':status'] = $input['status'];
     $detail['status'] = ['from' => $existing['status'], 'to' => $input['status']];
+    if (in_array($input['status'], ['completed', 'cancelled'], true)) {
+      $sets[] = 'payment_screenshot = NULL';
+    }
   }
 
   if (array_key_exists('payment_status', $input)) {
