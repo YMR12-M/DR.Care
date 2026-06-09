@@ -20,5 +20,5 @@ return [
   ],
   'branches' => ['قليوب — شارع العروبة'],
   'paymentMethods'  => ['كاش', 'Instapay'],
-  'instapayNumber'  => '01XXXXXXXXX'
+  'instapayNumber'  => '01037957593'
 ];

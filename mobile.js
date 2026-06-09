@@ -64,7 +64,7 @@ const fallbackConfig = {
   ],
   branches:       ['قليوب — شارع العروبة'],
   paymentMethods: ['كاش', 'Instapay'],
-  instapayNumber: '01XXXXXXXXX'
+  instapayNumber: '01037957593'
 };
 
 let appConfig     = { ...fallbackConfig };
