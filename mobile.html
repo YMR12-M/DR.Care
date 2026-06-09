@@ -508,8 +508,22 @@
             رقم الموبايل
             <input type="tel" name="phone" placeholder="01XXXXXXXXX" autocomplete="tel" inputmode="numeric" required>
           </label>
-          <div class="m-form__info-note">
-            📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
+          <div id="apptPickerWrap">
+            <label for="apptDate" id="apptDateLabel" class="m-form__label" style="display:none">
+              تاريخ الموعد
+              <select id="apptDate" name="apptDate">
+                <option value="">— اختار يوم —</option>
+              </select>
+            </label>
+            <label for="apptTime" id="apptTimeLabel" class="m-form__label" style="display:none">
+              وقت الموعد
+              <select id="apptTime" name="apptTime">
+                <option value="">— اختار وقت —</option>
+              </select>
+            </label>
+            <div class="m-form__info-note" id="apptFallback">
+              📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
+            </div>
           </div>
         </div>
 

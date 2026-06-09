@@ -398,7 +398,9 @@ bookingForm?.addEventListener('submit', async (e) => {
     phone:          normalize(raw.phone),
     notes:          normalize(raw.notes) || null,
     plateNumber:    normalize(raw.plateNumber) || null,
-    appointment:    normalize(raw.appointment) || null,
+    appointment:    (_mApptDate?.value && _mApptTime?.value)
+                    ? `${_mApptDate.value}T${_mApptTime.value}`
+                    : (normalize(raw.appointment) || null),
     servicePackage: raw.servicePackage,
     carType:        raw.carType,
     branch:         raw.branch,
@@ -417,7 +419,7 @@ bookingForm?.addEventListener('submit', async (e) => {
   if (!payload.email || !isValidEmail(payload.email)) {
     setMessage('اكتب بريد إلكتروني صالح، مثل your@gmail.com.', 'error'); return;
   }
-  if (payload.appointment) {
+  if (payload.appointment && !(_mApptDate?.value && _mApptTime?.value)) {
     const apptDate = new Date(payload.appointment);
     if (isNaN(apptDate) || apptDate < new Date(Date.now() + 15 * 60 * 1000)) {
       setMessage('الميعاد لازم يكون بعد 15 دقيقة من الآن.', 'error'); return;
@@ -711,9 +713,75 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// ─── Appointment Slots ────────────────────────────────
+let _mAvailableSlots = {};
+
+const _mApptDate    = document.getElementById('apptDate');
+const _mApptTime    = document.getElementById('apptTime');
+const _mApptFallback = document.getElementById('apptFallback');
+
+const _mFmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('ar-EG', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+const _mFmtTime = (t) => {
+  const [h, m] = t.split(':').map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'م' : 'ص'}`;
+};
+
+const _mPopulateDates = () => {
+  if (!_mApptDate) return;
+  _mApptDate.innerHTML = '<option value="">— اختار يوم —</option>';
+  Object.keys(_mAvailableSlots).sort().forEach(date => {
+    if (!_mAvailableSlots[date].some(s => s.available > 0)) return;
+    const opt = document.createElement('option');
+    opt.value = date;
+    opt.textContent = _mFmtDate(date);
+    _mApptDate.appendChild(opt);
+  });
+};
+
+const _mPopulateTimes = (dateStr) => {
+  if (!_mApptTime) return;
+  _mApptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+  (_mAvailableSlots[dateStr] || []).filter(s => s.available > 0).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.time;
+    opt.textContent = _mFmtTime(s.time);
+    _mApptTime.appendChild(opt);
+  });
+};
+
+const loadAppointmentSlots = async () => {
+  if (!_mApptDate) return;
+  try {
+    const res  = await fetch('api/slots.php');
+    if (!res.ok) return;
+    const data = await res.json();
+    const slots = data.slots || {};
+    if (!Object.keys(slots).length) return;
+    _mAvailableSlots = slots;
+    _mPopulateDates();
+    if (_mApptFallback) _mApptFallback.style.display = 'none';
+    const dateLabel = document.getElementById('apptDateLabel');
+    if (dateLabel) dateLabel.style.display = '';
+    _mApptDate.addEventListener('change', () => {
+      const d      = _mApptDate.value;
+      const tLabel = document.getElementById('apptTimeLabel');
+      if (d) {
+        _mPopulateTimes(d);
+        if (tLabel) tLabel.style.display = '';
+      } else {
+        if (_mApptTime) _mApptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+        if (tLabel) tLabel.style.display = 'none';
+      }
+    });
+  } catch (_) { /* fallback to static note */ }
+};
+
 /* ── Init ── */
 fetchCsrf();
 loadConfig();
+loadAppointmentSlots();
 setMinimumAppointment();
 checkSession();
 loadReviews();
