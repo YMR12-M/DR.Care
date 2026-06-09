@@ -1877,9 +1877,19 @@ section[id] {
 }
 
 .m-reviews-grid {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--yellow-line) transparent;
 }
+.m-reviews-grid::-webkit-scrollbar { height: 4px; }
+.m-reviews-grid::-webkit-scrollbar-track { background: transparent; }
+.m-reviews-grid::-webkit-scrollbar-thumb { background: var(--yellow-line); border-radius: 2px; }
 
 .m-review-card {
   padding: 18px 20px;
@@ -1887,6 +1897,8 @@ section[id] {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   transition: border-color var(--transition), transform var(--transition);
+  flex: 0 0 82vw;
+  scroll-snap-align: start;
 }
 
 .m-review-card:hover {
@@ -2226,7 +2238,7 @@ section[id] {
 ═══════════════════════════════ */
 @media (min-width: 480px) {
   .m-why-grid { grid-template-columns: repeat(2, 1fr); }
-  .m-reviews-grid { grid-template-columns: repeat(2, 1fr); }
+  .m-reviews-grid .m-review-card { flex: 0 0 60vw; }
   .m-footer__cols { grid-template-columns: repeat(3, 1fr); }
 }
 

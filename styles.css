@@ -1404,10 +1404,19 @@ select {
 
 /* ── Reviews grid ── */
 .reviews-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 14px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--yellow-line) transparent;
 }
+.reviews-grid::-webkit-scrollbar { height: 4px; }
+.reviews-grid::-webkit-scrollbar-track { background: transparent; }
+.reviews-grid::-webkit-scrollbar-thumb { background: var(--yellow-line); border-radius: 2px; }
 
 .review-card {
   background: var(--panel);
@@ -1416,6 +1425,8 @@ select {
   padding: 22px;
   display: flex; flex-direction: column; gap: 12px;
   transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  flex: 0 0 320px;
+  scroll-snap-align: start;
 }
 .review-card:hover {
   border-color: var(--yellow-line);
@@ -1468,11 +1479,11 @@ select {
 @keyframes rev-dot { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
 
 @media (max-width: 860px) {
-  .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+  .reviews-grid .review-card { flex: 0 0 280px; }
   .reviews-summary { gap: 20px; padding: 20px; }
 }
 @media (max-width: 600px) {
-  .reviews-grid { grid-template-columns: 1fr; }
+  .reviews-grid .review-card { flex: 0 0 85vw; }
   .reviews-summary { flex-direction: column; align-items: flex-start; }
 }
 

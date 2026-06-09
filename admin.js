@@ -328,6 +328,17 @@ const showBookingDetails = (booking) => {
           <label>طريقة الدفع</label>
           <value>${escapeHtml(booking.payment_method || '—')}</value>
         </div>
+        ${booking.payment_screenshot ? `
+        <div class="modal-cell modal-cell--wide">
+          <label>إيصال Instapay</label>
+          <div style="margin-top:8px">
+            <a href="${booking.payment_screenshot}" target="_blank" rel="noreferrer">
+              <img src="${booking.payment_screenshot}" alt="إيصال الدفع"
+                style="max-width:100%;max-height:300px;border-radius:10px;border:2px solid var(--line);cursor:zoom-in;object-fit:contain;display:block">
+            </a>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:6px">اضغط على الصورة لعرضها بالحجم الكامل</p>
+          </div>
+        </div>` : ''}
         <div class="modal-cell">
           <label>تاريخ الإنشاء</label>
           <value>${fmtDate(booking.created_at)}</value>
