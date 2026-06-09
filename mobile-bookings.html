@@ -325,12 +325,13 @@
   }
   .mbx-reschedule-form.open { display:flex; }
   .mbx-reschedule-form label { font-size:.75rem; font-weight:700; color:var(--muted); }
-  .mbx-reschedule-form input[type="datetime-local"] {
+  .mbx-reschedule-form select {
     width:100%; background:var(--panel-3); border:1px solid var(--line-1);
     border-radius:12px; color:var(--fg); font-family:inherit; font-size:.9rem;
     padding:10px 12px; outline:none; transition:border-color .2s;
   }
-  .mbx-reschedule-form input:focus { border-color:var(--yellow-line); }
+  .mbx-reschedule-form select:focus { border-color:var(--yellow-line); }
+  .mbx-reschedule-form select:disabled { opacity:.5; }
   .mbx-reschedule-msg { font-size:.78rem; font-weight:600; display:none; padding:8px 10px; border-radius:8px; }
   .mbx-reschedule-msg.show.ok    { display:block; background:rgba(52,199,89,.1); color:#34c759; border:1px solid rgba(52,199,89,.3); }
   .mbx-reschedule-msg.show.error { display:block; background:rgba(240,83,62,.1); color:var(--error); border:1px solid rgba(240,83,62,.25); }
@@ -608,8 +609,9 @@
           <button class="m-btn m-btn--ghost m-btn--sm" data-cancel-booking="${esc(b.id)}" type="button" style="color:var(--error);border-color:rgba(240,83,62,.3)">إلغاء</button>
         </div>
         <div class="mbx-reschedule-form" id="reschedule-form-${esc(b.id)}">
-          <label>الموعد الجديد</label>
-          <input type="datetime-local" id="reschedule-date-${esc(b.id)}">
+          <label>اختار موعد جديد</label>
+          <select id="reschedule-date-${esc(b.id)}"><option value="">جاري التحميل...</option></select>
+          <select id="reschedule-time-${esc(b.id)}" disabled><option value="">— اختار وقت —</option></select>
           <p class="mbx-reschedule-msg" id="reschedule-msg-${esc(b.id)}"></p>
           <div style="display:flex;gap:8px">
             <button class="m-btn m-btn--primary" style="flex:1;min-height:40px" data-confirm-reschedule="${esc(b.id)}" type="button">تأكيد</button>
@@ -694,9 +696,9 @@
     if (rescheduleBtn) {
       const id=rescheduleBtn.dataset.rescheduleBtn;
       const form=document.getElementById(`reschedule-form-${id}`);
-      const inp=document.getElementById(`reschedule-date-${id}`);
-      if(inp)inp.min=minAppt();
+      const wasOpen = form?.classList.contains('open');
       form?.classList.toggle('open');
+      if (!wasOpen) loadRescheduleSlots(id);
       return;
     }
 
@@ -708,10 +710,13 @@
     const confirmR = e.target.closest('[data-confirm-reschedule]');
     if (confirmR) {
       const id=confirmR.dataset.confirmReschedule;
-      const appt=document.getElementById(`reschedule-date-${id}`)?.value;
+      const dateEl=document.getElementById(`reschedule-date-${id}`);
+      const timeEl=document.getElementById(`reschedule-time-${id}`);
       const msg=document.getElementById(`reschedule-msg-${id}`);
       const showM=(t,type)=>{msg.textContent=t;msg.className=`mbx-reschedule-msg show ${type}`;};
-      if(!appt){showM('اختار الموعد الجديد','error');return;}
+      if(!dateEl?.value){showM('اختار التاريخ أولاً','error');return;}
+      if(!timeEl?.value){showM('اختار الوقت أولاً','error');return;}
+      const appt=`${dateEl.value}T${timeEl.value}`;
       confirmR.disabled=true;confirmR.textContent='...';
       try {
         const res=await csrfFetch('api/customer-bookings.php',{method:'PATCH',body:JSON.stringify({id:Number(id),action:'reschedule',appointment:appt})});
@@ -763,6 +768,39 @@
   });
 
   /* ── Load bookings ── */
+  const _mbxRescheduleSlots = {};
+  const loadRescheduleSlots = async (bookingId) => {
+    const dateEl = document.getElementById(`reschedule-date-${bookingId}`);
+    const timeEl = document.getElementById(`reschedule-time-${bookingId}`);
+    if (!dateEl) return;
+    dateEl.innerHTML = '<option value="">جاري التحميل...</option>';
+    timeEl.disabled = true; timeEl.innerHTML = '<option value="">— اختار وقت —</option>';
+    try {
+      const res  = await fetch('api/slots.php');
+      const data = await res.json().catch(() => ({}));
+      const slots = data.slots || {};
+      _mbxRescheduleSlots[bookingId] = slots;
+      const dates = Object.keys(slots);
+      if (!dates.length) { dateEl.innerHTML = '<option value="">لا توجد مواعيد متاحة</option>'; return; }
+      dateEl.innerHTML = '<option value="">— اختار يوم —</option>' + dates.map(d => {
+        const label = new Date(d + 'T00:00').toLocaleDateString('ar-EG', { weekday: 'long', month: 'long', day: 'numeric' });
+        return `<option value="${d}">${label}</option>`;
+      }).join('');
+      dateEl.onchange = () => {
+        const d = dateEl.value;
+        timeEl.innerHTML = '<option value="">— اختار وقت —</option>';
+        timeEl.disabled = !d;
+        if (!d) return;
+        (_mbxRescheduleSlots[bookingId][d] || []).filter(s => s.available > 0).forEach(s => {
+          const h = parseInt(s.time), ampm = h < 12 ? 'ص' : 'م', h12 = h % 12 || 12;
+          const opt = document.createElement('option');
+          opt.value = s.time; opt.textContent = `${h12}:${s.time.slice(3)} ${ampm}`;
+          timeEl.appendChild(opt);
+        });
+      };
+    } catch { dateEl.innerHTML = '<option value="">خطأ في التحميل</option>'; }
+  };
+
   const loadBookings = async () => {
     const list=document.getElementById('bookingsList');
     list.innerHTML='<div class="mbx-loading"><div class="mbx-dot"></div><div class="mbx-dot"></div><div class="mbx-dot"></div><span>جاري التحميل...</span></div>';
