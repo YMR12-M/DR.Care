@@ -19,4 +19,8 @@ RUN mkdir -p /var/www/html/data \
     && chmod 755 /var/www/html/data \
     && rm -f /var/www/html/.env
 
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 80
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
