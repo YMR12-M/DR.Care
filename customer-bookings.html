@@ -442,9 +442,15 @@
             <button class="btn btn-ghost" style="min-height:36px;font-size:.78rem;padding:0 14px;color:var(--error);border-color:rgba(240,83,62,.3)" data-cancel-booking="${b.id}">إلغاء الحجز</button>
           </div>
           <div class="cx-review-form" id="reschedule-form-${b.id}" style="display:none;gap:12px">
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الموعد الجديد</label>
-            <input type="datetime-local" id="reschedule-date-${b.id}" min="${minAppt()}"
-                   style="background:var(--panel-3);border:1px solid var(--line-2);border-radius:var(--radius);color:var(--white);font-family:inherit;font-size:.9rem;padding:9px 12px;outline:none;width:100%">
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">اختار موعد جديد</label>
+            <select id="reschedule-date-${b.id}"
+              style="background:var(--panel-3);border:1px solid var(--line-2);border-radius:var(--radius);color:var(--white);font-family:inherit;font-size:.9rem;padding:9px 12px;outline:none;width:100%">
+              <option value="">جاري التحميل...</option>
+            </select>
+            <select id="reschedule-time-${b.id}" disabled
+              style="background:var(--panel-3);border:1px solid var(--line-2);border-radius:var(--radius);color:var(--white);font-family:inherit;font-size:.9rem;padding:9px 12px;outline:none;width:100%">
+              <option value="">— اختار وقت —</option>
+            </select>
             <p id="reschedule-msg-${b.id}" style="font-size:.8rem;font-weight:600;display:none"></p>
             <div style="display:flex;gap:8px">
               <button class="btn btn-primary" style="flex:1;min-height:38px;font-size:.82rem" data-confirm-reschedule="${b.id}">تأكيد التعديل</button>
@@ -531,6 +537,39 @@
       } catch { window.location.href = 'customer-login.html'; }
     };
 
+    const _rescheduleSlots = {};
+    const loadRescheduleSlots = async (bookingId) => {
+      const dateEl = document.getElementById(`reschedule-date-${bookingId}`);
+      const timeEl = document.getElementById(`reschedule-time-${bookingId}`);
+      if (!dateEl) return;
+      dateEl.innerHTML = '<option value="">جاري التحميل...</option>';
+      timeEl.disabled = true; timeEl.innerHTML = '<option value="">— اختار وقت —</option>';
+      try {
+        const res  = await fetch('api/slots.php');
+        const data = await res.json().catch(() => ({}));
+        const slots = data.slots || {};
+        _rescheduleSlots[bookingId] = slots;
+        const dates = Object.keys(slots);
+        if (!dates.length) { dateEl.innerHTML = '<option value="">لا توجد مواعيد متاحة</option>'; return; }
+        dateEl.innerHTML = '<option value="">— اختار يوم —</option>' + dates.map(d => {
+          const label = new Date(d + 'T00:00').toLocaleDateString('ar-EG', { weekday: 'long', month: 'long', day: 'numeric' });
+          return `<option value="${d}">${label}</option>`;
+        }).join('');
+        dateEl.onchange = () => {
+          const d = dateEl.value;
+          timeEl.innerHTML = '<option value="">— اختار وقت —</option>';
+          timeEl.disabled = !d;
+          if (!d) return;
+          (_rescheduleSlots[bookingId][d] || []).filter(s => s.available > 0).forEach(s => {
+            const h = parseInt(s.time), ampm = h < 12 ? 'ص' : 'م', h12 = h % 12 || 12;
+            const opt = document.createElement('option');
+            opt.value = s.time; opt.textContent = `${h12}:${s.time.slice(3)} ${ampm}`;
+            timeEl.appendChild(opt);
+          });
+        };
+      } catch { dateEl.innerHTML = '<option value="">خطأ في التحميل</option>'; }
+    };
+
     const loadBookings = async () => {
       try {
         const res  = await fetch('api/customer-bookings.php', { credentials: 'same-origin' });
@@ -597,7 +636,11 @@
       if (rescheduleBtn) {
         const id   = rescheduleBtn.dataset.rescheduleBtn;
         const form = document.getElementById(`reschedule-form-${id}`);
-        if (form) { const open = form.style.display !== 'none'; form.style.display = open ? 'none' : 'grid'; }
+        if (form) {
+          const open = form.style.display !== 'none';
+          form.style.display = open ? 'none' : 'grid';
+          if (!open) loadRescheduleSlots(id);
+        }
         return;
       }
 
@@ -613,11 +656,13 @@
       const confirmReschedule = e.target.closest('[data-confirm-reschedule]');
       if (confirmReschedule) {
         const id   = confirmReschedule.dataset.confirmReschedule;
-        const inp  = document.getElementById(`reschedule-date-${id}`);
+        const dateEl = document.getElementById(`reschedule-date-${id}`);
+        const timeEl = document.getElementById(`reschedule-time-${id}`);
         const msg  = document.getElementById(`reschedule-msg-${id}`);
-        const appt = inp?.value;
         const showM = (text, color) => { if (msg) { msg.textContent = text; msg.style.cssText = `display:block;color:${color};font-size:.8rem;font-weight:600`; } };
-        if (!appt) { showM('اختار الموعد الجديد', 'var(--error)'); return; }
+        if (!dateEl?.value) { showM('اختار التاريخ أولاً', 'var(--error)'); return; }
+        if (!timeEl?.value) { showM('اختار الوقت أولاً', 'var(--error)'); return; }
+        const appt = `${dateEl.value}T${timeEl.value}`;
         confirmReschedule.disabled = true; confirmReschedule.textContent = '...';
         try {
           const res  = await csrfFetch('api/customer-bookings.php', {
