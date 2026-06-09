@@ -115,7 +115,7 @@ if ($method === 'POST') {
     }
 
     try {
-      $stmt = $pdo->prepare('SELECT id, name, email, password_hash, is_active FROM customer_users WHERE email = :email LIMIT 1');
+      $stmt = $pdo->prepare('SELECT id, name, email, phone, password_hash, is_active FROM customer_users WHERE email = :email LIMIT 1');
       $stmt->execute([':email' => $email]);
       $customer = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -128,9 +128,10 @@ if ($method === 'POST') {
       }
 
       session_regenerate_id(true);
-      $_SESSION['customer_id'] = $customer['id'];
+      $_SESSION['customer_id']    = $customer['id'];
       $_SESSION['customer_email'] = $customer['email'];
-      $_SESSION['customer_name'] = $customer['name'];
+      $_SESSION['customer_name']  = $customer['name'];
+      $_SESSION['customer_phone'] = $customer['phone'] ?? null;
 
       $pdo->prepare('UPDATE customer_users SET last_login = :now WHERE id = :id')
         ->execute([':now' => date('c'), ':id' => $customer['id']]);
@@ -191,7 +192,7 @@ if ($method === 'GET' && ($_GET['action'] ?? '') === 'logout') {
 
 if ($method === 'GET' && isset($_GET['action']) && $_GET['action'] === 'check') {
   if (isset($_SESSION['customer_id'])) {
-    $stmt = $pdo->prepare('SELECT email_verified FROM customer_users WHERE id = :id LIMIT 1');
+    $stmt = $pdo->prepare('SELECT email_verified, phone FROM customer_users WHERE id = :id LIMIT 1');
     $stmt->execute([':id' => (int)$_SESSION['customer_id']]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     jsonResponse([
@@ -199,6 +200,7 @@ if ($method === 'GET' && isset($_GET['action']) && $_GET['action'] === 'check') 
       'authenticated'  => true,
       'name'           => $_SESSION['customer_name']  ?? null,
       'email'          => $_SESSION['customer_email'] ?? null,
+      'phone'          => $row['phone'] ?? ($_SESSION['customer_phone'] ?? null),
       'email_verified' => (bool)($row['email_verified'] ?? false),
     ]);
   } else {

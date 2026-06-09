@@ -2,10 +2,15 @@
 // DR.Care — Config (packages, car types, branches, payment methods)
 return [
   'packages' => [
-    ['code' => 'quick',  'name' => 'غسلة سريعة', 'price' => 150],
-    ['code' => 'full',   'name' => 'Full Care',   'price' => 280],
-    ['code' => 'detail', 'name' => 'دكتور العربية', 'price' => 650],
-    ['code' => 'fleet',  'name' => 'باقات الشركات', 'price' => 0]
+    ['code' => 'inside-out', 'name' => 'غسيل داخلي وخارجي',          'price' => 150],
+    ['code' => 'outside',    'name' => 'غسيل خارجي فقط',              'price' => 100],
+    ['code' => 'deep',       'name' => 'غسيل متخصص (Deep Cleaning)',  'price' => 250],
+    ['code' => 'cover',      'name' => 'غسيل غطاء السيارة',           'price' => 50],
+    ['code' => 'rims',       'name' => 'غسيل وتنظيف جنوط السيارة',   'price' => 100],
+    ['code' => 'engine',     'name' => 'غسيل موتور السيارة',          'price' => 100],
+    ['code' => 'chemical',   'name' => 'الغسيل الكيماوي',             'price' => 0],
+    ['code' => 'carpet',     'name' => 'غسيل سجاد',                   'price' => 0],
+    ['code' => 'blanket',    'name' => 'غسيل بطاطين',                 'price' => 80]
   ],
   'carTypes' => [
     ['code' => 'sedan',  'name' => 'سيدان',    'extra' => 0],
@@ -13,6 +18,7 @@ return [
     ['code' => 'van',    'name' => 'فان',      'extra' => 90],
     ['code' => 'pickup', 'name' => 'نقل خفيف','extra' => 120]
   ],
-  'branches' => ['قليوب شارع الملحاني'],
-  'paymentMethods' => ['كاش', 'Instapay', 'Vodafone Cash', 'بطاقة بنكية']
+  'branches' => ['قليوب — شارع العروبة'],
+  'paymentMethods'  => ['كاش', 'Instapay'],
+  'instapayNumber'  => '01XXXXXXXXX'
 ];

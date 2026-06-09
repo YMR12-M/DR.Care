@@ -21,7 +21,7 @@
     .cp-hero {
       background: var(--panel);
       border-bottom: 1px solid var(--line);
-      padding: 40px 0 32px;
+      padding: 32px 0;
       position: relative; overflow: hidden;
     }
     .cp-hero::before {
@@ -81,7 +81,7 @@
 
     /* ── Tabs ── */
     .cp-tabs {
-      display: flex; gap: 2px; margin-top: 24px;
+      display: flex; gap: 2px; margin-bottom: 0;
       border-bottom: 1px solid var(--line);
     }
     .cp-tab {
@@ -95,11 +95,11 @@
     .cp-tab.active { color: var(--yellow); border-bottom-color: var(--yellow); }
 
     /* ── Main layout ── */
-    .cp-main { padding: 32px 0 64px; }
-    .cp-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; max-width: 960px; }
+    .cp-main { padding: 28px 0 64px; }
+    .cp-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 28px; align-items: start; }
 
     .cp-panel-content { display: none; }
-    .cp-panel-content.show { display: block; }
+    .cp-panel-content.show { display: block; margin-top: 20px; }
 
     /* ── Form card ── */
     .cp-card {
@@ -373,11 +373,43 @@
     .loy-info-box strong { display: block; font-size: .85rem; color: var(--white); margin-bottom: 4px; }
     .loy-info-box p { font-size: .78rem; color: var(--muted); line-height: 1.75; margin: 0; }
 
+    /* ── Loyalty Desktop Layout ── */
+    @media (min-width: 901px) {
+      .loy-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+      .loy-aside {
+        position: sticky;
+        top: 90px;
+      }
+      .loy-hero {
+        text-align: center;
+      }
+      .loy-tier-badge__ring {
+        width: 96px; height: 96px;
+      }
+      .loy-tier-badge__icon { font-size: 3rem; }
+      .loy-pts-num { font-size: 4.2rem; }
+      .loy-stats-strip--col {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+      }
+      .loy-info-box--aside {
+        margin-top: 0;
+        font-size: .8rem;
+      }
+    }
+
     /* ── Responsive ── */
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
       .cp-layout { grid-template-columns: 1fr; }
+      .cp-sidebar { display: none; }
       .cp-hero-stats { display: none; }
       .cp-hero-inner { flex-wrap: wrap; }
+      .cp-tabs { margin-top: 0; }
     }
   </style>
 </head>
@@ -387,7 +419,7 @@
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="DR.Care">
-        <span class="brand-mark" aria-hidden="true">DR</span>
+        <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
         <span class="brand-text">
           <strong>DR.Care</strong>
           <small>حسابي</small>
@@ -438,15 +470,6 @@
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="cp-tabs">
-        <button class="cp-tab active" data-tab="personal">البيانات الشخصية</button>
-        <button class="cp-tab" data-tab="password">كلمة المرور</button>
-        <button class="cp-tab" data-tab="activity">النشاط</button>
-        <button class="cp-tab" data-tab="rewards" id="rewardsTabBtn">
-          ⭐ نقاطي <span id="rewardsTabBadge" style="display:none;font-size:.7rem;background:var(--yellow);color:#0a0800;padding:1px 7px;border-radius:50px;margin-right:4px;font-weight:900"></span>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -455,8 +478,16 @@
     <div class="container">
       <div class="cp-layout">
 
-        <!-- LEFT: Panel content -->
+        <!-- Main panel: tabs + content -->
         <div>
+          <div class="cp-tabs">
+            <button class="cp-tab active" data-tab="personal">البيانات الشخصية</button>
+            <button class="cp-tab" data-tab="password">كلمة المرور</button>
+            <button class="cp-tab" data-tab="activity">النشاط</button>
+            <button class="cp-tab" data-tab="rewards" id="rewardsTabBtn">
+              ⭐ نقاطي <span id="rewardsTabBadge" style="display:none;font-size:.7rem;background:var(--yellow);color:#0a0800;padding:1px 7px;border-radius:50px;margin-right:4px;font-weight:900"></span>
+            </button>
+          </div>
           <!-- Personal Tab -->
           <div class="cp-panel-content show" data-tab="personal">
             <div class="cp-card">
@@ -571,102 +602,113 @@
 
           <!-- Rewards Tab -->
           <div class="cp-panel-content" data-tab="rewards">
+            <div class="loy-layout">
 
-            <!-- ① Tier Hero -->
-            <div class="loy-hero">
-              <div class="loy-hero__glow"></div>
-              <div class="loy-hero__top">
-                <div class="loy-pts-block">
-                  <p class="loy-eyebrow">Loyalty Points</p>
-                  <div class="loy-pts-row">
-                    <span class="loy-pts-num" id="cpPointsBalance">—</span>
-                    <span class="loy-pts-word">نقطة</span>
+              <!-- RIGHT: Tier hero + stats (sticky) -->
+              <div class="loy-aside">
+
+                <div class="loy-hero">
+                  <div class="loy-hero__glow"></div>
+                  <!-- Tier badge centered at top -->
+                  <div class="loy-tier-badge" style="margin-bottom:20px">
+                    <div class="loy-tier-badge__ring">
+                      <span class="loy-tier-badge__icon" id="cpTierEmoji">🥉</span>
+                    </div>
+                    <p class="loy-tier-badge__name" id="cpTierName">Bronze</p>
+                    <p class="loy-tier-badge__label">مستواك الحالي</p>
                   </div>
-                  <p class="loy-pts-next" id="cpPointsNext">جاري التحميل...</p>
+                  <!-- Points block centered -->
+                  <div class="loy-pts-block" style="text-align:center">
+                    <p class="loy-eyebrow">Loyalty Points</p>
+                    <div class="loy-pts-row" style="justify-content:center">
+                      <span class="loy-pts-num" id="cpPointsBalance">—</span>
+                      <span class="loy-pts-word">نقطة</span>
+                    </div>
+                    <p class="loy-pts-next" id="cpPointsNext">جاري التحميل...</p>
+                  </div>
+                  <!-- Journey track + milestones -->
+                  <div class="loy-journey" style="margin-top:24px">
+                    <div class="loy-journey__track">
+                      <div class="loy-journey__fill" id="cpLoyaltyBar"></div>
+                    </div>
+                    <div class="loy-journey__milestones">
+                      <div class="loy-ms" id="loyMs0">
+                        <div class="loy-ms__dot"></div>
+                        <div class="loy-ms__emoji">🥉</div>
+                        <div class="loy-ms__name">Bronze</div>
+                      </div>
+                      <div class="loy-ms" id="loyMs1">
+                        <div class="loy-ms__dot"></div>
+                        <div class="loy-ms__emoji">🥈</div>
+                        <div class="loy-ms__name">Silver</div>
+                      </div>
+                      <div class="loy-ms" id="loyMs2">
+                        <div class="loy-ms__dot"></div>
+                        <div class="loy-ms__emoji">🏆</div>
+                        <div class="loy-ms__name">Gold</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="loy-tier-badge">
-                  <div class="loy-tier-badge__ring">
-                    <span class="loy-tier-badge__icon" id="cpTierEmoji">🥉</span>
+
+                <!-- Quick stats strip -->
+                <div class="loy-stats-strip loy-stats-strip--col" id="loyStatsStrip" style="display:none">
+                  <div class="loy-stat-chip">
+                    <span class="loy-stat-chip__val loy-stat-chip__val--earn" id="loyTotalEarned">+0</span>
+                    <span class="loy-stat-chip__lbl">نقاط مكتسبة</span>
                   </div>
-                  <p class="loy-tier-badge__name" id="cpTierName">Bronze</p>
-                  <p class="loy-tier-badge__label">مستواك الحالي</p>
-                </div>
-              </div>
-              <!-- Journey track + milestones -->
-              <div class="loy-journey">
-                <div class="loy-journey__track">
-                  <div class="loy-journey__fill" id="cpLoyaltyBar"></div>
-                </div>
-                <div class="loy-journey__milestones">
-                  <div class="loy-ms" id="loyMs0">
-                    <div class="loy-ms__dot"></div>
-                    <div class="loy-ms__emoji">🥉</div>
-                    <div class="loy-ms__name">Bronze</div>
+                  <div class="loy-stat-chip">
+                    <span class="loy-stat-chip__val loy-stat-chip__val--spend" id="loyTotalSpent">-0</span>
+                    <span class="loy-stat-chip__lbl">نقاط مستردة</span>
                   </div>
-                  <div class="loy-ms" id="loyMs1">
-                    <div class="loy-ms__dot"></div>
-                    <div class="loy-ms__emoji">🥈</div>
-                    <div class="loy-ms__name">Silver</div>
-                  </div>
-                  <div class="loy-ms" id="loyMs2">
-                    <div class="loy-ms__dot"></div>
-                    <div class="loy-ms__emoji">🏆</div>
-                    <div class="loy-ms__name">Gold</div>
+                  <div class="loy-stat-chip">
+                    <span class="loy-stat-chip__val" id="loyAvailCount">0</span>
+                    <span class="loy-stat-chip__lbl">مكافآت متاحة</span>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- ② Quick stats strip -->
-            <div class="loy-stats-strip" id="loyStatsStrip" style="display:none">
-              <div class="loy-stat-chip">
-                <span class="loy-stat-chip__val loy-stat-chip__val--earn" id="loyTotalEarned">+0</span>
-                <span class="loy-stat-chip__lbl">نقاط مكتسبة</span>
-              </div>
-              <div class="loy-stat-chip">
-                <span class="loy-stat-chip__val loy-stat-chip__val--spend" id="loyTotalSpent">-0</span>
-                <span class="loy-stat-chip__lbl">نقاط مستردة</span>
-              </div>
-              <div class="loy-stat-chip">
-                <span class="loy-stat-chip__val" id="loyAvailCount">0</span>
-                <span class="loy-stat-chip__lbl">مكافآت متاحة</span>
-              </div>
-            </div>
+                <!-- How it works -->
+                <div class="loy-info-box loy-info-box--aside">
+                  <div class="loy-info-box__icon">💡</div>
+                  <div>
+                    <strong>كيف تكسب النقاط؟</strong>
+                    <p>كل 10 جنيه = نقطة. الحد الأدنى 5 نقاط لكل حجز.</p>
+                  </div>
+                </div>
 
-            <!-- ③ Coupon reveal -->
-            <div id="cpCouponReveal" style="display:none;background:rgba(111,207,71,.08);border:1px solid rgba(111,207,71,.3);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;text-align:center">
-              <p style="font-size:.82rem;color:var(--muted);margin-bottom:8px">🎉 تم إنشاء كوبون الخصم!</p>
-              <div id="cpCouponCode" style="font-family:var(--font-en);font-size:1.5rem;font-weight:900;letter-spacing:.1em;background:var(--panel-2);border:1px dashed rgba(111,207,71,.4);border-radius:var(--radius);padding:14px 20px;cursor:pointer;transition:background var(--transition)">—</div>
-              <p id="cpCouponExpiry" style="font-size:.75rem;color:var(--muted);margin-top:8px"></p>
-              <p style="font-size:.8rem;color:var(--success);margin-top:6px;font-weight:700">✓ استخدم الكود في خانة الخصم عند الحجز</p>
-            </div>
-
-            <!-- ④ Rewards grid -->
-            <p class="loy-section-hd">المكافآت المتاحة</p>
-            <div id="cpRewardsList" class="loy-rewards-grid">
-              <div style="text-align:center;padding:28px;color:var(--muted);font-size:.88rem;grid-column:1/-1">جاري التحميل...</div>
-            </div>
-
-            <!-- ⑤ Points history -->
-            <p class="loy-section-hd">سجل النقاط</p>
-            <div class="loy-history-card">
-              <div id="cpPointsHistory">
-                <div style="text-align:center;padding:28px;color:var(--muted);font-size:.85rem">لا يوجد سجل حتى الآن</div>
               </div>
-            </div>
 
-            <!-- ⑥ How it works -->
-            <div class="loy-info-box">
-              <div class="loy-info-box__icon">💡</div>
-              <div>
-                <strong>كيف تكسب النقاط؟</strong>
-                <p>كل 10 جنيه مصروفة في حجز مكتمل = نقطة واحدة. الحد الأدنى 5 نقاط لكل حجز. استخدم برنامج الإحالة لتكسب نقاطاً مضاعفة!</p>
+              <!-- LEFT: Rewards + History -->
+              <div class="loy-main">
+
+                <!-- Coupon reveal -->
+                <div id="cpCouponReveal" style="display:none;background:rgba(111,207,71,.08);border:1px solid rgba(111,207,71,.3);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;text-align:center">
+                  <p style="font-size:.82rem;color:var(--muted);margin-bottom:8px">🎉 تم إنشاء كوبون الخصم!</p>
+                  <div id="cpCouponCode" style="font-family:var(--font-en);font-size:1.5rem;font-weight:900;letter-spacing:.1em;background:var(--panel-2);border:1px dashed rgba(111,207,71,.4);border-radius:var(--radius);padding:14px 20px;cursor:pointer;transition:background var(--transition)">—</div>
+                  <p id="cpCouponExpiry" style="font-size:.75rem;color:var(--muted);margin-top:8px"></p>
+                  <p style="font-size:.8rem;color:var(--success);margin-top:6px;font-weight:700">✓ استخدم الكود في خانة الخصم عند الحجز</p>
+                </div>
+
+                <!-- Rewards grid -->
+                <p class="loy-section-hd">المكافآت المتاحة</p>
+                <div id="cpRewardsList" class="loy-rewards-grid">
+                  <div style="text-align:center;padding:28px;color:var(--muted);font-size:.88rem;grid-column:1/-1">جاري التحميل...</div>
+                </div>
+
+                <!-- Points history -->
+                <p class="loy-section-hd">سجل النقاط</p>
+                <div class="loy-history-card">
+                  <div id="cpPointsHistory">
+                    <div style="text-align:center;padding:28px;color:var(--muted);font-size:.85rem">لا يوجد سجل حتى الآن</div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
 
-        <!-- RIGHT: Sidebar -->
-        <div class="cp-sidebar">
+        <!-- Sidebar -->
+        <div class="cp-sidebar" style="padding-top:8px">
 
           <!-- Quick links -->
           <div class="cp-stat-card">

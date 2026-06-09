@@ -28,10 +28,15 @@ const offlineToast     = document.getElementById('offlineToast');
 // ─── Fallback Config ────────────────────────────────
 const fallbackConfig = {
   packages: [
-    { code: 'quick',  name: 'غسلة سريعة',      price: 150, description: 'غسيل خارجي، فوم، تنشيف، وتنظيف زجاج.' },
-    { code: 'full',   name: 'Full Care',        price: 280, description: 'غسيل خارجي وداخلي، تنظيف تابلوه، تعطير، وتلميع إطارات.' },
-    { code: 'detail', name: 'دكتور العربية',    price: 650, description: 'تنظيف عميق، واكس حماية، عناية بالفرش.' },
-    { code: 'fleet',  name: 'باقات الشركات',   price: 0,   description: 'عقود شهرية للأساطيل ومكاتب الإيجار.' }
+    { code: 'inside-out', name: 'غسيل داخلي وخارجي',         price: 150, description: 'غسيل خارجي وداخلي شامل مع تنشيف.' },
+    { code: 'outside',   name: 'غسيل خارجي فقط',             price: 100, description: 'غسيل خارجي كامل مع تنشيف مايكروفايبر.' },
+    { code: 'deep',      name: 'غسيل متخصص (Deep Cleaning)', price: 250, description: 'تنظيف عميق داخلي وخارجي بمعدات متخصصة.' },
+    { code: 'cover',     name: 'غسيل غطاء السيارة',          price: 50,  description: 'غسيل وتنظيف غطاء السيارة بالكامل.' },
+    { code: 'rims',      name: 'غسيل وتنظيف جنوط السيارة',  price: 100, description: 'تنظيف الجنوط والإطارات بمواد متخصصة.' },
+    { code: 'engine',    name: 'غسيل موتور السيارة',         price: 100, description: 'تنظيف حجرة المحرك بأمان.' },
+    { code: 'chemical',  name: 'الغسيل الكيماوي',            price: 0,   description: 'السعر يتحدد حسب حالة العربية والشغل المطلوب.' },
+    { code: 'carpet',   name: 'غسيل سجاد',                  price: 0,   description: 'تنظيف وتغليف — 15 جنيه للمتر.' },
+    { code: 'blanket',  name: 'غسيل بطاطين',                price: 80,  description: 'تنظيف وتغليف — 80 جنيه للقطعة.' }
   ],
   carTypes: [
     { code: 'sedan',  name: 'سيدان',       extra: 0 },
@@ -39,8 +44,9 @@ const fallbackConfig = {
     { code: 'van',    name: 'فان',          extra: 90 },
     { code: 'pickup', name: 'نقل خفيف',    extra: 120 }
   ],
-  branches: ['قليوب شارع الملحاني'],
-  paymentMethods: ['كاش', 'Instapay', 'Vodafone Cash', 'بطاقة بنكية']
+  branches:        ['قليوب — شارع العروبة'],
+  paymentMethods:  ['كاش', 'Instapay'],
+  instapayNumber:  '01XXXXXXXXX'
 };
 
 let appConfig = { ...fallbackConfig };
@@ -292,7 +298,9 @@ const updateEstimate = () => {
   const subtotal = Number(pkg?.price ?? 0) + Number(car?.extra ?? 0);
   const discount = appliedCoupon ? appliedCoupon.discount : 0;
   const total    = Math.max(0, subtotal - discount);
-  const newText  = pkg?.code === 'fleet' ? 'حسب التعاقد' : formatPrice(total);
+  const newText  = pkg?.code === 'carpet' ? '15 ج / متر'
+                 : (pkg?.price === 0)    ? 'حسب الشغل'
+                 : formatPrice(total);
 
   if (estimateValue.textContent !== newText) {
     estimateValue.textContent = newText;
@@ -353,7 +361,7 @@ const populateForm = () => {
     appConfig.packages,
     (p) => p.code,
     (p) => p.price > 0 ? `${p.name} — ${formatPrice(p.price)}` : p.name,
-    'full'
+    'inside-out'
   );
   renderSelect(
     carType,
@@ -364,6 +372,8 @@ const populateForm = () => {
   );
   renderSelect(branch, appConfig.branches, (b) => b, (b) => b, appConfig.branches[0]);
   renderSelect(paymentMethod, appConfig.paymentMethods, (m) => m, (m) => m, appConfig.paymentMethods[0]);
+  const numEl = document.getElementById('instapayNumberDisplay');
+  if (numEl) numEl.textContent = appConfig.instapayNumber;
   updateEstimate();
 };
 
@@ -376,7 +386,8 @@ const loadConfig = async () => {
       packages:       data.packages?.length       ? data.packages       : fallbackConfig.packages,
       carTypes:       data.carTypes?.length        ? data.carTypes       : fallbackConfig.carTypes,
       branches:       data.branches?.length        ? data.branches       : fallbackConfig.branches,
-      paymentMethods: data.paymentMethods?.length  ? data.paymentMethods : fallbackConfig.paymentMethods
+      paymentMethods: data.paymentMethods?.length  ? data.paymentMethods : fallbackConfig.paymentMethods,
+      instapayNumber: data.instapayNumber           || fallbackConfig.instapayNumber
     };
   } catch {
     appConfig = { ...fallbackConfig };
@@ -432,6 +443,139 @@ async function ensureBookingAllowed({ forceAlert = false } = {}) {
 
 [servicePackage, carType].forEach((el) => el?.addEventListener('change', updateEstimate));
 
+// ─── Instapay Screenshot Toggle ────────────────────
+const screenshotField   = document.getElementById('screenshotField');
+const paymentScreenshot = document.getElementById('paymentScreenshot');
+const screenshotPreview = document.getElementById('screenshotPreview');
+
+paymentMethod?.addEventListener('change', () => {
+  const isInstapay = paymentMethod.value === 'Instapay';
+  if (screenshotField) screenshotField.style.display = isInstapay ? '' : 'none';
+  if (!isInstapay && paymentScreenshot) {
+    paymentScreenshot.value = '';
+    screenshotPreview.innerHTML = '';
+    const zone = document.querySelector('label.upload-zone');
+    if (zone) {
+      zone.classList.remove('has-file');
+      const main = zone.querySelector('.upload-zone__main');
+      const sub  = zone.querySelector('.upload-zone__sub');
+      if (main) main.textContent = 'اضغط لرفع إيصال الدفع';
+      if (sub)  sub.textContent  = 'PNG أو JPG — الحد الأقصى 3MB';
+    }
+  }
+});
+
+document.getElementById('copyInstapayBtn')?.addEventListener('click', () => {
+  const num = document.getElementById('instapayNumberDisplay')?.textContent || '';
+  navigator.clipboard.writeText(num).then(() => {
+    const btn = document.getElementById('copyInstapayBtn');
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = '✓ تم النسخ';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+});
+
+paymentScreenshot?.addEventListener('change', () => {
+  const file = paymentScreenshot.files[0];
+  if (!file) return;
+  const zone = document.querySelector('label.upload-zone[for="paymentScreenshot"], label.upload-zone[for]');
+  if (zone) {
+    zone.classList.add('has-file');
+    const main = zone.querySelector('.upload-zone__main');
+    const sub  = zone.querySelector('.upload-zone__sub');
+    if (main) main.textContent = `✓ ${file.name}`;
+    if (sub)  sub.textContent  = `${(file.size / 1024).toFixed(0)} KB`;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    screenshotPreview.innerHTML = `<img src="${e.target.result}" alt="إيصال الدفع">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+const getScreenshotBase64 = () => new Promise((resolve) => {
+  const file = paymentScreenshot?.files[0];
+  if (!file) return resolve(null);
+  if (file.size > 3 * 1024 * 1024) { setMessage('حجم الصورة كبير — الحد الأقصى 3MB', 'error'); return resolve(false); }
+  const reader = new FileReader();
+  reader.onload = (e) => resolve(e.target.result);
+  reader.readAsDataURL(file);
+});
+
+// ─── Appointment Slots ────────────────────────────
+let _availableSlots = {};  // { 'YYYY-MM-DD': [{id, time, available}] }
+
+const apptDate    = document.getElementById('apptDate');
+const apptTime    = document.getElementById('apptTime');
+const apptFallback = document.getElementById('apptFallback');
+
+const formatSlotDate = (dateStr) => {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+const formatSlotTime = (timeStr) => {
+  const [h, m] = timeStr.split(':').map(Number);
+  const suffix = h >= 12 ? 'م' : 'ص';
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${String(m).padStart(2,'0')} ${suffix}`;
+};
+
+const populateSlotDates = () => {
+  if (!apptDate) return;
+  apptDate.innerHTML = '<option value="">— اختار يوم —</option>';
+  Object.keys(_availableSlots).sort().forEach(date => {
+    const hasFree = _availableSlots[date].some(s => s.available > 0);
+    if (!hasFree) return;
+    const opt = document.createElement('option');
+    opt.value = date;
+    opt.textContent = formatSlotDate(date);
+    apptDate.appendChild(opt);
+  });
+};
+
+const populateSlotTimes = (dateStr) => {
+  if (!apptTime) return;
+  apptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+  const slots = (_availableSlots[dateStr] || []).filter(s => s.available > 0);
+  slots.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.time;
+    opt.textContent = formatSlotTime(s.time);
+    apptTime.appendChild(opt);
+  });
+};
+
+const loadAppointmentSlots = async () => {
+  if (!apptDate) return;
+  try {
+    const res = await fetch('api/slots.php');
+    if (!res.ok) return;
+    const data = await res.json();
+    const slots = data.slots || {};
+    const hasDates = Object.keys(slots).length > 0;
+    _availableSlots = slots;
+
+    if (hasDates) {
+      populateSlotDates();
+      if (apptFallback) apptFallback.style.display = 'none';
+      if (document.getElementById('apptDateLabel')) document.getElementById('apptDateLabel').style.display = '';
+      apptDate.addEventListener('change', () => {
+        const d = apptDate.value;
+        const tLabel = document.getElementById('apptTimeLabel');
+        if (d) {
+          populateSlotTimes(d);
+          if (tLabel) tLabel.style.display = '';
+        } else {
+          if (apptTime) apptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+          if (tLabel) tLabel.style.display = 'none';
+        }
+      });
+    }
+  } catch (_) { /* slots API unavailable — fallback to static note */ }
+};
+
 // ─── Appointment min date ──────────────────────────
 const setMinimumAppointment = () => {
   if (!appointment) return;
@@ -474,11 +618,24 @@ if (bookingForm) {
       return;
     }
 
-    payload.appointment = payload.appointment ? normalize(payload.appointment) : null;
+    /* Build appointment from slot picker if used */
+    if (apptDate && apptDate.value && apptTime && apptTime.value) {
+      payload.appointment = `${apptDate.value}T${apptTime.value}`;
+    } else {
+      payload.appointment = payload.appointment ? normalize(payload.appointment) : null;
+    }
     payload.email = payload.email || null;
     payload.notes = payload.notes || null;
     payload.plateNumber = payload.plateNumber || null;
     if (appliedCoupon) payload.couponCode = appliedCoupon.code;
+
+    // Instapay screenshot
+    if (payload.paymentMethod === 'Instapay') {
+      const screenshot = await getScreenshotBase64();
+      if (screenshot === false) return;
+      if (!screenshot) { setMessage('رجاء ارفع إيصال الدفع (Instapay)', 'error'); return; }
+      payload.paymentScreenshot = screenshot;
+    }
 
     // Ensure fresh CSRF token before sending
     await refreshCsrf();
@@ -552,6 +709,7 @@ if (bookingForm) {
 // ─── Init ──────────────────────────────────────────
 loadConfig();
 setMinimumAppointment();
+loadAppointmentSlots();
 // Check customer session and update nav
 async function checkCustomerSession() {
   try {
@@ -560,30 +718,26 @@ async function checkCustomerSession() {
     const link = document.getElementById('customerLoginLink');
     if (!link) return;
 
+    const hint = document.getElementById('navAccountHint');
     if (data.authenticated) {
-      link.textContent = data.name ? `مرحبا ${data.name}` : 'حسابي';
       link.href = 'customer-profile.html';
       link.classList.add('is-authenticated');
+      if (hint) hint.style.display = '';
 
-      if (!document.getElementById('customerLogoutLink')) {
-        const logout = document.createElement('a');
-        logout.id = 'customerLogoutLink';
-        logout.href = 'api/customer-login.php?action=logout';
-        logout.textContent = 'خروج';
-        logout.className = 'nav-logout';
-        logout.addEventListener('click', async (e) => {
-          e.preventDefault();
-          await fetch(logout.href, { credentials: 'same-origin' });
-          window.location.href = 'customer-login.html';
-        });
-        link.parentNode.insertBefore(logout, link.nextSibling);
-      }
+      // Pre-fill booking form
+      const form = document.getElementById('bookingForm');
+      const set  = (name, val) => {
+        if (!val) return;
+        const el = form?.querySelector(`[name="${name}"]`);
+        if (el && !el.value) { el.value = val; el.classList.add('prefilled'); }
+      };
+      set('name',  data.name);
+      set('email', data.email);
+      set('phone', data.phone);
     } else {
-      link.textContent = 'حسابي';
       link.href = 'customer-login.html';
       link.classList.remove('is-authenticated');
-      const logout = document.getElementById('customerLogoutLink');
-      if (logout) logout.remove();
+      if (hint) hint.style.display = 'none';
     }
   } catch (e) {
     // silent
@@ -591,6 +745,28 @@ async function checkCustomerSession() {
 }
 
 checkCustomerSession();
+
+// ─── Nav social dropdown ────────────────────────────
+(function () {
+  const btn  = document.getElementById('navSocialBtn');
+  const drop = document.getElementById('navSocialDrop');
+  if (!btn || !drop) return;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = !drop.hidden;
+    drop.hidden = open;
+    btn.setAttribute('aria-expanded', String(!open));
+  });
+
+  document.addEventListener('click', () => {
+    if (!drop.hidden) { drop.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !drop.hidden) { drop.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+  });
+})();
 
 // ─── Reviews ───────────────────────────────────────
 const loadReviews = async () => {

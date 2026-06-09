@@ -140,14 +140,14 @@ const getFilteredBookings = () => {
   }
 
   if (currentDateFrom) {
-    const from = new Date(currentDateFrom);
-    from.setHours(0, 0, 0, 0);
+    const [fy, fm, fd] = currentDateFrom.split('-').map(Number);
+    const from = new Date(fy, fm - 1, fd, 0, 0, 0, 0); // local midnight — no UTC offset confusion
     list = list.filter((b) => b.created_at && new Date(b.created_at) >= from);
   }
 
   if (currentDateTo) {
-    const to = new Date(currentDateTo);
-    to.setHours(23, 59, 59, 999);
+    const [ty, tm, td] = currentDateTo.split('-').map(Number);
+    const to = new Date(ty, tm - 1, td, 23, 59, 59, 999); // local end-of-day
     list = list.filter((b) => b.created_at && new Date(b.created_at) <= to);
   }
 
@@ -553,6 +553,10 @@ const renderCharts = (bookings) => {
 
 const renderBookings = (bookings) => {
   allBookings = bookings;
+  /* Keep poller baseline in sync so new bookings after initial load are detected */
+  if (bookings.length > 0) {
+    _lastBookingId = Math.max(_lastBookingId, Number(bookings[0].id));
+  }
   renderAdminFilters(bookings);
   renderStats(bookings);
   renderReports(bookings);
@@ -785,20 +789,22 @@ clearDateRangeEl?.addEventListener('click', () => {
 document.querySelectorAll('[data-preset]').forEach(btn => {
   btn.addEventListener('click', () => {
     const now = new Date();
-    const fmt = (d) => d.toISOString().slice(0, 10);
+    /* Use LOCAL date parts — toISOString() gives UTC which can be yesterday/tomorrow */
+    const fmtLocal = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const preset = btn.dataset.preset;
     let from;
 
     if (preset === 'today') {
-      from = fmt(now);
+      from = fmtLocal(now);
     } else if (preset === 'week') {
       const d = new Date(now); d.setDate(d.getDate() - 6);
-      from = fmt(d);
+      from = fmtLocal(d);
     } else if (preset === 'month') {
-      from = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+      from = fmtLocal(new Date(now.getFullYear(), now.getMonth(), 1));
     }
 
-    const to = fmt(now);
+    const to = fmtLocal(now);
     if (dateFromEl) dateFromEl.value = from;
     if (dateToEl)   dateToEl.value   = to;
     currentDateFrom = from; currentDateTo = to;
@@ -884,6 +890,7 @@ const startBookingPoller = () => {
   }
   };
 
+  poll(); /* run immediately on start so baseline is set right away */
   setInterval(poll, 30000);
 
   /* Reset badge when user focuses the tab */
@@ -945,7 +952,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     chartsVisible = !chartsVisible;
     if (chartsPanel) chartsPanel.style.display = chartsVisible ? '' : 'none';
     if (chartsVisible) renderCharts(allBookings);
-    toggleChartsBtn.style.color = chartsVisible ? 'var(--yellow)' : '';
+    toggleChartsBtn.classList.toggle('panel-active', chartsVisible);
   });
 
   /* ── Customers panel ── */
@@ -996,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   toggleCustomersBtn?.addEventListener('click', () => {
     customersVisible = !customersVisible;
     if (customersPanel) customersPanel.style.display = customersVisible ? '' : 'none';
-    toggleCustomersBtn.style.color = customersVisible ? 'var(--yellow)' : '';
+    toggleCustomersBtn.classList.toggle('panel-active', customersVisible);
     if (customersVisible) fetchCustomers();
   });
 
@@ -1057,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (bookingsTable)   bookingsTable.style.display   = couponsVisible ? 'none' : '';
     const filterBar = document.querySelector('.filter-bar');
     if (filterBar)       filterBar.style.display       = couponsVisible ? 'none' : '';
+    toggleCouponsBtn.classList.toggle('panel-active', couponsVisible);
     if (couponsVisible) fetchCoupons();
   });
 
@@ -1124,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   toggleReviewsBtn?.addEventListener('click', () => {
     reviewsVisible = !reviewsVisible;
     if (reviewsPanel) reviewsPanel.style.display = reviewsVisible ? '' : 'none';
-    toggleReviewsBtn.style.color = reviewsVisible ? 'var(--yellow)' : '';
+    toggleReviewsBtn.classList.toggle('panel-active', reviewsVisible);
     if (reviewsVisible && !reviewsLoaded) fetchReviews();
   });
 
@@ -1201,5 +1209,153 @@ document.addEventListener('DOMContentLoaded', async () => {
       await fetch('api/coupons.php', { method: 'DELETE', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id) }) });
       fetchCoupons();
     }
+  });
+
+  /* ══════════════════════════════════════════
+     SLOTS PANEL
+  ══════════════════════════════════════════ */
+  const slotsPanel     = document.getElementById('slotsPanel');
+  const toggleSlotsBtn = document.getElementById('toggleSlotsBtn');
+  let slotsVisible     = false;
+
+  const SLOT_TIMES = [
+    '08:00','09:00','10:00','11:00','12:00',
+    '13:00','14:00','15:00','16:00','17:00','18:00'
+  ];
+  const fmtTime = (t) => {
+    const [h, m] = t.split(':').map(Number);
+    return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'م' : 'ص'}`;
+  };
+  const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('ar-EG', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric'
+  });
+
+  /* Build time picker toggle pills */
+  const slotTimePicker = document.getElementById('slotTimePicker');
+  const updateTimeCount = () => {
+    const n   = document.querySelectorAll('.slot-time-pill--active').length;
+    const el  = document.getElementById('slotSelectedCount');
+    if (!el) return;
+    if (n) { el.textContent = n; el.removeAttribute('data-empty'); }
+    else   { el.textContent = ''; el.setAttribute('data-empty', ''); }
+  };
+  if (slotTimePicker) {
+    slotTimePicker.innerHTML = SLOT_TIMES.map(t => {
+      const [h, m] = t.split(':').map(Number);
+      const ampm   = h >= 12 ? 'م' : 'ص';
+      const h12    = h % 12 || 12;
+      return `<button type="button" class="slot-time-pill" data-time="${t}">
+        ${h12}:${String(m).padStart(2,'0')}
+        <span class="pill-sub">${ampm}</span>
+      </button>`;
+    }).join('');
+    slotTimePicker.addEventListener('click', e => {
+      const pill = e.target.closest('.slot-time-pill');
+      if (!pill) return;
+      pill.classList.toggle('slot-time-pill--active');
+      updateTimeCount();
+    });
+  }
+
+  /* Stepper */
+  document.getElementById('slotDecBtn')?.addEventListener('click', () => {
+    const inp  = document.getElementById('slotMaxInput');
+    const disp = document.getElementById('slotMaxDisplay');
+    const val  = Math.max(1, parseInt(inp.value || '1', 10) - 1);
+    inp.value = val; disp.textContent = val;
+  });
+  document.getElementById('slotIncBtn')?.addEventListener('click', () => {
+    const inp  = document.getElementById('slotMaxInput');
+    const disp = document.getElementById('slotMaxDisplay');
+    const val  = Math.min(20, parseInt(inp.value || '1', 10) + 1);
+    inp.value = val; disp.textContent = val;
+  });
+
+  const renderSlots = (slots) => {
+    const tbody = document.getElementById('slotsBody');
+    if (!tbody) return;
+    if (!slots.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="table-empty"><span>📅</span><p>لا توجد مواعيد بعد</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = slots.map(s => {
+      const full = s.booked_count >= s.max_bookings;
+      const pct  = s.max_bookings > 0 ? Math.round((s.booked_count / s.max_bookings) * 100) : 0;
+      return `<tr>
+        <td>${fmtDate(s.slot_date)}</td>
+        <td style="font-family:var(--font-en)">${fmtTime(s.slot_time)}</td>
+        <td>
+          <span style="font-weight:800;color:${full ? 'var(--error)' : 'var(--success)'}">${s.booked_count}</span>
+          <span style="color:var(--muted-2)"> / ${s.max_bookings}</span>
+          <div style="margin-top:4px;height:3px;border-radius:2px;background:var(--line);overflow:hidden;width:80px">
+            <div style="height:100%;width:${pct}%;background:${full ? 'var(--error)' : 'var(--yellow)'}"></div>
+          </div>
+        </td>
+        <td>${full
+          ? '<span class="bk-badge bk-badge--cancelled">مكتمل</span>'
+          : '<span class="bk-badge bk-badge--new">متاح</span>'
+        }</td>
+        <td>
+          <button class="bk-view-btn" data-delete-slot="${s.id}"
+            style="color:var(--error);border-color:rgba(240,83,62,.25);background:rgba(240,83,62,.06)">حذف</button>
+        </td>
+      </tr>`;
+    }).join('');
+  };
+
+  const fetchSlots = async () => {
+    try {
+      const res  = await adminFetch('api/slots.php?admin=1');
+      const data = await res.json().catch(() => ({}));
+      renderSlots(data.all_slots || []);
+    } catch (_) {}
+  };
+
+  toggleSlotsBtn?.addEventListener('click', () => {
+    slotsVisible = !slotsVisible;
+    if (slotsPanel) slotsPanel.style.display = slotsVisible ? '' : 'none';
+    toggleSlotsBtn.classList.toggle('panel-active', slotsVisible);
+    if (slotsVisible) fetchSlots();
+  });
+
+  document.getElementById('addSlotBtn')?.addEventListener('click', async () => {
+    const dateVal = document.getElementById('slotDateInput')?.value;
+    const maxVal  = parseInt(document.getElementById('slotMaxInput')?.value || '1', 10);
+    const checked = [...document.querySelectorAll('.slot-time-pill--active')].map(p => p.dataset.time);
+
+    if (!dateVal) { showToast('اختار يوم أولاً', 'error'); return; }
+    if (!checked.length) { showToast('اختار وقت واحد على الأقل', 'error'); return; }
+
+    const btn = document.getElementById('addSlotBtn');
+    btn.disabled = true; btn.innerHTML = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/slots.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: dateVal, times: checked, max_bookings: maxVal })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast(`تمت إضافة ${data.added} موعد`, 'success');
+        document.querySelectorAll('.slot-time-pill--active').forEach(p => p.classList.remove('slot-time-pill--active'));
+        updateTimeCount();
+        fetchSlots();
+      } else {
+        showToast(data.message || 'خطأ', 'error');
+      }
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-left:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة مواعيد';
+    }
+  });
+
+  document.getElementById('slotsTable')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-delete-slot]');
+    if (!btn) return;
+    if (!confirm('حذف هذا الموعد؟')) return;
+    const id = btn.dataset.deleteSlot;
+    await adminFetch(`api/slots.php?id=${id}`, { method: 'DELETE' });
+    fetchSlots();
   });
 });

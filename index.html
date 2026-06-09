@@ -43,13 +43,38 @@
   <!-- ══ HEADER ══ -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
-      <a class="brand" href="#home" aria-label="DR.Care الرئيسية">
-        <span class="brand-mark" aria-hidden="true">DR</span>
-        <span class="brand-text">
-          <strong>DR.Care</strong>
-          <small>مغسلة عربيات مصرية</small>
-        </span>
-      </a>
+      <div class="header-start">
+        <a class="brand" href="#home" aria-label="DR.Care الرئيسية">
+          <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
+          <span class="brand-text">
+            <strong>DR.Care</strong>
+            <small>مغسلة عربيات مصرية</small>
+          </span>
+        </a>
+        <div class="nav-social-wrap" id="headerSocialWrap">
+          <div class="nav-social-hint" aria-hidden="true">
+            <div class="nav-social-hint__bubble">تابعنا</div>
+            <svg class="nav-social-hint__arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <button class="nav-social-btn" id="navSocialBtn" type="button" aria-label="تواصل معنا" aria-expanded="false" aria-controls="navSocialDrop">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <div class="nav-social-drop" id="navSocialDrop" hidden>
+            <a href="https://www.facebook.com/Dr.Careforcars" target="_blank" rel="noopener" class="nav-social-drop__item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              فيسبوك
+            </a>
+            <a href="https://wa.me/201005552026" target="_blank" rel="noopener" class="nav-social-drop__item nav-social-drop__item--wa">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+              واتساب
+            </a>
+            <a href="https://maps.google.com/maps?q=DR.Care+%D9%85%D8%BA%D8%B3%D9%84%D8%A9+%D9%82%D9%84%D9%8A%D9%88%D8%A8&hl=ar" target="_blank" rel="noopener" class="nav-social-drop__item nav-social-drop__item--maps">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              قيّمنا على خرائط
+            </a>
+          </div>
+        </div>
+      </div>
       <button class="menu-toggle" type="button" aria-label="فتح القائمة" aria-controls="mainNav" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -57,8 +82,18 @@
         <a href="#services">الخدمات</a>
         <a href="#packages">الباقات</a>
         <a href="#why">لماذا نحن</a>
-        <a href="#booking">الحجز</a>
-        <a id="customerLoginLink" href="customer-login.html">حسابي</a>
+        <a href="#branches">الفروع</a>
+        <a href="#reviews">آراء العملاء</a>
+        <div class="nav-acct-anchor">
+          <a id="customerLoginLink" href="customer-login.html" class="nav-account">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="navAccountLabel">حسابي</span>
+          </a>
+          <div id="navAccountHint" class="nav-acct-hint" aria-hidden="true" style="display:none">
+            <svg class="nav-acct-hint__arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            <div class="nav-acct-hint__bubble">معلوماتك هنا</div>
+          </div>
+        </div>
         <a class="nav-cta" href="#booking">احجز الآن</a>
       </nav>
     </div>
@@ -144,7 +179,7 @@
             </div>
           </div>
           <div class="hero-panel-footer">
-            <span>متاح في قليوب شارع الملحاني</span>
+            <span>متاح في قليوب — شارع العروبة</span>
           </div>
         </div>
       </div>
@@ -164,7 +199,7 @@
           </div>
           <div class="strip-text">
             <strong>فرع قليوب</strong>
-            <small>شارع الملحاني</small>
+            <small>شارع العروبة</small>
           </div>
         </div>
         <div class="strip-item">
@@ -253,88 +288,161 @@
       <div class="container">
         <div class="section-heading reveal">
           <p class="section-kicker">Packages & Pricing</p>
-          <h2 id="packagesTitle">اختار الباقة المناسبة لعربيتك</h2>
-          <p class="section-copy">أسعار واضحة ومحسوبة حسب نوع العربية — بدون مفاجآت أو رسوم خفية.</p>
+          <h2 id="packagesTitle">خدماتنا وأسعارها</h2>
+          <p class="section-copy">أسعار واضحة بدون مفاجآت — اختار الخدمة واحجز في ثواني.</p>
         </div>
 
         <div class="packages-grid" id="packagesGrid">
-          <article class="package-card reveal" data-package-card="quick" style="transition-delay:.05s">
-            <div class="pkg-card-top">
-              <span class="pkg-icon-wrap" aria-hidden="true">⚡</span>
-              <p class="package-label">Quick Wash</p>
-            </div>
-            <h3>غسلة سريعة</h3>
-            <p>غسيل خارجي، فوم، تنشيف، وتنظيف زجاج. مثالية للاستخدام اليومي.</p>
-            <div class="package-price">
-              <strong>150</strong>
-              <span>جنيه</span>
-            </div>
-            <div class="pkg-features">
-              <span>✓ غسيل خارجي</span>
-              <span>✓ تنشيف مايكروفايبر</span>
-              <span>✓ تنظيف زجاج</span>
-            </div>
-            <button class="package-action" type="button" data-select-package="quick">اختيار الباقة</button>
-          </article>
 
-          <article class="package-card package-card-featured reveal" data-package-card="full" style="transition-delay:.10s">
-            <div class="package-featured-badge">الأكثر طلباً</div>
-            <div class="pkg-card-top">
-              <span class="pkg-icon-wrap" aria-hidden="true">✨</span>
-              <p class="package-label">Most Popular</p>
+          <!-- ── خدمات السيارات ── -->
+          <div class="pkg-cat reveal">
+            <div class="pkg-cat__head">
+              <span class="pkg-cat__icon" aria-hidden="true">🚗</span>
+              <span class="pkg-cat__title">خدمات غسيل السيارات</span>
             </div>
-            <h3>Full Care</h3>
-            <p>غسيل خارجي وداخلي، تنظيف تابلوه، تعطير، وتلميع إطارات. التجربة الكاملة.</p>
-            <div class="package-price">
-              <strong>280</strong>
-              <span>جنيه</span>
-            </div>
-            <div class="pkg-features">
-              <span>✓ غسيل داخلي وخارجي</span>
-              <span>✓ تعطير شرقي</span>
-              <span>✓ تلميع إطارات</span>
-              <span>✓ تنظيف تابلوه</span>
-            </div>
-            <button class="package-action package-action--featured" type="button" data-select-package="full">اختيار الباقة</button>
-          </article>
+            <div class="pkg-cat__cards">
 
-          <article class="package-card reveal" data-package-card="detail" style="transition-delay:.15s">
-            <div class="pkg-card-top">
-              <span class="pkg-icon-wrap" aria-hidden="true">🏆</span>
-              <p class="package-label">Premium Detail</p>
-            </div>
-            <h3>دكتور العربية</h3>
-            <p>تنظيف عميق، واكس حماية، عناية بالفرش، وتشطيب نهائي يستاهل.</p>
-            <div class="package-price">
-              <strong>650</strong>
-              <span>جنيه</span>
-            </div>
-            <div class="pkg-features">
-              <span>✓ تنظيف عميق شامل</span>
-              <span>✓ واكس حماية</span>
-              <span>✓ عناية بالفرش والجلد</span>
-            </div>
-            <button class="package-action" type="button" data-select-package="detail">اختيار الباقة</button>
-          </article>
+              <article class="package-card package-card-featured" data-package-card="inside-out">
+                <div class="package-featured-badge">الأكثر طلباً</div>
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">✨</span>
+                  <p class="package-label">Inside & Outside</p>
+                </div>
+                <h3>غسيل داخلي وخارجي</h3>
+                <div class="package-price"><strong>150</strong><span>جنيه</span></div>
+                <div class="pkg-features">
+                  <span>✓ غسيل خارجي كامل</span>
+                  <span>✓ تنظيف داخلي</span>
+                  <span>✓ تنشيف مايكروفايبر</span>
+                </div>
+                <button class="package-action package-action--featured" type="button" data-select-package="inside-out">اختيار</button>
+              </article>
 
-          <article class="package-card reveal" data-package-card="fleet" style="transition-delay:.20s">
-            <div class="pkg-card-top">
-              <span class="pkg-icon-wrap" aria-hidden="true">🏢</span>
-              <p class="package-label">Corporate Fleet</p>
+              <article class="package-card" data-package-card="outside">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">💧</span>
+                  <p class="package-label">Outside Only</p>
+                </div>
+                <h3>غسيل خارجي فقط</h3>
+                <div class="package-price"><strong>100</strong><span>جنيه</span></div>
+                <div class="pkg-features">
+                  <span>✓ غسيل خارجي</span>
+                  <span>✓ تنشيف مايكروفايبر</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="outside">اختيار</button>
+              </article>
+
+              <article class="package-card" data-package-card="deep">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">🏆</span>
+                  <p class="package-label">Deep Cleaning</p>
+                </div>
+                <h3>غسيل متخصص</h3>
+                <div class="package-price"><strong>250</strong><span>جنيه</span></div>
+                <div class="pkg-features">
+                  <span>✓ تنظيف عميق داخلي وخارجي</span>
+                  <span>✓ معدات متخصصة</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="deep">اختيار</button>
+              </article>
+
+              <article class="package-card" data-package-card="cover">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">🛡️</span>
+                  <p class="package-label">Car Cover</p>
+                </div>
+                <h3>غسيل غطاء السيارة</h3>
+                <div class="package-price"><strong>50</strong><span>جنيه</span></div>
+                <div class="pkg-features">
+                  <span>✓ غسيل وتنشيف الغطاء</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="cover">اختيار</button>
+              </article>
+
+              <article class="package-card" data-package-card="rims">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">⚙️</span>
+                  <p class="package-label">Rims & Tires</p>
+                </div>
+                <h3>غسيل وتنظيف جنوط</h3>
+                <div class="package-price"><strong>100</strong><span>جنيه</span></div>
+                <div class="pkg-features">
+                  <span>✓ تنظيف الجنوط والإطارات</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="rims">اختيار</button>
+              </article>
+
+              <article class="package-card" data-package-card="engine">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">🔧</span>
+                  <p class="package-label">Engine Wash</p>
+                </div>
+                <h3>غسيل موتور السيارة</h3>
+                <div class="package-price"><strong>100</strong><span>جنيه</span></div>
+                <div class="pkg-features">
+                  <span>✓ تنظيف حجرة المحرك</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="engine">اختيار</button>
+              </article>
+
+              <article class="package-card" data-package-card="chemical">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">🧪</span>
+                  <p class="package-label">Chemical Wash</p>
+                </div>
+                <h3>الغسيل الكيماوي</h3>
+                <div class="package-price"><strong style="font-size:1.2rem">حسب</strong><span>الشغل</span></div>
+                <div class="pkg-features">
+                  <span>✓ مواد كيماوية متخصصة</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="chemical">طلب تقييم</button>
+              </article>
+
             </div>
-            <h3>باقات الشركات</h3>
-            <p>عقود شهرية للشركات، مكاتب التأجير، والأساطيل الصغيرة بأسعار مخصوصة.</p>
-            <div class="package-price">
-              <strong style="font-size:1.4rem">حسب</strong>
-              <span>التعاقد</span>
+          </div>
+
+          <!-- ── سجاد وبطاطين ── -->
+          <div class="pkg-cat reveal">
+            <div class="pkg-cat__head">
+              <span class="pkg-cat__icon" aria-hidden="true">🧺</span>
+              <span class="pkg-cat__title">غسيل سجاد وبطاطين</span>
+              <span class="pkg-cat__sub">شامل التنظيف والتغليف</span>
             </div>
-            <div class="pkg-features">
-              <span>✓ عقود مرنة</span>
-              <span>✓ خصم كمية</span>
-              <span>✓ أولوية في المواعيد</span>
+            <div class="pkg-cat__cards pkg-cat__cards--2">
+
+              <article class="package-card" data-package-card="carpet">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">🟫</span>
+                  <p class="package-label">Carpet Wash</p>
+                </div>
+                <h3>غسيل سجاد</h3>
+                <p>تنظيف وتغليف السجاد — السعر حسب المساحة.</p>
+                <div class="package-price"><strong>15</strong><span>جنيه / متر</span></div>
+                <div class="pkg-features">
+                  <span>✓ تنظيف عميق</span>
+                  <span>✓ تغليف بعد التنظيف</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="carpet">اختيار</button>
+              </article>
+
+              <article class="package-card" data-package-card="blanket">
+                <div class="pkg-card-top">
+                  <span class="pkg-icon-wrap" aria-hidden="true">🛏️</span>
+                  <p class="package-label">Blanket Wash</p>
+                </div>
+                <h3>غسيل بطاطين</h3>
+                <p>تنظيف وتغليف البطاطين — للقطعة الواحدة.</p>
+                <div class="package-price"><strong>80</strong><span>جنيه / قطعة</span></div>
+                <div class="pkg-features">
+                  <span>✓ تنظيف شامل</span>
+                  <span>✓ تغليف بعد التنظيف</span>
+                </div>
+                <button class="package-action" type="button" data-select-package="blanket">اختيار</button>
+              </article>
+
             </div>
-            <button class="package-action" type="button" data-select-package="fleet">طلب عرض سعر</button>
-          </article>
+          </div>
+
         </div>
       </div>
     </section>
@@ -431,17 +539,17 @@
         <div class="section-heading reveal">
           <p class="section-kicker">Our Branches</p>
           <h2 id="branchesTitle">فروعنا على الخريطة</h2>
-          <p class="section-copy">فرعنا في قليوب — شارع الملحاني.</p>
+          <p class="section-copy">فرعنا في قسم قليوب — شارع العروبة.</p>
         </div>
         <div class="branches-layout reveal">
           <div class="branches-list">
             <div class="branch-card active" data-branch-desktop="0">
               <div class="branch-card__dot"></div>
               <div class="branch-card__info">
-                <strong>قليوب شارع الملحاني</strong>
+                <strong>قليوب — شارع العروبة</strong>
                 <small>يومياً 9ص – 12م</small>
               </div>
-              <a class="branch-card__nav" href="https://maps.google.com/?q=قليوب+شارع+الملحاني+مصر" target="_blank" rel="noopener">فتح الخريطة ↗</a>
+              <a class="branch-card__nav" href="https://maps.google.com/?q=شارع+العروبة+قسم+قليوب+محافظة+القليوبية+مصر" target="_blank" rel="noopener">فتح الخريطة ↗</a>
             </div>
             <a class="btn btn-ghost" href="tel:01005552026" style="margin-top:8px;justify-content:center">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -489,7 +597,7 @@
         <div class="booking-copy reveal">
           <p class="section-kicker">Book Now</p>
           <h2 id="bookingTitle">احجز دورك في DR.Care</h2>
-          <p class="section-copy">النموذج متصل بـ PHP API. الطلب بيتحفظ في قاعدة البيانات ويظهر في لوحة الإدارة فوراً.</p>
+          <p class="section-copy">آخر خطوة وأبسطها — اختار طريقة الدفع المناسبة وأنهِ حجزك في ثوانٍ.</p>
           <div class="booking-note">
             <strong>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -503,8 +611,8 @@
               تأكيد فوري
             </div>
             <div class="booking-feat">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              كاش أو بطاقة
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              كاش أو Instapay
             </div>
             <div class="booking-feat">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -530,8 +638,22 @@
               رقم الموبايل
               <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX" autocomplete="tel" inputmode="numeric" required>
             </label>
-            <div class="form-info-note">
-              📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
+            <div id="apptPickerWrap">
+              <label for="apptDate" id="apptDateLabel" style="display:none">
+                تاريخ الموعد
+                <select id="apptDate" name="apptDate">
+                  <option value="">— اختار يوم —</option>
+                </select>
+              </label>
+              <label for="apptTime" id="apptTimeLabel" style="display:none">
+                وقت الموعد
+                <select id="apptTime" name="apptTime">
+                  <option value="">— اختار وقت —</option>
+                </select>
+              </label>
+              <div class="form-info-note" id="apptFallback">
+                📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
+              </div>
             </div>
           </div>
 
@@ -555,6 +677,49 @@
               طريقة الدفع
               <select id="paymentMethod" name="paymentMethod" required></select>
             </label>
+          </div>
+          <div id="screenshotField" class="instapay-section" style="display:none">
+
+            <!-- Step 1 -->
+            <div class="ipay-step">
+              <div class="ipay-step__badge">١</div>
+              <div class="ipay-step__body">
+                <div class="ipay-step__title">حوّل المبلغ على رقم Instapay</div>
+                <div class="ipay-number-box">
+                  <span id="instapayNumberDisplay" class="ipay-number-box__num" dir="ltr">01XXXXXXXXX</span>
+                  <button type="button" id="copyInstapayBtn" class="ipay-number-box__copy">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    نسخ الرقم
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Warning -->
+            <div class="ipay-warning">
+              <div class="ipay-warning__icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="ipay-warning__text">
+                <strong>مطلوب:</strong> بعد التحويل لازم ترفع صورة الإيصال أو شاشة التأكيد من تطبيق البنك — من غير صورة مش هيتم تأكيد الحجز
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="ipay-step">
+              <div class="ipay-step__badge">٢</div>
+              <div class="ipay-step__body">
+                <div class="ipay-step__title">ارفع صورة إيصال الدفع <span class="required-tag">مطلوب</span></div>
+                <label for="paymentScreenshot" class="upload-zone">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span class="upload-zone__main">اضغط لرفع إيصال الدفع</span>
+                  <span class="upload-zone__sub">PNG أو JPG — الحد الأقصى 3MB</span>
+                </label>
+                <input type="file" id="paymentScreenshot" accept="image/*" class="upload-zone-input">
+                <div id="screenshotPreview" class="screenshot-preview"></div>
+              </div>
+            </div>
+
           </div>
           <label for="plateNumber">
             رقم اللوحة (اختياري)
@@ -598,7 +763,7 @@
       <div class="container footer-top-inner">
         <div class="footer-brand">
           <a class="brand" href="#home" aria-label="DR.Care">
-            <span class="brand-mark">DR</span>
+            <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
             <span class="brand-text">
               <strong>DR.Care</strong>
               <small>مغسلة عربيات مصرية</small>
@@ -608,6 +773,12 @@
           <div class="footer-brand__badges">
             <span class="footer-badge">صُنع في مصر 🇪🇬</span>
             <span class="footer-badge">PWA Ready</span>
+          </div>
+          <div class="footer-social">
+            <a class="footer-social__link" href="https://www.facebook.com/Dr.Careforcars" target="_blank" rel="noopener" aria-label="DR.Care على فيسبوك">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              فيسبوك
+            </a>
           </div>
         </div>
 
@@ -621,10 +792,11 @@
 
         <div class="footer-col">
           <h5>الباقات</h5>
-          <a href="#packages">غسلة سريعة — 150 ج</a>
-          <a href="#packages">Full Care — 280 ج</a>
-          <a href="#packages">دكتور العربية — 650 ج</a>
-          <a href="#packages">باقات الشركات</a>
+          <a href="#packages">غسيل داخلي وخارجي — 150 ج</a>
+          <a href="#packages">غسيل خارجي فقط — 100 ج</a>
+          <a href="#packages">غسيل متخصص — 250 ج</a>
+          <a href="#packages">غسيل جنوط — 100 ج</a>
+          <a href="#packages">الغسيل الكيماوي</a>
         </div>
 
         <div class="footer-col">
@@ -666,7 +838,7 @@
     const el = document.getElementById('drcare-map-desktop');
     if (!el) return;
     const BRANCHES = [
-      { name: 'قليوب شارع الملحاني', lat: 30.1877, lng: 31.2041 }
+      { name: 'قليوب — شارع العروبة', lat: 30.1877, lng: 31.2041 }
     ];
     const map = L.map(el, { zoomControl: true, attributionControl: false })
       .setView([30.1877, 31.2041], 15);

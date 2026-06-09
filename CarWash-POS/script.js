@@ -298,6 +298,7 @@ const updateLivePrice = () => {
   const carExtra = Number(opt?.dataset.extra || 0);
   const carLabel = opt?.text.replace(/\s*\(.*\)/, '').trim() || '';
   const base     = selectedPackage.price + carExtra;
+  const isVariable = selectedPackage.code === 'carpet' || selectedPackage.code === 'chemical';
 
   // Calculate discounts
   let totalDiscount = appliedCoupon ? appliedCoupon.discount : 0;
@@ -309,14 +310,18 @@ const updateLivePrice = () => {
   totalDiscount = Math.min(totalDiscount, base);
   const finalTotal = base - totalDiscount;
 
+  const priceLabel = isVariable
+    ? (selectedPackage.code === 'carpet' ? '15 ج / متر' : 'حسب الشغل')
+    : (finalTotal === 0 ? 'حسب الشغل' : finalTotal.toLocaleString('ar-EG') + ' جنيه');
+
   priceBar.className = 'pos-price-bar';
   priceBar.innerHTML = `
     <div class="pos-price-bar__details">
       <span>${selectedPackage.name}</span>
-      ${carExtra > 0 ? `<span>${carLabel} (+${carExtra.toLocaleString('ar-EG')} ج)</span>` : ''}
-      ${totalDiscount > 0 ? `<span style="color:#6fcf47">خصم -${totalDiscount.toLocaleString('ar-EG')} ج</span>` : ''}
+      ${carExtra > 0 && !isVariable ? `<span>${carLabel} (+${carExtra.toLocaleString('ar-EG')} ج)</span>` : ''}
+      ${totalDiscount > 0 && !isVariable ? `<span style="color:#6fcf47">خصم -${totalDiscount.toLocaleString('ar-EG')} ج</span>` : ''}
     </div>
-    <strong class="pos-price-bar__total" style="${totalDiscount>0?'color:#6fcf47':''}">${finalTotal === 0 ? 'حسب التعاقد' : finalTotal.toLocaleString('ar-EG') + ' جنيه'}</strong>`;
+    <strong class="pos-price-bar__total" style="${totalDiscount>0&&!isVariable?'color:#6fcf47':''}">${priceLabel}</strong>`;
 };
 
 carTypeEl?.addEventListener('change', updateLivePrice);

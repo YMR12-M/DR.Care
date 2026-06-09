@@ -333,7 +333,8 @@ try {
   addMissingColumn($pdo, 'bookings', 'car_extra_price', 'REAL DEFAULT 0');
   addMissingColumn($pdo, 'bookings', 'discount_amount', 'REAL DEFAULT 0');
   addMissingColumn($pdo, 'bookings', 'discount_note',   'TEXT DEFAULT NULL');
-  addMissingColumn($pdo, 'bookings', 'claim_token',     'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'bookings', 'claim_token',        'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'bookings', 'payment_screenshot', 'TEXT DEFAULT NULL');
   $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_claim ON bookings(claim_token) WHERE claim_token IS NOT NULL");
 
   $pdo->exec("CREATE TABLE IF NOT EXISTS admin_users (
@@ -355,6 +356,19 @@ try {
     hit_at  TEXT NOT NULL
   )");
   $pdo->exec("CREATE INDEX IF NOT EXISTS idx_rl_key ON rate_limits(rl_key)");
+
+  /* ── Appointment slots ── */
+  $pdo->exec("CREATE TABLE IF NOT EXISTS appointment_slots (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    slot_date    TEXT NOT NULL,
+    slot_time    TEXT NOT NULL,
+    max_bookings INTEGER NOT NULL DEFAULT 1,
+    booked_count INTEGER NOT NULL DEFAULT 0,
+    is_active    INTEGER NOT NULL DEFAULT 1,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(slot_date, slot_time)
+  )");
+  $pdo->exec("CREATE INDEX IF NOT EXISTS idx_slots_date ON appointment_slots(slot_date, is_active)");
 
   /* ── Push subscriptions ── */
   $pdo->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (

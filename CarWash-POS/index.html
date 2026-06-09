@@ -14,7 +14,7 @@
     <div class="pos-header__inner">
 
       <div class="pos-brand">
-        <div class="pos-brand__mark">DR</div>
+        <img src="../assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
         <div class="pos-brand__text">
           <strong>DR.Care <span class="pos-tag">POS</span></strong>
           <small>نظام الفواتير الداخلي</small>
@@ -75,35 +75,76 @@
 
             <!-- Packages -->
             <p class="pos-kicker">Service Package</p>
-            <div class="packages-grid" id="packageGrid">
-              <button type="button" class="package-card" data-code="quick" data-price="150" aria-pressed="false">
-                <span class="pkg-icon">⚡</span>
-                <span class="pkg-label">Quick Wash</span>
-                <strong>غسلة سريعة</strong>
-                <div class="pkg-price"><small>ج</small>150</div>
-                <p>غسيل خارجي، فوم، تنشيف، تنظيف زجاج</p>
-              </button>
-              <button type="button" class="package-card" data-code="full" data-price="280" aria-pressed="false">
-                <span class="pkg-icon">✨</span>
-                <span class="pkg-label">Full Service</span>
-                <strong>Full Care</strong>
-                <div class="pkg-price"><small>ج</small>280</div>
-                <p>غسيل داخلي وخارجي، تعطير، تنظيف شامل</p>
-              </button>
-              <button type="button" class="package-card" data-code="detail" data-price="650" aria-pressed="false">
-                <span class="pkg-icon">🏆</span>
-                <span class="pkg-label">Premium Detail</span>
-                <strong>دكتور العربية</strong>
-                <div class="pkg-price"><small>ج</small>650</div>
-                <p>تنظيف عميق، تلميع، واكس حماية كاملة</p>
-              </button>
-              <button type="button" class="package-card" data-code="fleet" data-price="0" aria-pressed="false">
-                <span class="pkg-icon">🏢</span>
-                <span class="pkg-label">Corporate Fleet</span>
-                <strong>باقات الشركات</strong>
-                <div class="pkg-price pkg-price--contract">حسب التعاقد</div>
-                <p>عقود وتنسيق مخصص للأسطول التجاري</p>
-              </button>
+            <div class="pos-packages-wrap" id="packageGrid">
+
+              <!-- Car wash services -->
+              <div class="pos-pkg-cat">
+                <div class="pos-pkg-cat__head"><span>🚗</span><span>خدمات غسيل السيارات</span></div>
+                <div class="pos-pkg-cards">
+                  <button type="button" class="package-card" data-code="inside-out" data-price="150" aria-pressed="false">
+                    <span class="pkg-icon">🚿</span>
+                    <span class="pkg-label">Inside + Out</span>
+                    <strong>داخلي وخارجي</strong>
+                    <div class="pkg-price"><small>ج</small>150</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="outside" data-price="100" aria-pressed="false">
+                    <span class="pkg-icon">✨</span>
+                    <span class="pkg-label">Exterior</span>
+                    <strong>خارجي فقط</strong>
+                    <div class="pkg-price"><small>ج</small>100</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="deep" data-price="250" aria-pressed="false">
+                    <span class="pkg-icon">💎</span>
+                    <span class="pkg-label">Deep Cleaning</span>
+                    <strong>غسيل متخصص</strong>
+                    <div class="pkg-price"><small>ج</small>250</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="cover" data-price="50" aria-pressed="false">
+                    <span class="pkg-icon">🛡️</span>
+                    <span class="pkg-label">Cover Wash</span>
+                    <strong>غطاء السيارة</strong>
+                    <div class="pkg-price"><small>ج</small>50</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="rims" data-price="100" aria-pressed="false">
+                    <span class="pkg-icon">⭕</span>
+                    <span class="pkg-label">Rims</span>
+                    <strong>غسيل الجنوط</strong>
+                    <div class="pkg-price"><small>ج</small>100</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="engine" data-price="100" aria-pressed="false">
+                    <span class="pkg-icon">⚙️</span>
+                    <span class="pkg-label">Engine Wash</span>
+                    <strong>غسيل الموتور</strong>
+                    <div class="pkg-price"><small>ج</small>100</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="chemical" data-price="0" aria-pressed="false">
+                    <span class="pkg-icon">🧪</span>
+                    <span class="pkg-label">Chemical</span>
+                    <strong>غسيل كيماوي</strong>
+                    <div class="pkg-price pkg-price--contract">حسب الشغل</div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Carpet & blanket -->
+              <div class="pos-pkg-cat">
+                <div class="pos-pkg-cat__head"><span>🧺</span><span>غسيل سجاد وبطاطين</span></div>
+                <div class="pos-pkg-cards pos-pkg-cards--2">
+                  <button type="button" class="package-card" data-code="carpet" data-price="0" aria-pressed="false">
+                    <span class="pkg-icon">🧺</span>
+                    <span class="pkg-label">Carpet</span>
+                    <strong>غسيل سجاد</strong>
+                    <div class="pkg-price pkg-price--contract">15 ج / متر</div>
+                  </button>
+                  <button type="button" class="package-card" data-code="blanket" data-price="80" aria-pressed="false">
+                    <span class="pkg-icon">🛏️</span>
+                    <span class="pkg-label">Blanket</span>
+                    <strong>غسيل بطاطين</strong>
+                    <div class="pkg-price"><small>ج</small>80</div>
+                  </button>
+                </div>
+              </div>
+
             </div>
 
             <!-- Customer info -->
@@ -128,16 +169,13 @@
               </label>
               <label class="m-form__label"><span>الفرع</span>
                 <select id="branch">
-                  <option value="القاهرة الجديدة">القاهرة الجديدة</option>
-                  <option value="مدينة نصر">مدينة نصر</option>
-                  <option value="الشيخ زايد">الشيخ زايد</option>
+                  <option value="قليوب — شارع العروبة">قليوب — شارع العروبة</option>
                 </select>
               </label>
               <label class="m-form__label"><span>طريقة الدفع</span>
                 <select id="paymentMethod">
                   <option value="كاش">كاش</option>
-                  <option value="بطاقة بنكية">بطاقة بنكية</option>
-                  <option value="محفظة إلكترونية">محفظة إلكترونية</option>
+                  <option value="Instapay">Instapay</option>
                 </select>
               </label>
             </div>
@@ -200,7 +238,7 @@
 
         <div class="invoice-card" id="invoiceCard" style="display:none">
           <div class="invoice-brand">
-            <div class="invoice-brand__mark">DR</div>
+            <img src="../assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
             <div class="invoice-brand__text">
               <strong>DR.Care</strong>
               <small>مغسلة عربيات مصرية</small>

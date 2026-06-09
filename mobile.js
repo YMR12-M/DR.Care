@@ -46,10 +46,15 @@ const pwaDismissBtn    = document.getElementById('pwaDismissBtn');
 /* ── Fallback config ── */
 const fallbackConfig = {
   packages: [
-    { code: 'quick',  name: 'غسلة سريعة',    price: 150 },
-    { code: 'full',   name: 'Full Care',       price: 280 },
-    { code: 'detail', name: 'دكتور العربية',  price: 650 },
-    { code: 'fleet',  name: 'باقات الشركات',  price: 0   }
+    { code: 'inside-out', name: 'غسيل داخلي وخارجي',         price: 150 },
+    { code: 'outside',   name: 'غسيل خارجي فقط',             price: 100 },
+    { code: 'deep',      name: 'غسيل متخصص (Deep Cleaning)', price: 250 },
+    { code: 'cover',     name: 'غسيل غطاء السيارة',          price: 50  },
+    { code: 'rims',      name: 'غسيل وتنظيف جنوط السيارة',  price: 100 },
+    { code: 'engine',    name: 'غسيل موتور السيارة',         price: 100 },
+    { code: 'chemical',  name: 'الغسيل الكيماوي',            price: 0   },
+    { code: 'carpet',   name: 'غسيل سجاد',                  price: 0   },
+    { code: 'blanket',  name: 'غسيل بطاطين',                price: 80  }
   ],
   carTypes: [
     { code: 'sedan',  name: 'سيدان',      extra: 0   },
@@ -57,8 +62,9 @@ const fallbackConfig = {
     { code: 'van',    name: 'فان',         extra: 90  },
     { code: 'pickup', name: 'نقل خفيف',   extra: 120 }
   ],
-  branches:       ['قليوب شارع الملحاني'],
-  paymentMethods: ['كاش', 'Instapay', 'Vodafone Cash', 'بطاقة بنكية']
+  branches:       ['قليوب — شارع العروبة'],
+  paymentMethods: ['كاش', 'Instapay'],
+  instapayNumber: '01XXXXXXXXX'
 };
 
 let appConfig     = { ...fallbackConfig };
@@ -102,7 +108,9 @@ const updateEstimate = () => {
   const subtotal = Number(pkg?.price ?? 0) + Number(car?.extra ?? 0);
   const discount = appliedCoupon ? (appliedCoupon.discount || 0) : 0;
   const total    = Math.max(0, subtotal - discount);
-  const newText  = pkg?.code === 'fleet' ? 'حسب التعاقد' : formatPrice(total);
+  const newText  = pkg?.code === 'carpet' ? '15 ج / متر'
+                 : (pkg?.price === 0)    ? 'حسب الشغل'
+                 : formatPrice(total);
 
   if (estimateValue.textContent !== newText) {
     estimateValue.textContent = newText;
@@ -120,7 +128,7 @@ const updatePackageCards = (code) => {
 };
 
 /* ── Config loader ── */
-const populateForm = (selected = 'full') => {
+const populateForm = (selected = 'inside-out') => {
   renderSelect(servicePackage, appConfig.packages,
     p => p.code,
     p => p.price > 0 ? `${p.name} — ${formatPrice(p.price)}` : p.name,
@@ -131,6 +139,8 @@ const populateForm = (selected = 'full') => {
     'sedan');
   renderSelect(branch,        appConfig.branches,       b => b, b => b, appConfig.branches[0]);
   renderSelect(paymentMethod, appConfig.paymentMethods, m => m, m => m, appConfig.paymentMethods[0]);
+  const numEl = document.getElementById('instapayNumberDisplay');
+  if (numEl) numEl.textContent = appConfig.instapayNumber;
   updateEstimate();
   if (servicePackage?.value) updatePackageCards(servicePackage.value);
 };
@@ -144,7 +154,8 @@ const loadConfig = async () => {
       packages:       data.packages?.length      ? data.packages       : fallbackConfig.packages,
       carTypes:       data.carTypes?.length       ? data.carTypes       : fallbackConfig.carTypes,
       branches:       data.branches?.length       ? data.branches       : fallbackConfig.branches,
-      paymentMethods: data.paymentMethods?.length ? data.paymentMethods : fallbackConfig.paymentMethods
+      paymentMethods: data.paymentMethods?.length ? data.paymentMethods : fallbackConfig.paymentMethods,
+      instapayNumber: data.instapayNumber          || fallbackConfig.instapayNumber
     };
   } catch {
     appConfig = { ...fallbackConfig };
@@ -161,13 +172,34 @@ const setMinimumAppointment = () => {
 };
 
 /* ── Session check ── */
+const prefillBookingForm = (data) => {
+  const set = (name, val) => {
+    if (!val) return;
+    const el = bookingForm?.querySelector(`[name="${name}"]`);
+    if (el && !el.value) { el.value = val; el.classList.add('prefilled'); }
+  };
+  set('name',  data.name);
+  set('email', data.email);
+  set('phone', data.phone);
+};
+
 const checkSession = async () => {
   try {
     const res  = await fetch('api/customer-login.php?action=check', { credentials: 'same-origin' });
     const data = await res.json().catch(() => ({}));
-    if (data.authenticated && mAccountBtn) {
-      mAccountBtn.textContent = data.name ? `مرحبا ${data.name.split(' ')[0]}` : 'حسابي';
-      mAccountBtn.href = 'mobile-profile.html';
+    if (data.authenticated) {
+      if (mAccountBtn) {
+        mAccountBtn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+        mAccountBtn.classList.add('m-btn--account-icon');
+        mAccountBtn.href = 'mobile-profile.html';
+      }
+      /* Show animated hint — always visible while logged in */
+      const hint = document.getElementById('accountHint');
+      if (hint) {
+        hint.style.display = '';
+        hint.setAttribute('aria-hidden', 'false');
+      }
+      prefillBookingForm(data);
     }
     return Boolean(data.authenticated);
   } catch {
@@ -243,6 +275,64 @@ applyCouponBtn?.addEventListener('click', async () => {
   if (appliedCoupon) resetCoupon();
   updateEstimate();
 }));
+
+/* ── Instapay screenshot toggle ── */
+const screenshotField   = document.getElementById('screenshotField');
+const paymentScreenshot = document.getElementById('paymentScreenshot');
+const screenshotPreview = document.getElementById('screenshotPreview');
+
+paymentMethod?.addEventListener('change', () => {
+  const isInstapay = paymentMethod.value === 'Instapay';
+  if (screenshotField) screenshotField.style.display = isInstapay ? '' : 'none';
+  if (!isInstapay && paymentScreenshot) {
+    paymentScreenshot.value = '';
+    screenshotPreview.innerHTML = '';
+    const zone = document.querySelector('label.upload-zone');
+    if (zone) {
+      zone.classList.remove('has-file');
+      const main = zone.querySelector('.upload-zone__main');
+      const sub  = zone.querySelector('.upload-zone__sub');
+      if (main) main.textContent = 'اضغط لرفع إيصال الدفع';
+      if (sub)  sub.textContent  = 'PNG أو JPG — الحد الأقصى 3MB';
+    }
+  }
+});
+
+paymentScreenshot?.addEventListener('change', () => {
+  const file = paymentScreenshot.files[0];
+  if (!file) return;
+  const zone = document.querySelector('label.upload-zone');
+  if (zone) {
+    zone.classList.add('has-file');
+    const main = zone.querySelector('.upload-zone__main');
+    const sub  = zone.querySelector('.upload-zone__sub');
+    if (main) main.textContent = `✓ ${file.name}`;
+    if (sub)  sub.textContent  = `${(file.size / 1024).toFixed(0)} KB`;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => { screenshotPreview.innerHTML = `<img src="${e.target.result}" alt="إيصال الدفع">`; };
+  reader.readAsDataURL(file);
+});
+
+const getScreenshotBase64 = () => new Promise((resolve) => {
+  const file = paymentScreenshot?.files[0];
+  if (!file) return resolve(null);
+  if (file.size > 3 * 1024 * 1024) { setMessage('حجم الصورة كبير — الحد الأقصى 3MB', 'error'); return resolve(false); }
+  const reader = new FileReader();
+  reader.onload = (e) => resolve(e.target.result);
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('copyInstapayBtn')?.addEventListener('click', () => {
+  const num = document.getElementById('instapayNumberDisplay')?.textContent || '';
+  navigator.clipboard.writeText(num).then(() => {
+    const btn = document.getElementById('copyInstapayBtn');
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = '✓ تم النسخ';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+});
 
 /* ── Per-field validation ── */
 const fieldValidators = {
@@ -332,6 +422,13 @@ bookingForm?.addEventListener('submit', async (e) => {
     if (isNaN(apptDate) || apptDate < new Date(Date.now() + 15 * 60 * 1000)) {
       setMessage('الميعاد لازم يكون بعد 15 دقيقة من الآن.', 'error'); return;
     }
+  }
+
+  if (payload.paymentMethod === 'Instapay') {
+    const screenshot = await getScreenshotBase64();
+    if (screenshot === false) return;
+    if (!screenshot) { setMessage('لازم ترفع صورة إيصال الدفع (Instapay) عشان يتم تأكيد الحجز.', 'error'); return; }
+    payload.paymentScreenshot = screenshot;
   }
 
   await fetchCsrf();
@@ -503,80 +600,52 @@ if (stickyCta) {
   });
 }
 
-/* ── PWA install banner ── */
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
+/* ── PWA install ── */
 const isInStandaloneMode = () =>
   ('standalone' in navigator && navigator.standalone) ||
   window.matchMedia('(display-mode: standalone)').matches;
 
-/* iOS: show guide sheet */
-if (isIOS && !isInStandaloneMode() && !localStorage.getItem('pwa-ios-dismissed')) {
-  setTimeout(() => {
-    const guide = document.getElementById('iosInstallGuide');
-    if (guide) { guide.hidden = false; guide.removeAttribute('aria-hidden'); }
-  }, 3000);
-}
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
 
-const closeIosGuide = () => {
-  const guide = document.getElementById('iosInstallGuide');
-  if (guide) { guide.hidden = true; }
-  localStorage.setItem('pwa-ios-dismissed', '1');
-};
-
-document.getElementById('iosGuideClose')?.addEventListener('click', closeIosGuide);
-document.getElementById('iosGuideBackdrop')?.addEventListener('click', closeIosGuide);
-
-/* Footer install button — always visible, works for both platforms */
-document.getElementById('footerInstallBtn')?.addEventListener('click', async () => {
-  if (isInStandaloneMode()) {
-    alert('التطبيق مثبّت بالفعل على جهازك ✓');
-    return;
-  }
-  if (deferredInstallPrompt) {
-    /* Android Chrome — trigger native prompt */
-    deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    if (outcome === 'accepted') deferredInstallPrompt = null;
-  } else if (isIOS) {
-    /* iOS Safari — show step-by-step guide */
-    localStorage.removeItem('pwa-ios-dismissed');
-    const guide = document.getElementById('iosInstallGuide');
-    if (guide) { guide.hidden = false; guide.removeAttribute('aria-hidden'); }
-  } else {
-    /* Other browsers — show iOS-style guide with general instructions */
-    const guide = document.getElementById('iosInstallGuide');
-    if (guide) { guide.hidden = false; guide.removeAttribute('aria-hidden'); }
-  }
-});
-
-/* Android / Chrome: beforeinstallprompt */
+/* Capture beforeinstallprompt — never auto-show, save for button only */
 window.addEventListener('beforeinstallprompt', (event) => {
   event.preventDefault();
   deferredInstallPrompt = event;
-  if (!sessionStorage.getItem('pwa-dismissed') && pwaInstallBanner) {
-    setTimeout(() => {
-      pwaInstallBanner.classList.add('visible');
-      pwaInstallBanner.removeAttribute('aria-hidden');
-    }, 2000);
+});
+
+/* Install handler — shared by footer + drawer buttons */
+async function handleInstall() {
+  if (isInStandaloneMode()) return;
+  if (deferredInstallPrompt) {
+    await deferredInstallPrompt.prompt();
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    if (outcome === 'accepted') deferredInstallPrompt = null;
+    return;
   }
-});
+  /* Fallback: show one-line toast with platform-specific hint */
+  const toast = document.getElementById('iosInstallGuide');
+  const msg   = toast?.querySelector('span');
+  if (!toast || !msg) return;
+  if (isIOS) {
+    msg.innerHTML = 'اضغط <strong>Share</strong> ثم <strong>«إضافة إلى الشاشة الرئيسية»</strong>';
+  } else {
+    msg.innerHTML = 'افتح قائمة المتصفح <strong>⋮</strong> واختار <strong>«تثبيت التطبيق»</strong>';
+  }
+  toast.hidden = false;
+  setTimeout(() => { toast.hidden = true; }, 6000);
+}
 
-pwaInstallBtn?.addEventListener('click', async () => {
-  if (!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  const { outcome } = await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt = null;
-  pwaInstallBanner?.classList.remove('visible');
-});
+document.getElementById('footerInstallBtn')?.addEventListener('click', handleInstall);
+document.getElementById('drawerInstallBtn')?.addEventListener('click', handleInstall);
 
-pwaDismissBtn?.addEventListener('click', () => {
-  pwaInstallBanner?.classList.remove('visible');
-  sessionStorage.setItem('pwa-dismissed', '1');
+document.getElementById('iosGuideClose')?.addEventListener('click', () => {
+  const toast = document.getElementById('iosInstallGuide');
+  if (toast) toast.hidden = true;
 });
 
 window.addEventListener('appinstalled', () => {
-  pwaInstallBanner?.classList.remove('visible');
   deferredInstallPrompt = null;
+  document.getElementById('drawerInstallItem')?.remove();
 });
 
 /* ── Offline / Online detection ── */

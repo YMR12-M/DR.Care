@@ -54,11 +54,32 @@ if ($method === 'POST') {
     jsonResponse(['ok' => false, 'message' => 'طريقة الدفع غير صالحة'], 400);
   }
 
+  $slotId = null;
   if ($appointment !== null && $appointment !== '') {
-    $date = DateTime::createFromFormat('Y-m-d\TH:i', $appointment);
-    $now = new DateTime('now');
-    if (!$date || $date < $now->modify('+15 minutes')) {
-      jsonResponse(['ok' => false, 'message' => 'الموعد يجب أن يكون بعد 15 دقيقة من الآن'], 400);
+    $apptDt = DateTime::createFromFormat('Y-m-d\TH:i', $appointment);
+    if (!$apptDt) {
+      jsonResponse(['ok' => false, 'message' => 'صيغة الموعد غير صحيحة'], 400);
+    }
+    $apptDate = $apptDt->format('Y-m-d');
+    $apptTime = $apptDt->format('H:i');
+
+    /* Check if slot-based booking is in use (any active slots defined) */
+    $slotCount = (int)$pdo->query("SELECT COUNT(*) FROM appointment_slots WHERE is_active=1")->fetchColumn();
+    if ($slotCount > 0) {
+      $slotRow = $pdo->prepare("
+        SELECT id, booked_count, max_bookings
+        FROM appointment_slots
+        WHERE slot_date=:d AND slot_time=:t AND is_active=1 LIMIT 1
+      ");
+      $slotRow->execute([':d' => $apptDate, ':t' => $apptTime]);
+      $slot = $slotRow->fetch(PDO::FETCH_ASSOC);
+      if (!$slot) {
+        jsonResponse(['ok' => false, 'message' => 'الموعد المختار غير متاح'], 400);
+      }
+      if ((int)$slot['booked_count'] >= (int)$slot['max_bookings']) {
+        jsonResponse(['ok' => false, 'message' => 'هذا الموعد اكتمل، اختار موعداً آخر'], 409);
+      }
+      $slotId = (int)$slot['id'];
     }
   }
 
@@ -78,8 +99,24 @@ if ($method === 'POST') {
     jsonResponse(['ok' => false, 'message' => 'بيانات الباقة أو نوع العربية غير صحيحة'], 400);
   }
 
-  $total = ($pkg['price'] ?? 0) + ($car['extra'] ?? 0);
-  $discount = 0;
+  $pkgPrice  = (float)($pkg['price'] ?? 0);
+  $carExtra  = (float)($car['extra'] ?? 0);
+  $total     = $pkgPrice + $carExtra;
+  $discount  = 0;
+  $discountNote = null;
+
+  /* ── Validate Instapay screenshot ── */
+  $paymentScreenshot = null;
+  if ($paymentMethod === 'Instapay') {
+    $raw = trim($input['paymentScreenshot'] ?? '');
+    if (!$raw) {
+      jsonResponse(['ok' => false, 'message' => 'رجاء ارفع إيصال الدفع (Instapay)'], 400);
+    }
+    if (!preg_match('/^data:image\/(jpeg|jpg|png|webp|gif);base64,/i', $raw) || strlen($raw) > 3 * 1024 * 1024) {
+      jsonResponse(['ok' => false, 'message' => 'صورة الإيصال غير صالحة أو حجمها كبير'], 400);
+    }
+    $paymentScreenshot = $raw;
+  }
 
   /* ── Coupon validation & application ── */
   $appliedCoupon = null;
@@ -97,33 +134,59 @@ if ($method === 'POST') {
         ? round($total * $coupon['discount_value'] / 100, 2)
         : min($coupon['discount_value'], $total);
       $total = max(0, $total - $discount);
+      $discountNote = "كوبون: {$couponCode}";
       $appliedCoupon = $coupon;
     }
   }
 
-  $totalLabel = $pkg['code'] === 'fleet' ? 'حسب التعاقد' : number_format($total, 0, '.', ',') . ' جنيه';
+  $totalLabel = ($total == 0) ? 'حسب الشغل' : number_format($total, 0, '.', ',') . ' جنيه';
 
   $pdo->beginTransaction();
   try {
-    $stmt = $pdo->prepare('INSERT INTO bookings (name, email, phone, package_code, package_name, car_type_code, car_type_name, branch, appointment, notes, plate_number, payment_method, total_price, created_at, status, customer_id, source) VALUES (:name,:email,:phone,:pkgc,:pkgN,:carc,:carN,:branch,:ap,:notes,:plate,:pm,:total,:created,:status,:customer_id,\'web\')');
+    $stmt = $pdo->prepare('INSERT INTO bookings
+      (name, email, phone, package_code, package_name, car_type_code, car_type_name,
+       branch, appointment, notes, plate_number, payment_method, total_price,
+       pkg_price, car_extra_price, discount_amount, discount_note, payment_screenshot,
+       created_at, status, customer_id, source)
+      VALUES
+      (:name,:email,:phone,:pkgc,:pkgN,:carc,:carN,:branch,:ap,:notes,:plate,:pm,:total,
+       :pkg_price,:car_extra,:discount,:disc_note,:screenshot,:created,:status,:customer_id,\'web\')');
     $stmt->execute([
-      ':name' => $name,
-      ':email' => $email,
-      ':phone' => $phone,
-      ':pkgc' => $pkg['code'],
-      ':pkgN' => $pkg['name'],
-      ':carc' => $car['code'],
-      ':carN' => $car['name'],
-      ':branch' => $branch,
-      ':ap' => $appointment,
-      ':notes' => $notes,
-      ':plate' => $plate,
-      ':pm' => $paymentMethod,
-      ':total' => $total,
-      ':created' => date('c'),
-      ':status' => 'new',
-      ':customer_id' => $customerId
+      ':name'       => $name,
+      ':email'      => $email,
+      ':phone'      => $phone,
+      ':pkgc'       => $pkg['code'],
+      ':pkgN'       => $pkg['name'],
+      ':carc'       => $car['code'],
+      ':carN'       => $car['name'],
+      ':branch'     => $branch,
+      ':ap'         => $appointment,
+      ':notes'      => $notes,
+      ':plate'      => $plate,
+      ':pm'         => $paymentMethod,
+      ':total'      => $total,
+      ':pkg_price'  => $pkgPrice,
+      ':car_extra'  => $carExtra,
+      ':discount'   => $discount,
+      ':disc_note'  => $discountNote,
+      ':screenshot' => $paymentScreenshot,
+      ':created'    => date('c'),
+      ':status'     => 'new',
+      ':customer_id'=> $customerId
     ]);
+
+    /* Atomic slot increment — prevents over-booking */
+    if ($slotId) {
+      $upd = $pdo->prepare(
+        'UPDATE appointment_slots SET booked_count = booked_count + 1
+         WHERE id = :id AND booked_count < max_bookings'
+      );
+      $upd->execute([':id' => $slotId]);
+      if ($upd->rowCount() === 0) {
+        $pdo->rollBack();
+        jsonResponse(['ok' => false, 'message' => 'هذا الموعد اكتمل، اختار موعداً آخر'], 409);
+      }
+    }
 
     /* Atomic coupon increment — WHERE clause prevents race condition */
     if ($appliedCoupon) {
