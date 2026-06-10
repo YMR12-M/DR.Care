@@ -625,10 +625,30 @@ function hideInstallBanner() {
   setTimeout(() => { pwaInstallBanner.hidden = true; }, 350);
 }
 
-/* Let the browser show its native install prompt automatically.
-   Also save the event so footer/drawer install buttons still work. */
+const INSTALL_DISMISSED_KEY = 'drcare-install-dismissed';
+
+/* Intercept the browser's mini-infobar and show the full install dialog
+   automatically after a short delay — only if not installed and not
+   previously dismissed by the user. */
 window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault(); // suppress mini-infobar
   deferredInstallPrompt = event;
+
+  if (isInStandaloneMode()) return;
+  if (localStorage.getItem(INSTALL_DISMISSED_KEY)) return;
+
+  setTimeout(async () => {
+    if (!deferredInstallPrompt) return;
+    try {
+      await deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      if (outcome === 'dismissed') {
+        localStorage.setItem(INSTALL_DISMISSED_KEY, '1');
+      } else {
+        deferredInstallPrompt = null;
+      }
+    } catch { /* browser may block if already installed */ }
+  }, 2500);
 });
 
 /* Install handler — shared by footer + drawer buttons + banner */

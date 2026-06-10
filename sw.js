@@ -1,5 +1,5 @@
-// DR.Care Service Worker v2.0
-const CACHE_NAME = 'drcare-v3';
+// DR.Care Service Worker v2.1
+const CACHE_NAME = 'drcare-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -12,6 +12,8 @@ const STATIC_ASSETS = [
   '/admin.html',
   '/admin.js',
   '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap'
 ];
 
