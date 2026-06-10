@@ -609,16 +609,36 @@ const isInStandaloneMode = () =>
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
 
-/* Capture beforeinstallprompt — never auto-show, save for button only */
+const PWA_DISMISSED_KEY = 'drcare-pwa-dismissed';
+
+function showInstallBanner() {
+  if (isInStandaloneMode()) return;
+  if (sessionStorage.getItem(PWA_DISMISSED_KEY)) return;
+  if (!pwaInstallBanner) return;
+  pwaInstallBanner.hidden = false;
+  requestAnimationFrame(() => pwaInstallBanner.classList.add('visible'));
+}
+
+function hideInstallBanner() {
+  if (!pwaInstallBanner) return;
+  pwaInstallBanner.classList.remove('visible');
+  setTimeout(() => { pwaInstallBanner.hidden = true; }, 350);
+}
+
+/* Capture beforeinstallprompt and auto-show banner after 3s */
 window.addEventListener('beforeinstallprompt', (event) => {
   event.preventDefault();
   deferredInstallPrompt = event;
+  if (!isInStandaloneMode()) {
+    setTimeout(showInstallBanner, 3000);
+  }
 });
 
-/* Install handler — shared by footer + drawer buttons */
+/* Install handler — shared by footer + drawer buttons + banner */
 async function handleInstall() {
   if (isInStandaloneMode()) return;
   if (deferredInstallPrompt) {
+    hideInstallBanner();
     await deferredInstallPrompt.prompt();
     const { outcome } = await deferredInstallPrompt.userChoice;
     if (outcome === 'accepted') deferredInstallPrompt = null;
@@ -637,6 +657,13 @@ async function handleInstall() {
   setTimeout(() => { toast.hidden = true; }, 6000);
 }
 
+pwaInstallBtn?.addEventListener('click', handleInstall);
+
+pwaDismissBtn?.addEventListener('click', () => {
+  hideInstallBanner();
+  sessionStorage.setItem(PWA_DISMISSED_KEY, '1');
+});
+
 document.getElementById('footerInstallBtn')?.addEventListener('click', handleInstall);
 document.getElementById('drawerInstallBtn')?.addEventListener('click', handleInstall);
 
@@ -645,8 +672,19 @@ document.getElementById('iosGuideClose')?.addEventListener('click', () => {
   if (toast) toast.hidden = true;
 });
 
+/* Auto-show iOS guide after 4s if not installed */
+if (isIOS && !isInStandaloneMode() && !sessionStorage.getItem(PWA_DISMISSED_KEY)) {
+  setTimeout(() => {
+    const toast = document.getElementById('iosInstallGuide');
+    if (!toast) return;
+    toast.hidden = false;
+    setTimeout(() => { toast.hidden = true; }, 8000);
+  }, 4000);
+}
+
 window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
+  hideInstallBanner();
   document.getElementById('drawerInstallItem')?.remove();
 });
 
