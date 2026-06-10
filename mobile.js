@@ -625,13 +625,10 @@ function hideInstallBanner() {
   setTimeout(() => { pwaInstallBanner.hidden = true; }, 350);
 }
 
-/* Capture beforeinstallprompt and auto-show banner after 3s */
+/* Let the browser show its native install prompt automatically.
+   Also save the event so footer/drawer install buttons still work. */
 window.addEventListener('beforeinstallprompt', (event) => {
-  event.preventDefault();
   deferredInstallPrompt = event;
-  if (!isInStandaloneMode()) {
-    setTimeout(showInstallBanner, 3000);
-  }
 });
 
 /* Install handler — shared by footer + drawer buttons + banner */
