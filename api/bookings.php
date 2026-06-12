@@ -271,6 +271,16 @@ if ($method === 'PATCH') {
     $detail['payment_status'] = ['from' => $existing['payment_status'] ?? 'pending', 'to' => $input['payment_status']];
   }
 
+  if (array_key_exists('admin_notes', $input)) {
+    $an = $input['admin_notes'];
+    if ($an !== null && mb_strlen((string)$an) > 1000) {
+      jsonResponse(['ok' => false, 'message' => 'الملاحظة أطول من 1000 حرف'], 400);
+    }
+    $sets[] = 'admin_notes = :admin_notes';
+    $params[':admin_notes'] = ($an === '' || $an === null) ? null : (string)$an;
+    $detail['admin_notes']  = 'updated';
+  }
+
   if (array_key_exists('appointment', $input)) {
     $appt = $input['appointment'];
     if ($appt !== null && $appt !== '') {

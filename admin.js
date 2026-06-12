@@ -104,6 +104,7 @@ let currentBranchFilter  = 'all';
 let currentPaymentFilter = 'all';
 let currentDateFrom      = '';
 let currentDateTo        = '';
+let selectedBookingIds   = new Set();
 
 // ─── Utils ─────────────────────────────────────────
 const formatPrice = (v) => `${Number(v).toLocaleString('ar-EG')} جنيه`;
@@ -190,6 +191,76 @@ const getFilteredBookings = () => {
   return list;
 };
 
+// ─── Overdue Detection ─────────────────────────────
+const isOverdue = (b) => {
+  if (['completed', 'cancelled'].includes(b.status)) return false;
+  if (!b.appointment) return false;
+  return new Date(b.appointment) < new Date();
+};
+
+// ─── CSV Export ────────────────────────────────────
+const downloadCsv = () => {
+  if (!allBookings.length) { showToast('لا توجد بيانات لتصديرها', 'error'); return; }
+  const cols = ['ID','الاسم','الموبايل','البريد','الباقة','نوع العربية','الفرع','الموعد','طريقة الدفع','السعر','الحالة','تاريخ الإنشاء','رقم اللوحة','المصدر'];
+  const rows = allBookings.map(b => [
+    b.id, b.name, b.phone, b.email||'', b.package_name, b.car_type_name,
+    b.branch, b.appointment||'', b.payment_method||'', b.total_price,
+    STATUS_LABELS[b.status]||b.status, b.created_at, b.plate_number||'', b.source||'web'
+  ]);
+  const esc = (v) => `"${String(v??'').replace(/"/g,'""')}"`;
+  const csv = '﻿' + [cols, ...rows].map(r => r.map(esc).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `dr-care-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+// ─── Print Booking ──────────────────────────────────
+const printBooking = (booking) => {
+  const printArea = document.getElementById('printArea');
+  if (!printArea) return;
+  const fmtD = (v) => v ? new Date(v).toLocaleString('ar-EG', { dateStyle:'long', timeStyle:'short' }) : '—';
+  const esc  = escapeHtml;
+  printArea.innerHTML = `
+    <div style="font-family:Cairo,sans-serif;direction:rtl;color:#000;max-width:420px;margin:0 auto;padding:24px;border:2px solid #000">
+      <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:14px;margin-bottom:14px">
+        <h1 style="font-size:1.6rem;font-weight:900;margin:0 0 4px">DR.Care</h1>
+        <p style="font-size:.82rem;margin:0;color:#555">مغسلة عربيات مصرية</p>
+      </div>
+      <h2 style="font-size:1rem;text-align:center;margin:0 0 14px;font-weight:800">تذكرة حجز #${esc(booking.id)}</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:.9rem">
+        <tr><td style="padding:5px 0;font-weight:700;width:38%">العميل:</td><td>${esc(booking.name)}</td></tr>
+        <tr><td style="padding:5px 0;font-weight:700">الموبايل:</td><td>${esc(booking.phone)}</td></tr>
+        <tr><td style="padding:5px 0;font-weight:700">الباقة:</td><td>${esc(booking.package_name)}</td></tr>
+        <tr><td style="padding:5px 0;font-weight:700">نوع العربية:</td><td>${esc(booking.car_type_name)}</td></tr>
+        <tr><td style="padding:5px 0;font-weight:700">الفرع:</td><td>${esc(booking.branch)}</td></tr>
+        <tr><td style="padding:5px 0;font-weight:700">الموعد:</td><td>${booking.appointment ? fmtD(booking.appointment) : '—'}</td></tr>
+        <tr><td style="padding:5px 0;font-weight:700">طريقة الدفع:</td><td>${esc(booking.payment_method||'—')}</td></tr>
+        ${booking.plate_number ? `<tr><td style="padding:5px 0;font-weight:700">رقم اللوحة:</td><td>${esc(booking.plate_number)}</td></tr>` : ''}
+        <tr style="border-top:2px solid #000">
+          <td style="padding:10px 0 0;font-weight:900;font-size:1.05rem">الإجمالي:</td>
+          <td style="padding:10px 0 0;font-weight:900;font-size:1.05rem">${Number(booking.total_price).toLocaleString('ar-EG')} جنيه</td>
+        </tr>
+      </table>
+      ${booking.notes ? `<div style="margin-top:14px;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:.82rem"><strong>ملاحظات:</strong> ${esc(booking.notes)}</div>` : ''}
+      <div style="margin-top:14px;text-align:center;font-size:.72rem;color:#999;border-top:1px solid #ccc;padding-top:10px">
+        تاريخ الإنشاء: ${fmtD(booking.created_at)}
+      </div>
+    </div>`;
+  window.print();
+};
+
+// ─── Bulk Bar ───────────────────────────────────────
+const updateBulkBar = () => {
+  const bar     = document.getElementById('bulkBar');
+  const countEl = document.getElementById('bulkCountText');
+  const n = selectedBookingIds.size;
+  if (countEl) countEl.textContent = `${n} ${n === 1 ? 'حجز محدد' : 'حجوزات محددة'}`;
+  if (bar) bar.style.display = n > 0 ? 'flex' : 'none';
+};
+
 // ─── Table Rendering ───────────────────────────────
 const renderTable = () => {
   const filtered  = getFilteredBookings();
@@ -230,14 +301,16 @@ const renderTable = () => {
       : null;
 
     return `
-    <div class="bk-card bk-card--${escapeHtml(b.status)}" role="listitem" data-booking-id="${b.id}">
+    <div class="bk-card bk-card--${escapeHtml(b.status)}${isOverdue(b) ? ' bk-card--overdue' : ''}" role="listitem" data-booking-id="${b.id}">
       <div class="bk-card__bar" aria-hidden="true"></div>
 
       <div class="bk-card__body">
-        <!-- Row 1: ID · Name · Status · Time -->
+        <!-- Row 1: checkbox · ID · Name · Status · Time -->
         <div class="bk-card__top">
+          <label class="bk-checkbox-wrap" onclick="event.stopPropagation()"><input type="checkbox" class="bk-checkbox" data-booking-id="${b.id}"${selectedBookingIds.has(b.id) ? ' checked' : ''}></label>
           <span class="bk-id">#${escapeHtml(b.id)}</span>
           <strong class="bk-name">${escapeHtml(b.name)}</strong>
+          ${isOverdue(b) ? '<span class="bk-overdue-badge">⚠ متأخر</span>' : ''}
           <span class="bk-badge bk-badge--${escapeHtml(b.status)}">${STATUS_LABELS[b.status] || b.status}</span>
           <span class="bk-time">${relTime(b.created_at)}</span>
         </div>
@@ -385,6 +458,15 @@ const showBookingDetails = (booking) => {
         ).join('')}
       </div>
 
+      <p class="modal-section-title">ملاحظات داخلية</p>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:4px">
+        <textarea id="adminNotesInput" class="search-input" rows="3"
+          placeholder="ملاحظة خاصة — لا تظهر للعميل"
+          style="flex:1;min-height:72px;padding:10px 12px;resize:vertical;font-family:inherit;font-size:.85rem">${escapeHtml(booking.admin_notes || '')}</textarea>
+        <button type="button" id="saveAdminNotesBtn" data-booking-id="${booking.id}"
+          class="details-btn" style="height:36px;flex-shrink:0">حفظ</button>
+      </div>
+
       ${waLink ? `
       <p class="modal-section-title">📱 واتساب — رسائل جاهزة</p>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
@@ -410,6 +492,10 @@ const showBookingDetails = (booking) => {
         ${Object.entries(STATUS_LABELS).map(([s, l]) =>
           `<button type="button" class="quick-action" data-status="${s}" data-booking-id="${booking.id}">${l}</button>`
         ).join('')}
+        <button type="button" id="printBookingBtn" class="quick-action" style="background:rgba(255,255,255,.04);color:var(--muted);border-color:var(--line-2)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:middle;margin-left:5px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          طباعة
+        </button>
       </div>
     </div>
   `;
@@ -683,6 +769,15 @@ downloadJson?.addEventListener('click', () => {
 });
 
 bookingsBody?.addEventListener('change', async (event) => {
+  /* Checkbox selection */
+  if (event.target.matches('.bk-checkbox')) {
+    const id = Number(event.target.dataset.bookingId);
+    if (event.target.checked) selectedBookingIds.add(id);
+    else selectedBookingIds.delete(id);
+    updateBulkBar();
+    return;
+  }
+
   if (!event.target.matches('.bk-status-select')) return;
   const select = event.target;
   const prev   = select.getAttribute('data-prev-value') || '';
@@ -715,6 +810,36 @@ bookingsBody?.addEventListener('mousedown', (event) => {
 bookingDetailsModal?.addEventListener('click', async (event) => {
   if (event.target.matches('[data-close-modal]') || event.target === bookingDetailsModal) {
     closeBookingDetails();
+    return;
+  }
+
+  /* ── Save admin notes ── */
+  const notesBtn = event.target.closest('#saveAdminNotesBtn');
+  if (notesBtn) {
+    const bookingId = notesBtn.dataset.bookingId;
+    const notes = document.getElementById('adminNotesInput')?.value.trim() || '';
+    notesBtn.disabled = true; notesBtn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/bookings.php', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: Number(bookingId), admin_notes: notes || null })
+      });
+      const data = await res.json().catch(() => ({}));
+      showToast(data.ok ? '✓ تم حفظ الملاحظة' : (data.message || 'فشل الحفظ'), data.ok ? 'success' : 'error');
+      if (data.ok) {
+        const bk = allBookings.find(b => Number(b.id) === Number(bookingId));
+        if (bk) bk.admin_notes = notes || null;
+      }
+    } catch { showToast('خطأ في الاتصال', 'error'); }
+    finally { notesBtn.disabled = false; notesBtn.textContent = 'حفظ'; }
+    return;
+  }
+
+  /* ── Print booking ── */
+  if (event.target.closest('#printBookingBtn')) {
+    const booking = getBookingById(bookingDetailsModal.dataset.currentBookingId);
+    if (booking) printBooking(booking);
     return;
   }
 
@@ -1393,5 +1518,156 @@ document.addEventListener('DOMContentLoaded', async () => {
     const id = btn.dataset.deleteSlot;
     await adminFetch(`api/slots.php?id=${id}`, { method: 'DELETE' });
     fetchSlots();
+  });
+
+  /* ═══════════════════════════════════════════════
+     CSV Export
+  ═══════════════════════════════════════════════ */
+  document.getElementById('downloadCsv')?.addEventListener('click', downloadCsv);
+
+  /* ═══════════════════════════════════════════════
+     Push Notification Panel
+  ═══════════════════════════════════════════════ */
+  const pushPanel      = document.getElementById('pushPanel');
+  const togglePushBtn  = document.getElementById('togglePushBtn');
+  let pushVisible      = false;
+  togglePushBtn?.addEventListener('click', () => {
+    pushVisible = !pushVisible;
+    if (pushPanel) pushPanel.style.display = pushVisible ? '' : 'none';
+    togglePushBtn.classList.toggle('panel-active', pushVisible);
+  });
+
+  document.getElementById('sendPushBtn')?.addEventListener('click', async () => {
+    const title = document.getElementById('pushTitle')?.value.trim();
+    const body  = document.getElementById('pushBody')?.value.trim();
+    const url   = document.getElementById('pushUrl')?.value.trim() || '/customer-bookings.html';
+    const resEl = document.getElementById('pushResult');
+    if (!title || !body) { if (resEl) { resEl.textContent = 'العنوان والنص مطلوبان'; resEl.style.color = 'var(--error)'; } return; }
+    const btn = document.getElementById('sendPushBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/push-send.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, body, url, customer_id: null })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (resEl) {
+        resEl.textContent = data.ok ? `✓ أُرسل لـ ${data.sent} مشترك` : (data.message || 'فشل الإرسال');
+        resEl.style.color = data.ok ? 'var(--success)' : 'var(--error)';
+      }
+    } catch { if (resEl) { resEl.textContent = 'خطأ في الاتصال'; resEl.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-left:5px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> إرسال الإشعار'; }
+  });
+
+  /* ═══════════════════════════════════════════════
+     WhatsApp Broadcast Modal
+  ═══════════════════════════════════════════════ */
+  const waBroadcastModal = document.getElementById('waBroadcastModal');
+  let _waBroadcastPhones = [];
+
+  const openWaBroadcast = (phones, total) => {
+    _waBroadcastPhones = phones;
+    const infoEl   = document.getElementById('waBroadcastInfo');
+    const resultEl = document.getElementById('waBroadcastResult');
+    const linksEl  = document.getElementById('waBroadcastLinksList');
+    if (infoEl)   infoEl.textContent   = `${phones.length} رقم فريد من ${total} حجز في الفلتر الحالي`;
+    if (resultEl) resultEl.textContent = '';
+    if (linksEl)  { linksEl.innerHTML = ''; linksEl.style.display = 'none'; }
+    if (waBroadcastModal) waBroadcastModal.style.display = 'flex';
+  };
+  const closeWaBroadcast = () => { if (waBroadcastModal) waBroadcastModal.style.display = 'none'; };
+
+  document.getElementById('waBroadcastBtn')?.addEventListener('click', () => {
+    const filtered = getFilteredBookings();
+    const phones   = [...new Set(filtered.map(b => b.phone).filter(Boolean))];
+    if (!phones.length) { showToast('لا توجد حجوزات في الفلتر الحالي', 'error'); return; }
+    openWaBroadcast(phones, filtered.length);
+  });
+  document.getElementById('waBroadcastClose')?.addEventListener('click', closeWaBroadcast);
+  document.getElementById('waBroadcastBackdrop')?.addEventListener('click', closeWaBroadcast);
+
+  document.getElementById('waBroadcastSend')?.addEventListener('click', async () => {
+    const msg    = document.getElementById('waBroadcastMsg')?.value.trim();
+    const resEl  = document.getElementById('waBroadcastResult');
+    if (!msg) { if (resEl) { resEl.textContent = 'الرسالة مطلوبة'; resEl.style.color = 'var(--error)'; } return; }
+    const btn = document.getElementById('waBroadcastSend');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/whatsapp-broadcast.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phones: _waBroadcastPhones, message: msg })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.no_token) {
+        if (resEl) { resEl.textContent = 'لا يوجد API token — استخدم روابط wa.me'; resEl.style.color = 'var(--yellow)'; }
+      } else if (data.ok) {
+        if (resEl) { resEl.textContent = `✓ أُرسل لـ ${data.sent} — فشل ${data.failed}`; resEl.style.color = 'var(--success)'; }
+      } else {
+        if (resEl) { resEl.textContent = data.message || 'فشل الإرسال'; resEl.style.color = 'var(--error)'; }
+      }
+    } catch { if (resEl) { resEl.textContent = 'خطأ في الاتصال'; resEl.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.textContent = 'إرسال عبر API'; }
+  });
+
+  document.getElementById('waBroadcastLinksBtn')?.addEventListener('click', () => {
+    const msg    = document.getElementById('waBroadcastMsg')?.value.trim();
+    const linksEl = document.getElementById('waBroadcastLinksList');
+    if (!linksEl) return;
+    if (!msg) { showToast('اكتب الرسالة أولاً', 'error'); return; }
+    linksEl.style.display = 'flex';
+    linksEl.innerHTML = _waBroadcastPhones.map(p => {
+      const wa = `https://wa.me/2${p}?text=${encodeURIComponent(msg)}`;
+      return `<a href="${wa}" target="_blank" rel="noreferrer"
+        style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.25);border-radius:8px;font-size:.82rem;font-weight:700;color:#25d366;text-decoration:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        ${escapeHtml(p)}
+      </a>`;
+    }).join('');
+  });
+
+  /* ═══════════════════════════════════════════════
+     Bulk Status Change
+  ═══════════════════════════════════════════════ */
+  document.getElementById('bulkSelectAllBtn')?.addEventListener('click', () => {
+    const filtered = getFilteredBookings();
+    const allSelected = filtered.every(b => selectedBookingIds.has(b.id));
+    filtered.forEach(b => allSelected ? selectedBookingIds.delete(b.id) : selectedBookingIds.add(b.id));
+    renderTable();
+    updateBulkBar();
+  });
+
+  document.getElementById('bulkClearBtn')?.addEventListener('click', () => {
+    selectedBookingIds.clear();
+    renderTable();
+    updateBulkBar();
+  });
+
+  document.getElementById('bulkApplyBtn')?.addEventListener('click', async () => {
+    const status = document.getElementById('bulkStatusSelect')?.value;
+    if (!status) { showToast('اختار حالة أولاً', 'error'); return; }
+    if (!selectedBookingIds.size) { showToast('لم تحدد أي حجوزات', 'error'); return; }
+    if (!confirm(`تغيير ${selectedBookingIds.size} حجز إلى "${STATUS_LABELS[status]}"؟`)) return;
+    const ids = [...selectedBookingIds];
+    const btn = document.getElementById('bulkApplyBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      let done = 0;
+      for (const id of ids) {
+        try {
+          await adminFetch('api/bookings.php', {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: Number(id), status })
+          });
+          done++;
+        } catch {}
+      }
+      showToast(`✓ تم تحديث ${done} حجز`, 'success');
+      selectedBookingIds.clear();
+      updateBulkBar();
+      await fetchBookings();
+    } finally { btn.disabled = false; btn.textContent = 'تطبيق'; }
   });
 });

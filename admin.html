@@ -565,6 +565,39 @@
     @media (max-width: 520px) {
       .slots-form { grid-template-columns: 1fr; }
     }
+
+    /* ── Overdue card ── */
+    .bk-card--overdue { border-color: rgba(245,166,35,.45) !important; }
+    .bk-overdue-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 8px; border-radius: 20px; font-size: .65rem; font-weight: 700;
+      background: rgba(245,166,35,.12); color: #f5a623;
+      border: 1px solid rgba(245,166,35,.3); white-space: nowrap;
+    }
+
+    /* ── Checkbox ── */
+    .bk-checkbox-wrap { display: inline-flex; align-items: center; padding: 0 6px 0 0; cursor: pointer; flex-shrink: 0; }
+    .bk-checkbox { width: 15px; height: 15px; accent-color: var(--yellow); cursor: pointer; }
+
+    /* ── Bulk bar ── */
+    .bulk-bar {
+      align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 10px 18px;
+      background: rgba(255,210,31,.07); border: 1px solid var(--yellow-line);
+      border-radius: var(--radius-lg);
+    }
+
+    /* ── Push Panel ── */
+    .push-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px 26px; }
+    .push-card__head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .push-card__icon { width: 38px; height: 38px; border-radius: 10px; background: rgba(91,164,245,.1); display: grid; place-items: center; flex-shrink: 0; }
+
+    /* ── Print ── */
+    #printArea { display: none; }
+    @media print {
+      body > *:not(#printArea) { display: none !important; }
+      #printArea { display: block !important; }
+    }
   </style>
 </head>
 <body class="admin-page">
@@ -613,6 +646,10 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             JSON
           </button>
+          <button class="btn btn-ghost" type="button" id="downloadCsv" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            CSV
+          </button>
         </div>
       </div>
 
@@ -642,6 +679,10 @@
         <button class="admin-nav-btn" type="button" id="toggleSlotsBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           المواعيد
+        </button>
+        <button class="admin-nav-btn" type="button" id="togglePushBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+          إشعار Push
         </button>
       </nav>
 
@@ -761,6 +802,39 @@
         </div>
       </div>
 
+      <!-- ── PUSH PANEL ── -->
+      <div id="pushPanel" style="display:none;margin-bottom:24px">
+        <div class="push-card">
+          <div class="push-card__head">
+            <div class="push-card__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ba4f5" stroke-width="2.2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div>
+              <p style="font-size:1rem;font-weight:800;margin:0 0 3px;color:var(--text)">إرسال إشعار Push مخصص</p>
+              <p style="font-size:.79rem;color:var(--muted);margin:0">يُرسَل لكل المشتركين في إشعارات DR.Care</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">العنوان
+              <input id="pushTitle" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="مثال: عرض خاص اليوم!" maxlength="80">
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الرابط عند الضغط
+              <input id="pushUrl" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" value="/customer-bookings.html">
+            </label>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">نص الإشعار
+              <textarea id="pushBody" class="search-input" rows="3" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit" placeholder="اكتب تفاصيل الإشعار..."></textarea>
+            </label>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button id="sendPushBtn" class="btn btn-primary" type="button" style="height:38px;padding:0 20px;font-size:.85rem;display:flex;align-items:center;gap:7px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              إرسال الإشعار
+            </button>
+            <span id="pushResult" style="font-size:.82rem;font-weight:700"></span>
+          </div>
+        </div>
+      </div>
+
       <!-- ── CUSTOMERS PANEL ── -->
       <div id="customersPanel" style="display:none;margin-bottom:24px">
         <div class="filter-bar" style="margin-bottom:12px">
@@ -858,6 +932,22 @@
         </div>
       </div>
 
+      <!-- ── BULK BAR ── -->
+      <div id="bulkBar" class="bulk-bar" style="display:none">
+        <span style="font-weight:800;color:var(--yellow);font-size:.85rem" id="bulkCountText">0 محدد</span>
+        <div class="spacer"></div>
+        <select id="bulkStatusSelect" class="search-input" style="height:34px;min-width:160px">
+          <option value="">غيّر الحالة إلى...</option>
+          <option value="confirmed">مؤكد</option>
+          <option value="in_service">قيد التنفيذ</option>
+          <option value="completed">تم التسليم</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+        <button id="bulkApplyBtn" class="btn btn-primary" type="button" style="height:34px;padding:0 16px;font-size:.82rem">تطبيق</button>
+        <button id="bulkSelectAllBtn" class="details-btn" type="button" style="height:34px">تحديد الكل</button>
+        <button id="bulkClearBtn" class="details-btn" type="button" style="height:34px;color:var(--error)">إلغاء التحديد</button>
+      </div>
+
       <!-- ── FILTER BAR ── -->
       <div class="filter-bar" role="toolbar" aria-label="أدوات الفلترة">
         <span class="filter-bar__label">الحالة</span>
@@ -896,6 +986,11 @@
         <input type="search" id="searchInput" class="search-input" placeholder="بحث..." aria-label="بحث" style="width:min(200px,100%)">
 
         <span class="results-badge" id="resultsCount" aria-live="polite"></span>
+
+        <button id="waBroadcastBtn" class="details-btn" type="button" style="display:flex;align-items:center;gap:7px;height:34px;background:rgba(37,211,102,.07);color:#25d366;border-color:rgba(37,211,102,.3)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          WhatsApp جماعي
+        </button>
       </div>
 
       <!-- ── COUPONS PANEL ── -->
@@ -1002,6 +1097,39 @@
     <span class="toast-bar__dot"></span>
     <span id="toastText"></span>
   </div>
+
+  <!-- ── WA BROADCAST MODAL ── -->
+  <div id="waBroadcastModal" style="display:none;position:fixed;inset:0;z-index:120;justify-content:center;align-items:center;padding:20px">
+    <div id="waBroadcastBackdrop" style="position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px)"></div>
+    <div style="position:relative;z-index:1;width:min(580px,100%);max-height:88vh;overflow:auto;background:var(--panel);border:1px solid var(--line-2);border-radius:var(--radius-xl);box-shadow:0 40px 120px rgba(0,0,0,.7)">
+      <div style="padding:24px 26px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--panel)">
+        <div>
+          <p style="font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#25d366;margin-bottom:4px">WhatsApp</p>
+          <h2 style="font-size:1.1rem;font-weight:900;margin:0">رسالة جماعية</h2>
+        </div>
+        <button id="waBroadcastClose" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);background:var(--panel-2);color:var(--muted);font-size:1.2rem;cursor:pointer;display:grid;place-items:center" type="button">✕</button>
+      </div>
+      <div style="padding:22px 26px 26px">
+        <p id="waBroadcastInfo" style="font-size:.85rem;color:var(--muted);margin-bottom:16px"></p>
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:16px">
+          نص الرسالة
+          <textarea id="waBroadcastMsg" class="search-input" rows="6" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit" placeholder="اكتب الرسالة..."></textarea>
+        </label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button id="waBroadcastSend" type="button" style="height:38px;padding:0 20px;border:none;border-radius:50px;background:#25d366;color:#fff;font-weight:800;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            إرسال عبر API
+          </button>
+          <button id="waBroadcastLinksBtn" class="details-btn" type="button" style="height:38px">عرض روابط wa.me</button>
+          <span id="waBroadcastResult" style="font-size:.82rem;font-weight:700"></span>
+        </div>
+        <div id="waBroadcastLinksList" style="margin-top:16px;display:none;display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRINT AREA ── -->
+  <div id="printArea"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="admin.js"></script>
