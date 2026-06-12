@@ -320,6 +320,28 @@ if ($method === 'PATCH') {
     }
   }
 
+  /* ── WhatsApp notification to customer on status change ── */
+  if (isset($input['status']) && $detail['status']['from'] !== $detail['status']['to']) {
+    $bkWa = $pdo->prepare('SELECT name, phone, package_name, branch FROM bookings WHERE id = :id');
+    $bkWa->execute([':id' => $id]);
+    $bkData = $bkWa->fetch(PDO::FETCH_ASSOC);
+
+    if ($bkData) {
+      $n = $bkData['name'];
+      $p = $bkData['package_name'];
+      $b = $bkData['branch'];
+      $waMessages = [
+        'confirmed'  => "مرحباً {$n}،\n\nتم تأكيد حجزك في DR.Care ✅\nرقم الحجز: #{$id}\nالباقة: {$p}\nالفرع: {$b}\n\nفي انتظارك! 🚗",
+        'in_service' => "مرحباً {$n}،\n\nعربيتك دلوقتي بتتغسل في DR.Care 🚿✨\nرقم الحجز: #{$id}\n\nهنعلّمك لما تخلص!",
+        'completed'  => "مرحباً {$n}،\n\nتم تسليم عربيتك بنجاح! ✅🎉\nرقم الحجز: #{$id}\n\nشكراً لثقتك في DR.Care. نتمنى نشوفك تاني! 🚗",
+        'cancelled'  => "مرحباً {$n}،\n\nللأسف تم إلغاء حجزك #{$id} في DR.Care.\n\nلو عندك أي استفسار تواصل معنا. نتمنى نخدمك تاني! 🚗",
+      ];
+      if (isset($waMessages[$input['status']])) {
+        sendWhatsApp($bkData['phone'], $waMessages[$input['status']]);
+      }
+    }
+  }
+
   jsonResponse(['ok' => true, 'message' => 'تم التحديث']);
 }
 

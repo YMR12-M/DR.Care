@@ -317,6 +317,10 @@ if ($method === 'POST') {
   ];
 
   sendBookingNotification($booking);
+
+  $waMsg = "مرحباً {$name}،\n\nتم استلام حجزك في DR.Care ✅\nرقم الحجز: #{$id}\nالباقة: {$pkg['name']}\nالفرع: {$branch}\nطريقة الدفع: {$paymentMethod}\n\nسنتواصل معك قريباً. شكراً لثقتك بنا! 🚗";
+  sendWhatsApp($phone, $waMsg);
+
   jsonResponse(['ok' => true, 'booking' => $booking]);
 }
 
