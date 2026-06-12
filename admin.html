@@ -602,6 +602,9 @@
 </head>
 <body class="admin-page">
 
+  <!-- ── SCROLL PROGRESS ── -->
+  <div id="adminScrollProgress"><div id="adminScrollBar"></div></div>
+
   <!-- ── HEADER ── -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
@@ -714,6 +717,7 @@
             </div>
             <p class="stat-card__kicker">إيراد الشهر</p>
             <div class="stat-card__value" id="monthRevenue">—</div>
+            <span class="stat-trend" id="monthRevenueTrend" style="display:none"></span>
             <p class="stat-card__label">هذا الشهر</p>
           </div>
 
@@ -723,6 +727,7 @@
             </div>
             <p class="stat-card__kicker">إيراد اليوم</p>
             <div class="stat-card__value" id="todayRevenue">—</div>
+            <span class="stat-trend" id="todayRevenueTrend" style="display:none"></span>
             <p class="stat-card__label">اليوم فقط</p>
           </div>
 
@@ -765,6 +770,7 @@
             </div>
             <p class="stat-card__kicker">اليوم</p>
             <div class="stat-card__value" id="todayBookings">—</div>
+            <span class="stat-trend" id="todayBookingsTrend" style="display:none"></span>
             <p class="stat-card__label">طلبات اليوم</p>
           </div>
 

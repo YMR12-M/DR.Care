@@ -3330,3 +3330,50 @@ input.error { border-color: var(--error); }
   }
 
 }
+
+/* ═══════════════════════════════════════════════
+   ADMIN UI ENHANCEMENTS
+═══════════════════════════════════════════════ */
+
+/* Scroll progress bar */
+#adminScrollProgress {
+  position: fixed; top: 0; inset-inline: 0; height: 3px;
+  z-index: 9999; pointer-events: none; background: transparent;
+}
+#adminScrollBar {
+  height: 100%; width: 0%;
+  background: linear-gradient(to left, var(--yellow), rgba(255,210,31,.55));
+  transition: width 0.08s linear;
+}
+
+/* Skeleton shimmer loader */
+@keyframes sk-shimmer {
+  0%   { background-position: -700px 0; }
+  100% { background-position:  700px 0; }
+}
+.bk-skeleton-card {
+  height: 84px; border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--panel) 25%, var(--panel-2) 50%, var(--panel) 75%);
+  background-size: 700px 100%;
+  animation: sk-shimmer 1.4s infinite linear;
+  border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+
+/* Trend badges on stat cards */
+.stat-trend {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .72rem; font-weight: 800;
+  padding: 2px 9px; border-radius: 20px;
+  margin-top: 4px; line-height: 1.7;
+}
+.stat-trend--up   { background: rgba(111,207,71,.12); color: #6fcf47; border: 1px solid rgba(111,207,71,.28); }
+.stat-trend--down { background: rgba(240,83,62,.10);  color: #f0533e; border: 1px solid rgba(240,83,62,.28); }
+.stat-trend--same { background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); }
+
+/* Panel slide-in animation */
+@keyframes adminPanelIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.panel-animate { animation: adminPanelIn 0.24s cubic-bezier(.25,.46,.45,.94) both; }

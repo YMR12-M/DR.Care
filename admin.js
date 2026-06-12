@@ -122,29 +122,44 @@ const showToast = (msg, type = '') => {
   toastTimer = setTimeout(() => { toastBar.classList.remove('show'); }, 3500);
 };
 
-// ─── Header scroll ─────────────────────────────────
+// ─── Header scroll + Scroll Progress ──────────────
 window.addEventListener('scroll', () => {
   siteHeader?.classList.toggle('is-scrolled', window.scrollY > 16);
+  const bar = document.getElementById('adminScrollBar');
+  if (bar) {
+    const h   = document.documentElement;
+    const pct = h.scrollHeight - window.innerHeight > 0
+      ? (h.scrollTop / (h.scrollHeight - window.innerHeight)) * 100 : 0;
+    bar.style.width = pct + '%';
+  }
 }, { passive: true });
+
+// ─── Animated Counter ─────────────────────────────
+const animateCounter = (el, endVal, formatter, duration = 650) => {
+  if (!el) return;
+  if (!endVal) { el.textContent = formatter(0); return; }
+  const start = performance.now();
+  const step  = (now) => {
+    const t     = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatter(Math.round(endVal * eased));
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+};
 
 // ─── Stats Rendering ───────────────────────────────
 const renderStats = (bookings) => {
   const active = bookings.filter((b) => b.status !== 'cancelled');
   const revenue = active.reduce((sum, b) => sum + Number(b.total_price || 0), 0);
-  
-  // Count unique customers by email
   const uniqueCustomers = new Set(
-    bookings
-      .filter((b) => b.email)
-      .map((b) => b.email.toLowerCase())
+    bookings.filter((b) => b.email).map((b) => b.email.toLowerCase())
   ).size;
 
-  const totalCustomersEl = document.getElementById('totalCustomers');
-  if (totalCustomersEl) totalCustomersEl.textContent = uniqueCustomers.toLocaleString('ar-EG');
-  
-  if (totalBookings)   totalBookings.textContent = bookings.length.toLocaleString('ar-EG');
-  if (newBookings)     newBookings.textContent   = bookings.filter((b) => b.status === 'new').length.toLocaleString('ar-EG');
-  if (expectedRevenue) expectedRevenue.textContent = formatPrice(revenue);
+  animateCounter(document.getElementById('totalCustomers'), uniqueCustomers, v => v.toLocaleString('ar-EG'));
+  animateCounter(totalBookings,   bookings.length,                                   v => v.toLocaleString('ar-EG'));
+  animateCounter(newBookings,     bookings.filter(b => b.status === 'new').length,   v => v.toLocaleString('ar-EG'));
+  animateCounter(expectedRevenue, revenue, formatPrice);
 };
 
 // ─── Filter & Search ───────────────────────────────
@@ -529,38 +544,51 @@ const renderAdminFilters = (bookings) => {
 };
 
 const renderReports = (bookings) => {
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const now              = new Date();
+  const startOfToday     = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  const startOfMonth     = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const safeDate = (value) => {
-    const date = new Date(value);
-    return Number.isFinite(date.getTime()) ? date : null;
-  };
+  const safeDate = (v) => { const d = new Date(v); return Number.isFinite(d.getTime()) ? d : null; };
 
-  const todayBookingsCount = bookings.filter((booking) => {
-    const created = safeDate(booking.created_at);
-    return created && created >= startOfToday;
-  }).length;
-
-  const monthBookingsCount = bookings.filter((booking) => {
-    const created = safeDate(booking.created_at);
-    return created && created >= startOfMonth;
-  }).length;
-
-  const sumRevenue = (filterFn) => bookings.reduce((sum, booking) => {
-    const created = safeDate(booking.created_at);
-    if (!created || !filterFn(created) || booking.status === 'cancelled') return sum;
-    return sum + Number(booking.total_price || 0);
+  const inRange  = (from, to)  => (b) => { const d = safeDate(b.created_at); return d && d >= from && (!to || d < to); };
+  const sumRev   = (from, to)  => bookings.reduce((s, b) => {
+    const d = safeDate(b.created_at);
+    if (!d || d < from || (to && d >= to) || b.status === 'cancelled') return s;
+    return s + Number(b.total_price || 0);
   }, 0);
 
-  const todayRevenueValue = sumRevenue((date) => date >= startOfToday);
-  const monthRevenueValue = sumRevenue((date) => date >= startOfMonth);
+  const todayBookingsCount     = bookings.filter(inRange(startOfToday)).length;
+  const yesterdayBookingsCount = bookings.filter(inRange(startOfYesterday, startOfToday)).length;
+  const monthBookingsCount     = bookings.filter(inRange(startOfMonth)).length;
+  const todayRevenueValue      = sumRev(startOfToday);
+  const yesterdayRevenueValue  = sumRev(startOfYesterday, startOfToday);
+  const monthRevenueValue      = sumRev(startOfMonth);
+  const lastMonthRevenueValue  = sumRev(startOfLastMonth, startOfMonth);
 
-  if (todayBookings) todayBookings.textContent = todayBookingsCount.toLocaleString('ar-EG');
-  if (monthBookings) monthBookings.textContent = monthBookingsCount.toLocaleString('ar-EG');
-  if (todayRevenue) todayRevenue.textContent = formatPrice(todayRevenueValue);
-  if (monthRevenue) monthRevenue.textContent = formatPrice(monthRevenueValue);
+  animateCounter(todayBookings, todayBookingsCount, v => v.toLocaleString('ar-EG'));
+  animateCounter(monthBookings, monthBookingsCount, v => v.toLocaleString('ar-EG'));
+  animateCounter(todayRevenue,  todayRevenueValue,  formatPrice);
+  animateCounter(monthRevenue,  monthRevenueValue,  formatPrice);
+
+  const setTrend = (id, todayVal, yestVal) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (yestVal === 0) {
+      if (todayVal > 0) { el.className = 'stat-trend stat-trend--up'; el.textContent = '▲ جديد'; el.style.display = ''; }
+      else              { el.style.display = 'none'; }
+      return;
+    }
+    const pct = Math.round(((todayVal - yestVal) / yestVal) * 100);
+    el.style.display = '';
+    el.className = `stat-trend ${pct > 0 ? 'stat-trend--up' : pct < 0 ? 'stat-trend--down' : 'stat-trend--same'}`;
+    el.textContent = `${pct > 0 ? '▲' : pct < 0 ? '▼' : '—'} ${Math.abs(pct)}% عن أمس`;
+  };
+
+  setTrend('todayBookingsTrend', todayBookingsCount,  yesterdayBookingsCount);
+  setTrend('todayRevenueTrend',  todayRevenueValue,   yesterdayRevenueValue);
+  setTrend('monthRevenueTrend',  monthRevenueValue,   lastMonthRevenueValue);
 };
 
 /* ── Charts ── */
@@ -688,6 +716,10 @@ const renderBookings = (bookings) => {
 
 // ─── Fetch Bookings ─────────────────────────────────
 const fetchBookings = async () => {
+  if (bookingsBody) {
+    bookingsBody.className = 'bk-list';
+    bookingsBody.innerHTML = Array(5).fill('<div class="bk-skeleton-card"></div>').join('');
+  }
   showToast('جاري تحميل الطلبات...', '');
 
   const response = await fetch('api/bookings.php', {
@@ -1109,9 +1141,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const chartsPanel   = document.getElementById('chartsPanel');
   const toggleChartsBtn = document.getElementById('toggleChartsBtn');
   let chartsVisible   = false;
+  const panelIn = (el) => { el.classList.remove('panel-animate'); void el.offsetWidth; el.classList.add('panel-animate'); };
+
   toggleChartsBtn?.addEventListener('click', () => {
     chartsVisible = !chartsVisible;
-    if (chartsPanel) chartsPanel.style.display = chartsVisible ? '' : 'none';
+    if (chartsPanel) { chartsPanel.style.display = chartsVisible ? '' : 'none'; if (chartsVisible) panelIn(chartsPanel); }
     if (chartsVisible) renderCharts(allBookings);
     toggleChartsBtn.classList.toggle('panel-active', chartsVisible);
   });
@@ -1163,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   toggleCustomersBtn?.addEventListener('click', () => {
     customersVisible = !customersVisible;
-    if (customersPanel) customersPanel.style.display = customersVisible ? '' : 'none';
+    if (customersPanel) { customersPanel.style.display = customersVisible ? '' : 'none'; if (customersVisible) panelIn(customersPanel); }
     toggleCustomersBtn.classList.toggle('panel-active', customersVisible);
     if (customersVisible) fetchCustomers();
   });
@@ -1221,7 +1255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   toggleCouponsBtn?.addEventListener('click', () => {
     couponsVisible = !couponsVisible;
-    if (couponsPanel)    couponsPanel.style.display    = couponsVisible ? '' : 'none';
+    if (couponsPanel)    { couponsPanel.style.display  = couponsVisible ? '' : 'none'; if (couponsVisible) panelIn(couponsPanel); }
     if (bookingsTable)   bookingsTable.style.display   = couponsVisible ? 'none' : '';
     const filterBar = document.querySelector('.filter-bar');
     if (filterBar)       filterBar.style.display       = couponsVisible ? 'none' : '';
@@ -1292,7 +1326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   toggleReviewsBtn?.addEventListener('click', () => {
     reviewsVisible = !reviewsVisible;
-    if (reviewsPanel) reviewsPanel.style.display = reviewsVisible ? '' : 'none';
+    if (reviewsPanel) { reviewsPanel.style.display = reviewsVisible ? '' : 'none'; if (reviewsVisible) panelIn(reviewsPanel); }
     toggleReviewsBtn.classList.toggle('panel-active', reviewsVisible);
     if (reviewsVisible && !reviewsLoaded) fetchReviews();
   });
@@ -1474,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   toggleSlotsBtn?.addEventListener('click', () => {
     slotsVisible = !slotsVisible;
-    if (slotsPanel) slotsPanel.style.display = slotsVisible ? '' : 'none';
+    if (slotsPanel) { slotsPanel.style.display = slotsVisible ? '' : 'none'; if (slotsVisible) panelIn(slotsPanel); }
     toggleSlotsBtn.classList.toggle('panel-active', slotsVisible);
     if (slotsVisible) fetchSlots();
   });
@@ -1533,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let pushVisible      = false;
   togglePushBtn?.addEventListener('click', () => {
     pushVisible = !pushVisible;
-    if (pushPanel) pushPanel.style.display = pushVisible ? '' : 'none';
+    if (pushPanel) { pushPanel.style.display = pushVisible ? '' : 'none'; if (pushVisible) panelIn(pushPanel); }
     togglePushBtn.classList.toggle('panel-active', pushVisible);
   });
 
