@@ -3453,3 +3453,18 @@ body.page-exit { pointer-events:none !important; animation: page-out .28s cubic-
   color: rgba(245,240,232,.35); font-weight: 600;
 }
 
+/* ── v10.1 patches ── */
+@keyframes v10Bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.14); color: #ffe566; }
+  100% { transform: scale(1); }
+}
+.v10-bump { animation: v10Bump .3s cubic-bezier(.22,1,.36,1); }
+
+/* Calc price value needs display:block so animation works predictably */
+.v10-calc-price__value { display: block; }
+.v10-calc-price__dur   { display: block; margin-top: 6px; font-size: .78rem; color: rgba(245,240,232,.5); font-weight: 700; }
+
+/* Package list item dur text — slightly muted */
+.v10-pkg-item__info small { color: rgba(245,240,232,.45); font-weight: 600; font-size: .7rem; }
+

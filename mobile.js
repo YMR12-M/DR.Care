@@ -161,6 +161,7 @@ const loadConfig = async () => {
     appConfig = { ...fallbackConfig };
   }
   populateForm();
+  document.dispatchEvent(new CustomEvent('dr:config-loaded'));
 };
 
 /* ── Minimum appointment ── */
@@ -1228,7 +1229,13 @@ if (mCounterEls.length) {
     const car = appConfig.carTypes.find(c => c.code === selectedCar);
     if (!pkg) return;
     const total = (pkg.price || 0) + (car?.extra || 0);
-    if (priceEl) priceEl.textContent = pkg.price === 0 ? 'حسب التقييم' : `${total} جنيه`;
+    const newPrice = pkg.price === 0 ? 'حسب التقييم' : `${total} جنيه`;
+    if (priceEl && priceEl.textContent !== newPrice) {
+      priceEl.textContent = newPrice;
+      priceEl.classList.remove('v10-bump');
+      void priceEl.offsetWidth;
+      priceEl.classList.add('v10-bump');
+    }
     if (durEl)   durEl.textContent   = durMap[pkg.code] || '—';
     if (bookBtn) {
       bookBtn.href = `mobile-booking.html?pkg=${encodeURIComponent(pkgSel.value)}&car=${encodeURIComponent(selectedCar || 'sedan')}`;
@@ -1250,9 +1257,8 @@ if (mCounterEls.length) {
     });
   });
 
-  // Repopulate when the real API config lands (watch servicePackage inner HTML change)
-  const spEl = document.getElementById('servicePackage');
-  if (spEl) new MutationObserver(populate).observe(spEl, { childList: true });
+  // Repopulate when API config loads (works on all pages including ones without #servicePackage)
+  document.addEventListener('dr:config-loaded', populate, { once: true });
 
   populate();
 })();
@@ -1270,6 +1276,26 @@ if (mCounterEls.length) {
     const code    = card.dataset.packageCard;
     const durText = dur[code];
     if (!durText) return;
+
+    // v10 featured card → append into .v10-featured__features
+    const v10Feats = card.querySelector('.v10-featured__features');
+    if (v10Feats) {
+      const s = document.createElement('span');
+      s.className = 'v10-featured__feat';
+      s.textContent = `⏱ ${durText}`;
+      v10Feats.appendChild(s);
+      return;
+    }
+
+    // v10 list item → append duration after the small desc
+    const v10Small = card.querySelector('.v10-pkg-item__info small');
+    if (v10Small && !v10Small.dataset.durAdded) {
+      v10Small.textContent += ` · ⏱ ${durText}`;
+      v10Small.dataset.durAdded = '1';
+      return;
+    }
+
+    // legacy .m-pkg-features
     const featEl = card.querySelector('.m-pkg-features');
     if (!featEl) return;
     const badge = document.createElement('span');

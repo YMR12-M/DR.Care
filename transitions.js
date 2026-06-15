@@ -170,7 +170,7 @@
 
       <!-- Inner progress bar -->
       <div style="background:rgba(255,255,255,.07);border-radius:4px;height:4px;margin-bottom:22px;overflow:hidden">
-        <div id="drInnerBar" style="height:100%;width:0%;background:linear-gradient(90deg,#c9a200,#ffd21f,#ffe566,#ffd21f);background-size:200% 100%;animation:drBarShimmer 1.4s linear infinite;border-radius:4px;transition:width 4.5s cubic-bezier(.04,.9,.12,1)"></div>
+        <div id="drInnerBar" style="height:100%;width:0%;background:linear-gradient(90deg,#c9a200,#ffd21f,#ffe566,#ffd21f);background-size:200% 100%;animation:drBarShimmer 1.4s linear infinite;border-radius:4px;transition:width 2.5s cubic-bezier(.04,.9,.12,1)"></div>
       </div>
 
       <!-- Tip -->
@@ -183,7 +183,7 @@
       <!-- Loading text + countdown -->
       <div style="display:flex;align-items:center;justify-content:center;gap:8px">
         <span id="drLoadDots" style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:rgba(255,210,31,.45);font-family:Montserrat,Arial,sans-serif">جاري التحميل</span>
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(255,210,31,.1);border:1px solid rgba(255,210,31,.2);font-size:.78rem;font-weight:900;color:#ffd21f;font-family:Montserrat,Arial,sans-serif" id="drCountdown">5</span>
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(255,210,31,.1);border:1px solid rgba(255,210,31,.2);font-size:.78rem;font-weight:900;color:#ffd21f;font-family:Montserrat,Arial,sans-serif" id="drCountdown">3</span>
       </div>
     `;
 
@@ -209,9 +209,10 @@
         const dotsForms = ['جاري التحميل', 'جاري التحميل .', 'جاري التحميل ..', 'جاري التحميل ...'];
         setInterval(() => { if (dotsEl) dotsEl.textContent = dotsForms[d++ % 4]; }, 500);
 
-        /* Countdown 5 → 1 */
-        let count = 5;
+        /* Countdown 3 → 1 */
+        let count = 3;
         const countEl = document.getElementById('drCountdown');
+        if (countEl) countEl.textContent = '3';
         const tick = setInterval(() => {
           count--;
           if (countEl) countEl.textContent = count > 0 ? count : '✓';
@@ -262,7 +263,7 @@
     navBar.style.animation = 'drBarShimmer 1.2s linear infinite';
     document.documentElement.appendChild(navBar);
     requestAnimationFrame(() => {
-      navBar.style.transition = 'width 4.6s cubic-bezier(.05,.8,.2,1)';
+      navBar.style.transition = 'width 2.6s cubic-bezier(.05,.8,.2,1)';
       navBar.style.width      = '88%';
     });
 
@@ -272,7 +273,7 @@
     /* Body exit animation */
     document.body.classList.add('page-exit');
 
-    setTimeout(() => { window.location.href = href; }, 5000);
+    setTimeout(() => { window.location.href = href; }, 3000);
   }, true);
 
   /* ── Shimmer keyframe injected once ─────────────── */
