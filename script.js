@@ -160,9 +160,36 @@ function updateOnlineStatus() {
 window.addEventListener('offline', updateOnlineStatus);
 window.addEventListener('online', updateOnlineStatus);
 
-// ─── Header scroll ─────────────────────────────────
+// ─── Toast notification system ─────────────────────
+function showToast(msg, type = 'info', duration = 3500) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const icons = { success: '✓', error: '✕', info: '★' };
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = `<span class="toast__icon">${icons[type] || icons.info}</span><span class="toast__msg">${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+  }, duration);
+}
+window.showToast = showToast;
+
+// ─── Header scroll + Booking CTA bar ──────────────
+const bookingCTA = document.getElementById('bookingCTA');
+const bookingSection = document.getElementById('booking');
+let _ctaHidden = true;
+
 window.addEventListener('scroll', () => {
   siteHeader?.classList.toggle('is-scrolled', window.scrollY > 16);
+  if (bookingCTA && bookingSection) {
+    const bookingRect = bookingSection.getBoundingClientRect();
+    const heroBottom  = document.getElementById('home')?.getBoundingClientRect().bottom ?? 0;
+    const shouldShow  = heroBottom < 0 && bookingRect.top > 0;
+    if (shouldShow && _ctaHidden) { bookingCTA.classList.add('visible');    _ctaHidden = false; }
+    if (!shouldShow && !_ctaHidden) { bookingCTA.classList.remove('visible'); _ctaHidden = true; }
+  }
 }, { passive: true });
 
 // ─── Mobile Menu ───────────────────────────────────
@@ -860,3 +887,73 @@ if (counterEls.length) {
   );
   counterEls.forEach(el => counterObs.observe(el));
 }
+
+// ─── Package Card Selection Highlight ─────────────
+(function () {
+  const cards = document.querySelectorAll('[data-select-package]');
+  const pkgSelect = document.getElementById('servicePackage');
+  if (!cards.length || !pkgSelect) return;
+
+  const updateSelection = () => {
+    const val = pkgSelect.value;
+    cards.forEach(card => {
+      const pkg = card.closest('[data-package-card]');
+      if (!pkg) return;
+      const match = pkg.dataset.packageCard === val;
+      pkg.classList.toggle('selected', match);
+    });
+  };
+
+  cards.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pkg = btn.dataset.selectPackage;
+      if (pkgSelect) {
+        pkgSelect.value = pkg;
+        pkgSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      updateSelection();
+      const bookingEl = document.getElementById('booking');
+      if (bookingEl) {
+        const top = bookingEl.getBoundingClientRect().top + window.scrollY - 88;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+      showToast('تم اختيار الباقة — أكمل الحجز', 'info');
+    });
+  });
+
+  pkgSelect.addEventListener('change', updateSelection);
+  updateSelection();
+})();
+
+// ─── Counter — pulse on finish ─────────────────────
+(function () {
+  const els = document.querySelectorAll('[data-counter]');
+  els.forEach(el => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !e.target.dataset.pulsed) {
+          e.target.dataset.pulsed = '1';
+          setTimeout(() => {
+            e.target.classList.add('counted');
+            e.target.addEventListener('animationend', () => e.target.classList.remove('counted'), { once: true });
+          }, 1450);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.6 });
+    obs.observe(el);
+  });
+})();
+
+// ─── Instapay copy button feedback ────────────────
+document.getElementById('copyInstapayBtn')?.addEventListener('click', function () {
+  const numEl = document.getElementById('instapayNumberDisplay');
+  if (!numEl) return;
+  navigator.clipboard?.writeText(numEl.textContent.trim()).then(() => {
+    this.classList.add('copied');
+    const orig = this.innerHTML;
+    this.textContent = '✓ تم النسخ';
+    setTimeout(() => { this.innerHTML = orig; this.classList.remove('copied'); }, 2000);
+    showToast('تم نسخ رقم Instapay', 'success');
+  }).catch(() => {});
+});

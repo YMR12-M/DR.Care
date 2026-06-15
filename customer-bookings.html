@@ -112,7 +112,9 @@
       margin-bottom: 12px;
       transition: border-color var(--transition), box-shadow var(--transition);
     }
-    .cx-booking:hover { border-color: var(--line-2); box-shadow: var(--shadow-sm); }
+    .cx-booking:hover { border-color: var(--yellow-line); box-shadow: var(--shadow-gold); }
+    .cx-booking { animation: bk-in 0.3s ease both; }
+    @keyframes bk-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
     .cx-booking-head {
       display: flex; align-items: center; justify-content: space-between;
@@ -160,12 +162,34 @@
     }
     .cx-booking-notes strong { color: var(--muted-2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; display: block; margin-bottom: 3px; font-family: var(--font-en); }
 
+    /* ── Skeleton loading ── */
+    .cx-skel-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .cx-skel-card {
+      height: 110px; border-radius: var(--radius-lg);
+      background: linear-gradient(90deg, var(--panel) 25%, var(--panel-2) 50%, var(--panel) 75%);
+      background-size: 700px 100%;
+      animation: sk-shimmer 1.4s infinite linear;
+      border: 1px solid var(--line);
+    }
+    @keyframes sk-shimmer { 0%{background-position:-700px 0} 100%{background-position:700px 0} }
+
     /* ── Empty / Loading states ── */
     .cx-empty {
-      text-align: center; padding: 64px 24px; color: var(--muted);
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: 64px 32px; color: var(--muted);
+      border: 1px dashed var(--line-2);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
     }
-    .cx-empty__icon { font-size: 3rem; opacity: 0.35; display: block; margin-bottom: 16px; }
-    .cx-empty p { font-size: 0.92rem; font-weight: 600; margin-bottom: 20px; }
+    .cx-empty__icon-wrap {
+      width: 72px; height: 72px; border-radius: var(--radius-lg);
+      background: var(--yellow-soft); border: 1px solid var(--yellow-line);
+      display: grid; place-items: center;
+      font-size: 2rem; margin-bottom: 20px;
+    }
+    .cx-empty h3 { font-size: 1.05rem; font-weight: 900; color: var(--white); margin-bottom: 8px; }
+    .cx-empty p { font-size: 0.88rem; font-weight: 600; margin-bottom: 24px; max-width: 280px; line-height: 1.8; }
 
     .cx-loading {
       display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -336,11 +360,11 @@
 
       <!-- Bookings list -->
       <div id="bookingsList">
-        <div class="cx-loading">
-          <div class="cx-loading__dot"></div>
-          <div class="cx-loading__dot"></div>
-          <div class="cx-loading__dot"></div>
-          <span>جاري تحميل حجوزاتك...</span>
+        <!-- Skeleton loading state -->
+        <div class="cx-skel-wrap" id="skeletonLoader">
+          <div class="cx-skel-card"></div>
+          <div class="cx-skel-card" style="opacity:.7"></div>
+          <div class="cx-skel-card" style="opacity:.45"></div>
         </div>
       </div>
     </div>
@@ -414,9 +438,15 @@
         const isEmpty = allBookings.length === 0;
         list.innerHTML = `
           <div class="cx-empty">
-            <span class="cx-empty__icon">${isEmpty ? '📋' : '🔍'}</span>
-            <p>${isEmpty ? 'لا توجد حجوزات حتى الآن' : 'لا توجد نتائج في هذا التبويب'}</p>
-            ${isEmpty ? `<a class="btn btn-primary" href="index.html#booking">احجز الآن</a>` : ''}
+            <div class="cx-empty__icon-wrap">${isEmpty ? '🚗' : '🔍'}</div>
+            <h3>${isEmpty ? 'لا توجد حجوزات بعد' : 'لا توجد نتائج هنا'}</h3>
+            <p>${isEmpty ? 'ابدأ أول تجربة مع DR.Care — حجز سريع في أقل من دقيقتين' : 'جرّب تبويب آخر أو ارجع لكل الحجوزات'}</p>
+            ${isEmpty
+              ? `<a class="btn btn-primary" href="index.html#booking">
+                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                   احجز دلوقتي
+                 </a>`
+              : `<button class="btn btn-ghost" onclick="document.querySelector('.cx-tab[data-tab=all]').click()" style="min-height:44px">عرض الكل</button>`}
           </div>`;
         return;
       }
