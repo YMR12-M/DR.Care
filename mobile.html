@@ -91,17 +91,6 @@
     <section class="m-hero" id="home" aria-labelledby="heroTitle">
       <div class="m-hero__glow" aria-hidden="true"></div>
       <div class="m-hero__glow m-hero__glow--2" aria-hidden="true"></div>
-      <!-- Water beads + shine beam -->
-      <div class="m-hero-drops" aria-hidden="true">
-        <span class="m-drop" style="--dur:5s;--dly:-1s;width:7px;height:7px;top:10%;left:8%"></span>
-        <span class="m-drop" style="--dur:7s;--dly:-3s;width:5px;height:5px;top:25%;left:22%"></span>
-        <span class="m-drop" style="--dur:6s;--dly:-2s;width:10px;height:10px;top:16%;left:50%"></span>
-        <span class="m-drop" style="--dur:9s;--dly:-5s;width:4px;height:4px;top:50%;left:7%"></span>
-        <span class="m-drop" style="--dur:5.5s;--dly:-0.5s;width:6px;height:6px;top:38%;left:68%"></span>
-        <span class="m-drop" style="--dur:8s;--dly:-4s;width:8px;height:8px;top:62%;left:82%"></span>
-        <span class="m-drop" style="--dur:4.5s;--dly:-2.5s;width:11px;height:11px;top:8%;left:75%"></span>
-        <span class="m-drop" style="--dur:10s;--dly:-6s;width:5px;height:5px;top:72%;left:40%"></span>
-      </div>
       <div class="m-hero-shine" aria-hidden="true"></div>
       <div class="m-hero__content">
         <div class="m-hero__eyebadge" aria-hidden="true">
@@ -120,7 +109,6 @@
           </a>
           <a class="m-btn m-btn--ghost m-btn--lg" href="#mPriceCalc">💰 الأسعار</a>
         </div>
-        <!-- Next appointment widget — shown when logged in with upcoming booking -->
         <div class="m-next-appt-widget" id="mNextApptWidget" style="display:none" aria-label="حجزك القادم">
           <span class="m-next-appt-widget__icon" aria-hidden="true">📅</span>
           <div class="m-next-appt-widget__info">
@@ -130,7 +118,6 @@
           </div>
           <a class="m-btn m-btn--ghost m-btn--sm" id="mNextApptLink" href="mobile-bookings.html">تتبع</a>
         </div>
-
         <div class="m-hero__trust">
           <span class="m-trust-pill">✓ بدون مفاجآت</span>
           <span class="m-trust-pill">✓ متابعة لحظية</span>
@@ -181,163 +168,158 @@
 
     <!-- ══ SERVICES ══ -->
     <section class="m-section" id="services" aria-labelledby="servicesTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">Our Services</p>
-        <h2 id="servicesTitle">خدماتنا باختصار</h2>
-        <p class="m-section__sub">كل عربية بتاخد وقتها الصح ومعاملتها الصح — بدون تنازل في الجودة.</p>
+      <div class="v10-head reveal">
+        <p class="v10-head__label">OUR SERVICES</p>
+        <h2 id="servicesTitle" class="v10-head__title">خدماتنا باختصار</h2>
+        <p class="v10-head__sub">كل عربية بتاخد وقتها الصح — بدون تنازل في الجودة</p>
       </div>
-      <div class="m-services">
-        <article class="m-service-card reveal" style="transition-delay:.05s">
-          <div class="m-service-card__icon" aria-hidden="true">💧</div>
-          <div class="m-service-card__body">
-            <h3>غسيل خارجي</h3>
-            <p>فوم + ضغط مياه + تنشيف مايكروفايبر</p>
-            <span class="m-service-card__price">من ١٠٠ ج</span>
-          </div>
+      <div class="v10-services reveal" style="transition-delay:.05s">
+        <article class="v10-svc">
+          <div class="v10-svc__icon-wrap" aria-hidden="true">💧</div>
+          <p class="v10-svc__name">غسيل خارجي</p>
+          <p class="v10-svc__desc">فوم + ضغط + مايكروفايبر</p>
+          <p class="v10-svc__price">من ١٠٠ ج</p>
+          <a href="mobile-booking.html?pkg=outside" class="v10-svc__cta">احجز</a>
         </article>
-        <article class="m-service-card reveal" style="transition-delay:.10s">
-          <div class="m-service-card__icon" aria-hidden="true">✨</div>
-          <div class="m-service-card__body">
-            <h3>تنظيف داخلي</h3>
-            <p>شفط + تابلوه + فرش + تعقيم</p>
-            <span class="m-service-card__price">شامل Inside &amp; Out</span>
-          </div>
+        <article class="v10-svc">
+          <div class="v10-svc__icon-wrap" aria-hidden="true">✨</div>
+          <p class="v10-svc__name">داخلي وخارجي</p>
+          <p class="v10-svc__desc">الأكثر طلباً — داخلي + خارجي</p>
+          <p class="v10-svc__price">١٥٠ ج</p>
+          <a href="mobile-booking.html?pkg=inside-out" class="v10-svc__cta">احجز</a>
         </article>
-        <article class="m-service-card reveal" style="transition-delay:.15s">
-          <div class="m-service-card__icon" aria-hidden="true">🏆</div>
-          <div class="m-service-card__body">
-            <h3>Deep Cleaning</h3>
-            <p>تنظيف عميق شامل داخلي وخارجي</p>
-            <span class="m-service-card__price">من ٢٥٠ ج</span>
-          </div>
+        <article class="v10-svc">
+          <div class="v10-svc__icon-wrap" aria-hidden="true">🏆</div>
+          <p class="v10-svc__name">Deep Cleaning</p>
+          <p class="v10-svc__desc">تنظيف عميق شامل</p>
+          <p class="v10-svc__price">من ٢٥٠ ج</p>
+          <a href="mobile-booking.html?pkg=deep" class="v10-svc__cta">احجز</a>
         </article>
-        <article class="m-service-card reveal" style="transition-delay:.20s">
-          <div class="m-service-card__icon" aria-hidden="true">⚙️</div>
-          <div class="m-service-card__body">
-            <h3>جنوط وكاوتش</h3>
-            <p>تنظيف وتلميع الجنوط والإطارات</p>
-            <span class="m-service-card__price">من ١٠٠ ج</span>
-          </div>
+        <article class="v10-svc">
+          <div class="v10-svc__icon-wrap" aria-hidden="true">⚙️</div>
+          <p class="v10-svc__name">جنوط وكاوتش</p>
+          <p class="v10-svc__desc">تلميع وتنظيف متخصص</p>
+          <p class="v10-svc__price">من ١٠٠ ج</p>
+          <a href="mobile-booking.html?pkg=rims" class="v10-svc__cta">احجز</a>
         </article>
       </div>
     </section>
 
     <!-- ══ PACKAGES ══ -->
     <section class="m-section m-section--alt" id="packages" aria-labelledby="packagesTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">Packages & Pricing</p>
-        <h2 id="packagesTitle">خدماتنا وأسعارها</h2>
-        <p class="m-section__sub">أسعار واضحة بدون مفاجآت — اختار الخدمة واحجز في ثواني.</p>
+      <div class="v10-head reveal">
+        <p class="v10-head__label">PACKAGES &amp; PRICING</p>
+        <h2 id="packagesTitle" class="v10-head__title">خدماتنا وأسعارها</h2>
+        <p class="v10-head__sub">أسعار واضحة — اختار واحجز في ثواني</p>
       </div>
+
       <div class="m-packages" id="packagesGrid">
 
-        <!-- ── خدمات السيارات ── -->
-        <div class="m-pkg-cat reveal">
-          <div class="m-pkg-cat__head">
-            <span aria-hidden="true">🚗</span>
-            <span class="m-pkg-cat__title">خدمات غسيل السيارات</span>
+        <article class="v10-featured reveal" data-package-card="inside-out">
+          <div class="v10-featured__badge">الأكثر طلباً ⭐</div>
+          <div class="v10-featured__header">
+            <span class="v10-featured__icon" aria-hidden="true">✨</span>
+            <div class="v10-featured__info">
+              <h3>غسيل داخلي وخارجي</h3>
+              <small>Inside &amp; Outside — الباقة الأكثر طلباً</small>
+            </div>
+            <div class="v10-featured__price">
+              <strong>150</strong><span>ج</span>
+            </div>
           </div>
-          <div class="m-pkg-cat__cards">
-            <article class="m-pkg-card m-pkg-card--featured" data-package-card="inside-out">
-              <div class="m-pkg-card__badge">الأكثر طلباً</div>
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">✨</span><p class="m-pkg-card__label">Inside & Outside</p></div>
-              <h3 class="m-pkg-card__name">غسيل داخلي وخارجي</h3>
-              <div class="m-pkg-card__price"><strong>150</strong><span>جنيه</span></div>
-              <div class="m-pkg-features"><span>✓ غسيل خارجي كامل</span><span>✓ تنظيف داخلي</span><span>✓ تنشيف مايكروفايبر</span></div>
-              <button class="m-btn m-btn--primary m-btn--full" type="button" data-select-package="inside-out">اختيار</button>
-            </article>
-
-            <article class="m-pkg-card" data-package-card="outside">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">💧</span><p class="m-pkg-card__label">Outside Only</p></div>
-              <h3 class="m-pkg-card__name">غسيل خارجي فقط</h3>
-              <div class="m-pkg-card__price"><strong>100</strong><span>جنيه</span></div>
-              <div class="m-pkg-features"><span>✓ غسيل خارجي</span><span>✓ تنشيف مايكروفايبر</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="outside">اختيار</button>
-            </article>
-
-            <article class="m-pkg-card" data-package-card="deep">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">🏆</span><p class="m-pkg-card__label">Deep Cleaning</p></div>
-              <h3 class="m-pkg-card__name">غسيل متخصص</h3>
-              <div class="m-pkg-card__price"><strong>250</strong><span>جنيه</span></div>
-              <div class="m-pkg-features"><span>✓ تنظيف عميق داخلي وخارجي</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="deep">اختيار</button>
-            </article>
-
-            <article class="m-pkg-card" data-package-card="cover">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">🛡️</span><p class="m-pkg-card__label">Car Cover</p></div>
-              <h3 class="m-pkg-card__name">غسيل غطاء السيارة</h3>
-              <div class="m-pkg-card__price"><strong>50</strong><span>جنيه</span></div>
-              <div class="m-pkg-features"><span>✓ غسيل وتنشيف الغطاء</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="cover">اختيار</button>
-            </article>
-
-            <article class="m-pkg-card" data-package-card="rims">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">⚙️</span><p class="m-pkg-card__label">Rims & Tires</p></div>
-              <h3 class="m-pkg-card__name">غسيل وتنظيف جنوط</h3>
-              <div class="m-pkg-card__price"><strong>100</strong><span>جنيه</span></div>
-              <div class="m-pkg-features"><span>✓ تنظيف الجنوط والإطارات</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="rims">اختيار</button>
-            </article>
-
-            <article class="m-pkg-card" data-package-card="engine">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">🔧</span><p class="m-pkg-card__label">Engine Wash</p></div>
-              <h3 class="m-pkg-card__name">غسيل موتور السيارة</h3>
-              <div class="m-pkg-card__price"><strong>100</strong><span>جنيه</span></div>
-              <div class="m-pkg-features"><span>✓ تنظيف حجرة المحرك</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="engine">اختيار</button>
-            </article>
-
-            <article class="m-pkg-card" data-package-card="chemical">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">🧪</span><p class="m-pkg-card__label">Chemical Wash</p></div>
-              <h3 class="m-pkg-card__name">الغسيل الكيماوي</h3>
-              <div class="m-pkg-card__price"><strong style="font-size:1.1rem">حسب</strong><span>الشغل</span></div>
-              <div class="m-pkg-features"><span>✓ مواد كيماوية متخصصة</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="chemical">طلب تقييم</button>
-            </article>
+          <div class="v10-featured__features">
+            <span class="v10-featured__feat">✓ غسيل خارجي</span>
+            <span class="v10-featured__feat">✓ تنظيف داخلي</span>
+            <span class="v10-featured__feat">✓ مايكروفايبر</span>
           </div>
+          <a href="mobile-booking.html?pkg=inside-out" data-select-package="inside-out" class="m-btn m-btn--primary m-btn--full">احجز هذه الباقة</a>
+        </article>
+
+        <div class="v10-pkg-list reveal" style="transition-delay:.06s">
+          <a href="mobile-booking.html?pkg=outside" class="v10-pkg-item" data-package-card="outside" data-select-package="outside">
+            <span class="v10-pkg-item__icon" aria-hidden="true">💧</span>
+            <div class="v10-pkg-item__info">
+              <strong>غسيل خارجي</strong>
+              <small>فوم + ضغط + مايكروفايبر</small>
+            </div>
+            <span class="v10-pkg-item__price">١٠٠ ج</span>
+            <span class="v10-pkg-item__arrow" aria-hidden="true">›</span>
+          </a>
+          <a href="mobile-booking.html?pkg=deep" class="v10-pkg-item" data-package-card="deep" data-select-package="deep">
+            <span class="v10-pkg-item__icon" aria-hidden="true">🏆</span>
+            <div class="v10-pkg-item__info">
+              <strong>Deep Cleaning</strong>
+              <small>تنظيف عميق داخلي وخارجي</small>
+            </div>
+            <span class="v10-pkg-item__price">٢٥٠ ج</span>
+            <span class="v10-pkg-item__arrow" aria-hidden="true">›</span>
+          </a>
+          <a href="mobile-booking.html?pkg=cover" class="v10-pkg-item" data-package-card="cover" data-select-package="cover">
+            <span class="v10-pkg-item__icon" aria-hidden="true">🛡️</span>
+            <div class="v10-pkg-item__info">
+              <strong>غطاء السيارة</strong>
+              <small>غسيل وتنشيف الغطاء</small>
+            </div>
+            <span class="v10-pkg-item__price">٥٠ ج</span>
+            <span class="v10-pkg-item__arrow" aria-hidden="true">›</span>
+          </a>
+          <a href="mobile-booking.html?pkg=rims" class="v10-pkg-item" data-package-card="rims" data-select-package="rims">
+            <span class="v10-pkg-item__icon" aria-hidden="true">⚙️</span>
+            <div class="v10-pkg-item__info">
+              <strong>جنوط وكاوتش</strong>
+              <small>تنظيف الجنوط والإطارات</small>
+            </div>
+            <span class="v10-pkg-item__price">١٠٠ ج</span>
+            <span class="v10-pkg-item__arrow" aria-hidden="true">›</span>
+          </a>
+          <a href="mobile-booking.html?pkg=engine" class="v10-pkg-item" data-package-card="engine" data-select-package="engine">
+            <span class="v10-pkg-item__icon" aria-hidden="true">🔧</span>
+            <div class="v10-pkg-item__info">
+              <strong>موتور السيارة</strong>
+              <small>تنظيف حجرة المحرك</small>
+            </div>
+            <span class="v10-pkg-item__price">١٠٠ ج</span>
+            <span class="v10-pkg-item__arrow" aria-hidden="true">›</span>
+          </a>
+          <a href="mobile-booking.html?pkg=chemical" class="v10-pkg-item" data-package-card="chemical" data-select-package="chemical">
+            <span class="v10-pkg-item__icon" aria-hidden="true">🧪</span>
+            <div class="v10-pkg-item__info">
+              <strong>الغسيل الكيماوي</strong>
+              <small>مواد كيماوية متخصصة</small>
+            </div>
+            <span class="v10-pkg-item__price">حسب الشغل</span>
+            <span class="v10-pkg-item__arrow" aria-hidden="true">›</span>
+          </a>
         </div>
 
-        <!-- ── سجاد وبطاطين ── -->
-        <div class="m-pkg-cat reveal">
-          <div class="m-pkg-cat__head">
-            <span aria-hidden="true">🧺</span>
-            <span class="m-pkg-cat__title">غسيل سجاد وبطاطين</span>
-            <span class="m-pkg-cat__sub">شامل التنظيف والتغليف</span>
-          </div>
-          <div class="m-pkg-cat__cards m-pkg-cat__cards--2">
-            <article class="m-pkg-card" data-package-card="carpet">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">🟫</span><p class="m-pkg-card__label">Carpet Wash</p></div>
-              <h3 class="m-pkg-card__name">غسيل سجاد</h3>
-              <p class="m-pkg-card__desc">تنظيف وتغليف السجاد — السعر حسب المساحة.</p>
-              <div class="m-pkg-card__price"><strong>15</strong><span>ج / متر</span></div>
-              <div class="m-pkg-features"><span>✓ تنظيف عميق</span><span>✓ تغليف بعد التنظيف</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="carpet">اختيار</button>
-            </article>
+        <div class="v10-pkg-divider reveal">🧺 غسيل سجاد وبطاطين</div>
 
-            <article class="m-pkg-card" data-package-card="blanket">
-              <div class="m-pkg-card__top"><span class="m-pkg-icon" aria-hidden="true">🛏️</span><p class="m-pkg-card__label">Blanket Wash</p></div>
-              <h3 class="m-pkg-card__name">غسيل بطاطين</h3>
-              <p class="m-pkg-card__desc">تنظيف وتغليف البطاطين — للقطعة الواحدة.</p>
-              <div class="m-pkg-card__price"><strong>80</strong><span>ج / قطعة</span></div>
-              <div class="m-pkg-features"><span>✓ تنظيف شامل</span><span>✓ تغليف بعد التنظيف</span></div>
-              <button class="m-btn m-btn--ghost m-btn--full" type="button" data-select-package="blanket">اختيار</button>
-            </article>
-          </div>
+        <div class="v10-carpet-grid reveal" style="transition-delay:.08s">
+          <a href="mobile-booking.html?pkg=carpet" class="v10-carpet-card" data-package-card="carpet" data-select-package="carpet">
+            <span class="v10-carpet-card__icon" aria-hidden="true">🟫</span>
+            <span class="v10-carpet-card__name">غسيل سجاد</span>
+            <span class="v10-carpet-card__price">١٥ ج / متر</span>
+          </a>
+          <a href="mobile-booking.html?pkg=blanket" class="v10-carpet-card" data-package-card="blanket" data-select-package="blanket">
+            <span class="v10-carpet-card__icon" aria-hidden="true">🛏️</span>
+            <span class="v10-carpet-card__name">غسيل بطاطين</span>
+            <span class="v10-carpet-card__price">٨٠ ج / قطعة</span>
+          </a>
         </div>
 
       </div>
     </section>
 
     <!-- ══ PRICE CALCULATOR ══ -->
-    <section class="m-section m-section--alt" id="mPriceCalc" aria-labelledby="mPriceCalcTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">Price Calculator</p>
-        <h2 id="mPriceCalcTitle">احسب سعر خدمتك</h2>
-        <p class="m-section__sub">اختار الباقة ونوع عربيتك وهتشوف السعر التقريبي على الفور — بدون أي مفاجآت.</p>
+    <section class="m-section" id="mPriceCalc" aria-labelledby="mPriceCalcTitle">
+      <div class="v10-head reveal">
+        <p class="v10-head__label">PRICE CALCULATOR</p>
+        <h2 id="mPriceCalcTitle" class="v10-head__title">احسب سعرك</h2>
+        <p class="v10-head__sub">اختار الباقة ونوع العربية وشوف السعر فوراً</p>
       </div>
 
-      <div class="m-price-calc reveal">
-        <label class="m-form__label" style="margin-bottom:18px">
+      <div class="v10-calc-card reveal" style="transition-delay:.05s">
+        <label class="m-form__label" style="margin-bottom:16px">
           الباقة
           <select id="mCalcPkg"></select>
         </label>
@@ -358,102 +340,112 @@
           </button>
         </div>
 
-        <div class="m-calc-result" id="mCalcResult" aria-live="polite">
-          <div class="m-calc-result__row">
-            <span>💰 السعر التقريبي</span>
-            <strong id="mCalcPrice">—</strong>
-          </div>
-          <div class="m-calc-result__row">
-            <span>⏱ مدة الخدمة</span>
-            <span id="mCalcDur" style="font-weight:700;color:var(--white)">—</span>
-          </div>
+        <div class="v10-calc-price" id="mCalcResult" aria-live="polite">
+          <strong class="v10-calc-price__value" id="mCalcPrice">—</strong>
+          <span class="v10-calc-price__dur" id="mCalcDur">—</span>
         </div>
 
-        <a class="m-btn m-btn--primary m-btn--full" id="mCalcBook" href="mobile-booking.html">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-          احجز هذه الخدمة الآن
-        </a>
+        <a class="m-btn m-btn--primary m-btn--full" id="mCalcBook" href="mobile-booking.html">احجز الآن بهذا السعر</a>
       </div>
     </section>
 
     <!-- ══ WHY US ══ -->
-    <section class="m-section" id="why" aria-labelledby="whyTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">Why DR.Care</p>
-        <h2 id="whyTitle">احتراف عالمي بروح مصرية واضحة</h2>
-        <p class="m-section__sub">العميل المصري عايز سرعة، أمانة، سعر واضح، ومعاملة محترمة. التجربة هنا مبنية على التفاصيل دي.</p>
+    <section class="m-section m-section--alt" id="why" aria-labelledby="whyTitle">
+      <div class="v10-head reveal">
+        <p class="v10-head__label">WHY DR.CARE</p>
+        <h2 id="whyTitle" class="v10-head__title">ليه DR.Care؟</h2>
+        <p class="v10-head__sub">مبنية على التفاصيل اللي بتفرق للعميل المصري</p>
       </div>
 
-      <div class="m-egyptian__badge reveal">
-        <span class="m-egyptian__badge-label">صُنع في قليوب</span>
-        <strong class="m-egyptian__badge-name">DR.Care</strong>
-        <span class="m-egyptian__badge-sub">Qaliub · Cairo</span>
-        <div class="m-egyptian__floater">صُنع في قليوب ✦</div>
-      </div>
-
-      <div class="m-why-grid reveal" style="transition-delay:.1s">
-        <div class="m-why-card">
-          <div class="m-why-card__icon">⏱</div>
-          <h4>سرعة في التنفيذ</h4>
-          <p>غسلة سريعة في 25 دقيقة، Full Care في ساعة — بدون انتظار مبالغ فيه.</p>
+      <div class="v10-why-list reveal" style="transition-delay:.05s">
+        <div class="v10-why-item">
+          <span class="v10-why-item__icon" aria-hidden="true">⏱</span>
+          <div>
+            <p class="v10-why-item__title">سرعة في التنفيذ</p>
+            <p class="v10-why-item__desc">غسلة في ٢٥ دقيقة بدون انتظار</p>
+          </div>
         </div>
-        <div class="m-why-card">
-          <div class="m-why-card__icon">💰</div>
-          <h4>سعر واضح قبل الشغل</h4>
-          <p>السعر التقريبي بيتحسب أونلاين — مفيش مفاجآت بعد الخلاص.</p>
+        <div class="v10-why-item">
+          <span class="v10-why-item__icon" aria-hidden="true">💰</span>
+          <div>
+            <p class="v10-why-item__title">سعر واضح قبل الشغل</p>
+            <p class="v10-why-item__desc">بتشوف السعر قبل ما تحجز — مفيش مفاجآت</p>
+          </div>
         </div>
-        <div class="m-why-card">
-          <div class="m-why-card__icon">📱</div>
-          <h4>متابعة لحظية</h4>
-          <p>حالة الطلب بتتحدث في الوقت الفعلي من لحظة الاستلام للتسليم.</p>
+        <div class="v10-why-item">
+          <span class="v10-why-item__icon" aria-hidden="true">📱</span>
+          <div>
+            <p class="v10-why-item__title">متابعة لحظية</p>
+            <p class="v10-why-item__desc">حالة طلبك بتتحدث من الاستلام للتسليم</p>
+          </div>
         </div>
-        <div class="m-why-card">
-          <div class="m-why-card__icon">🌟</div>
-          <h4>معاملة محترمة</h4>
-          <p>قهوة وشاي في الانتظار، ومتابعة رضا العميل بعد الخدمة.</p>
+        <div class="v10-why-item">
+          <span class="v10-why-item__icon" aria-hidden="true">🌟</span>
+          <div>
+            <p class="v10-why-item__title">خدمة محترمة</p>
+            <p class="v10-why-item__desc">معاملة صح من أول لحظة لآخر لحظة</p>
+          </div>
         </div>
-      </div>
-
-      <div class="m-culture-tags reveal" style="transition-delay:.2s">
-        <span>قهوة وشاي في الانتظار</span>
-        <span>لغة قريبة من العميل</span>
-        <span>سعر واضح قبل الشغل</span>
-        <span>متابعة بعد الخدمة</span>
       </div>
     </section>
 
     <!-- ══ PROCESS ══ -->
-    <section class="m-section m-section--alt" aria-labelledby="processTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">How It Works</p>
-        <h2 id="processTitle">من الحجز للتسليم في 4 خطوات</h2>
+    <section class="m-section" aria-labelledby="processTitle">
+      <div class="v10-head reveal">
+        <p class="v10-head__label">HOW IT WORKS</p>
+        <h2 id="processTitle" class="v10-head__title">من الحجز للتسليم</h2>
+        <p class="v10-head__sub">٤ خطوات بسيطة وعربيتك تبقى زي الفل</p>
       </div>
-      <div class="m-process">
-        <article class="m-process-card reveal" style="transition-delay:.05s">
-          <div class="m-process-card__num" aria-hidden="true">01</div>
-          <div><h3>احجز أونلاين</h3><p>اختار الباقة، الفرع، والميعاد المناسب في دقيقتين.</p></div>
-        </article>
-        <article class="m-process-card reveal" style="transition-delay:.10s">
-          <div class="m-process-card__num" aria-hidden="true">02</div>
-          <div><h3>تأكيد فوري</h3><p>الطلب بيدخل لوحة الإدارة بحالة "جديد" فور الإرسال.</p></div>
-        </article>
-        <article class="m-process-card reveal" style="transition-delay:.15s">
-          <div class="m-process-card__num" aria-hidden="true">03</div>
-          <div><h3>تنفيذ الخدمة</h3><p>الفريق بيغير حالة الطلب أثناء التشغيل وأنت مطمن.</p></div>
-        </article>
-        <article class="m-process-card reveal" style="transition-delay:.20s">
-          <div class="m-process-card__num" aria-hidden="true">04</div>
-          <div><h3>تسليم ومتابعة</h3><p>تأكيد نهائي ومراجعة رضا العميل بعد التسليم مباشرة.</p></div>
-        </article>
+      <div class="v10-process reveal" style="transition-delay:.05s">
+        <div class="v10-step">
+          <div class="v10-step__num-wrap">
+            <div class="v10-step__num">01</div>
+            <div class="v10-step__connector"></div>
+          </div>
+          <div class="v10-step__body">
+            <p class="v10-step__title">احجز أونلاين</p>
+            <p class="v10-step__desc">اختار الباقة والميعاد المناسب في دقيقتين.</p>
+          </div>
+        </div>
+        <div class="v10-step">
+          <div class="v10-step__num-wrap">
+            <div class="v10-step__num">02</div>
+            <div class="v10-step__connector"></div>
+          </div>
+          <div class="v10-step__body">
+            <p class="v10-step__title">تأكيد فوري</p>
+            <p class="v10-step__desc">الطلب بيدخل لوحة الإدارة فور الإرسال.</p>
+          </div>
+        </div>
+        <div class="v10-step">
+          <div class="v10-step__num-wrap">
+            <div class="v10-step__num">03</div>
+            <div class="v10-step__connector"></div>
+          </div>
+          <div class="v10-step__body">
+            <p class="v10-step__title">تنفيذ الخدمة</p>
+            <p class="v10-step__desc">الفريق بيغير حالة الطلب وأنت شايف كل حاجة.</p>
+          </div>
+        </div>
+        <div class="v10-step">
+          <div class="v10-step__num-wrap">
+            <div class="v10-step__num">04</div>
+            <div class="v10-step__connector"></div>
+          </div>
+          <div class="v10-step__body">
+            <p class="v10-step__title">تسليم ومتابعة</p>
+            <p class="v10-step__desc">تأكيد نهائي ومراجعة رضا العميل بعد التسليم.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ══ BRANCHES MAP ══ -->
-    <section class="m-section m-map-section" id="branches" aria-labelledby="branchesTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">Our Branches</p>
-        <h2 id="branchesTitle">فروعنا على الخريطة</h2>
-        <p class="m-section__sub">فرعنا في قليوب — شارع العروبة.</p>
+    <section class="m-section m-section--alt m-map-section" id="branches" aria-labelledby="branchesTitle">
+      <div class="v10-head reveal">
+        <p class="v10-head__label">OUR BRANCH</p>
+        <h2 id="branchesTitle" class="v10-head__title">فرعنا</h2>
+        <p class="v10-head__sub">قليوب — شارع العروبة</p>
       </div>
 
       <div class="m-branches-list reveal">
@@ -469,7 +461,7 @@
 
       <div id="drcare-map" role="application" aria-label="خريطة الفروع"></div>
 
-      <a class="m-btn m-btn--ghost m-btn--full" href="tel:01037957593" style="margin-top:4px">
+      <a class="m-btn m-btn--ghost m-btn--full" href="tel:01037957593" style="margin-top:12px">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
         اتصل للاستفسار عن الفرع
       </a>
@@ -477,10 +469,10 @@
 
     <!-- ══ REVIEWS ══ -->
     <section class="m-section" id="reviews" aria-labelledby="reviewsTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">Customer Reviews</p>
-        <h2 id="reviewsTitle">ماذا قال عملاؤنا</h2>
-        <p class="m-section__sub">تقييمات حقيقية من عملاء جربوا الخدمة وشاركوا تجربتهم.</p>
+      <div class="v10-head reveal">
+        <p class="v10-head__label">CUSTOMER REVIEWS</p>
+        <h2 id="reviewsTitle" class="v10-head__title">عملاؤنا بيقولوا</h2>
+        <p class="v10-head__sub">تقييمات حقيقية من عملاء جربوا الخدمة</p>
       </div>
 
       <div class="m-reviews-summary reveal" id="reviewsSummary" style="display:none">
@@ -501,35 +493,21 @@
       </div>
     </section>
 
-    <!-- ══ BOOKING CTA (form moved to mobile-booking.html) ══ -->
+    <!-- ══ BOOKING CTA ══ -->
     <section class="m-section m-section--alt" id="booking" aria-labelledby="bookingCtaTitle">
-      <div class="m-section__head reveal">
-        <p class="m-kicker">احجز الآن</p>
-        <h2 id="bookingCtaTitle">جاهز تحجز دورك؟</h2>
-        <p class="m-section__sub">٣ خطوات سريعة — تأكيد فوري — بدون مفاجآت.</p>
-      </div>
-
-      <div class="m-booking-features reveal">
-        <div class="m-booking-feat">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          تأكيد فوري
+      <div class="v10-booking-cta reveal">
+        <h2 id="bookingCtaTitle" class="v10-booking-cta__title">جاهز تحجز دورك؟</h2>
+        <p class="v10-booking-cta__sub">٣ خطوات سريعة — تأكيد فوري — بدون مفاجآت</p>
+        <div class="v10-booking-cta__feats">
+          <span class="v10-booking-cta__feat">✓ تأكيد فوري</span>
+          <span class="v10-booking-cta__feat">✓ كاش أو Instapay</span>
+          <span class="v10-booking-cta__feat">✓ متابعة لحظية</span>
         </div>
-        <div class="m-booking-feat">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-          كاش أو Instapay
-        </div>
-        <div class="m-booking-feat">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          متابعة لحظية
-        </div>
-      </div>
-
-      <div style="margin-top:28px;text-align:center" class="reveal">
-        <a class="m-btn m-btn--primary m-btn--xl" href="mobile-booking.html" style="display:inline-flex;min-width:220px;justify-content:center">
+        <a class="m-btn m-btn--primary m-btn--xl m-btn--full" href="mobile-booking.html">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
           ابدأ الحجز الآن
         </a>
-        <p style="margin-top:14px;font-size:.76rem;color:rgba(245,240,232,.4);font-weight:600">⏱ يستغرق أقل من دقيقتين</p>
+        <p class="v10-booking-cta__hint">⏱ أقل من دقيقتين</p>
       </div>
     </section>
 
