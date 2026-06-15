@@ -30,6 +30,14 @@
 </head>
 <body>
 
+  <!-- PROMO BANNER -->
+  <div class="m-promo-banner" id="mPromoBanner">
+    <span class="m-promo-banner__badge">عرض</span>
+    <p class="m-promo-banner__text">احجز اليوم — أول 5 حجوزات يومياً لهم أسبقية التنفيذ الفوري</p>
+    <span class="m-promo-banner__timer" id="mPromoTimer" dir="ltr" aria-live="off"></span>
+    <button class="m-promo-banner__close" id="mPromoBannerClose" aria-label="إغلاق" type="button">✕</button>
+  </div>
+
   <!-- Toast container -->
   <div id="toastContainer" aria-live="polite" aria-atomic="true" class="m-toast-container"></div>
 
@@ -106,6 +114,17 @@
           </a>
           <a class="m-btn m-btn--ghost m-btn--lg" href="#packages">الباقات</a>
         </div>
+        <!-- Next appointment widget — shown when logged in with upcoming booking -->
+        <div class="m-next-appt-widget" id="mNextApptWidget" style="display:none" aria-label="حجزك القادم">
+          <span class="m-next-appt-widget__icon" aria-hidden="true">📅</span>
+          <div class="m-next-appt-widget__info">
+            <span class="m-next-appt-widget__label">حجزك القادم</span>
+            <strong class="m-next-appt-widget__pkg" id="mNextApptPkg">—</strong>
+            <span class="m-next-appt-widget__date" id="mNextApptDate">—</span>
+          </div>
+          <a class="m-btn m-btn--ghost m-btn--sm" id="mNextApptLink" href="mobile-bookings.html">تتبع</a>
+        </div>
+
         <div class="m-trust-items">
           <div class="m-trust-item">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -331,6 +350,54 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ══ PRICE CALCULATOR ══ -->
+    <section class="m-section m-section--alt" id="mPriceCalc" aria-labelledby="mPriceCalcTitle">
+      <div class="m-section__head reveal">
+        <p class="m-kicker">Price Calculator</p>
+        <h2 id="mPriceCalcTitle">احسب سعر خدمتك</h2>
+        <p class="m-section__sub">اختار الباقة ونوع عربيتك وهتشوف السعر التقريبي على الفور — بدون أي مفاجآت.</p>
+      </div>
+
+      <div class="m-price-calc reveal">
+        <label class="m-form__label" style="margin-bottom:18px">
+          الباقة
+          <select id="mCalcPkg"></select>
+        </label>
+
+        <p class="m-form__label" style="margin-bottom:10px;display:block">نوع العربية</p>
+        <div class="m-calc-cars" role="group" aria-label="اختار نوع العربية">
+          <button type="button" class="m-calc-car-btn active" data-calc-car="sedan" aria-pressed="true">
+            <span aria-hidden="true">🚗</span><span>سيدان</span>
+          </button>
+          <button type="button" class="m-calc-car-btn" data-calc-car="suv" aria-pressed="false">
+            <span aria-hidden="true">🚙</span><span>SUV</span>
+          </button>
+          <button type="button" class="m-calc-car-btn" data-calc-car="van" aria-pressed="false">
+            <span aria-hidden="true">🚐</span><span>فان</span>
+          </button>
+          <button type="button" class="m-calc-car-btn" data-calc-car="pickup" aria-pressed="false">
+            <span aria-hidden="true">🛻</span><span>نقل</span>
+          </button>
+        </div>
+
+        <div class="m-calc-result" id="mCalcResult" aria-live="polite">
+          <div class="m-calc-result__row">
+            <span>💰 السعر التقريبي</span>
+            <strong id="mCalcPrice">—</strong>
+          </div>
+          <div class="m-calc-result__row">
+            <span>⏱ مدة الخدمة</span>
+            <span id="mCalcDur" style="font-weight:700;color:var(--white)">—</span>
+          </div>
+        </div>
+
+        <a class="m-btn m-btn--primary m-btn--full" id="mCalcBook" href="#booking">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          احجز هذه الخدمة الآن
+        </a>
       </div>
     </section>
 
@@ -586,7 +653,8 @@
 
             <!-- Visual time slot picker -->
             <div id="timeSlotLabel" style="display:none">
-              <span class="m-form__label" style="display:block;margin-bottom:8px">وقت الموعد</span>
+              <span class="m-form__label" style="display:block;margin-bottom:6px">وقت الموعد</span>
+              <span class="m-slot-dur-hint" id="mSlotDurHint" style="display:none"></span>
               <div id="timeSlotGrid" class="m-time-slot-grid" role="group" aria-label="اختار وقت الموعد"></div>
               <input type="hidden" id="apptTime" name="apptTime">
             </div>
@@ -612,6 +680,15 @@
         <!-- ══ STEP 3: التأكيد ══ -->
         <div class="m-bf-panel" id="mBfPanel3">
           <div class="m-form__section-title">بياناتك</div>
+
+          <!-- Auto-fill from previous booking -->
+          <div id="mAutoFillWrap" style="display:none;margin-bottom:16px">
+            <button type="button" id="mAutoFillBtn" class="m-auto-fill-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              ملأ بياناتي تلقائياً من حجزي السابق
+            </button>
+          </div>
+
           <div class="m-form__grid">
             <label class="m-form__label">
               الاسم الكريم
@@ -801,6 +878,12 @@
   <a class="m-whatsapp-btn" href="https://wa.me/201037957593?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20DR.Care%20%F0%9F%9A%97%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AE%D8%AF%D9%85%D8%A7%D8%AA" target="_blank" rel="noopener" aria-label="تواصل معنا على واتساب">
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
   </a>
+
+  <!-- ONBOARDING TOOLTIP (first-time visitors) -->
+  <div class="m-onboarding-tip" id="mOnboardingTip" style="display:none" role="tooltip" aria-hidden="true">
+    <span>👆 احجز غسلتك في دقيقتين</span>
+    <button type="button" class="m-onboarding-tip__close" id="mOnboardingClose" aria-label="إغلاق التلميح">✕</button>
+  </div>
 
   <!-- MOBILE NAV DRAWER -->
   <div class="m-nav-overlay" id="mNavOverlay" aria-hidden="true"></div>

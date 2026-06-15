@@ -1142,3 +1142,226 @@ if (mCounterEls.length) {
 
   document.getElementById('mBfBack3')?.addEventListener('click', () => goTo(1, true));
 })();
+
+// ── Promo Banner Countdown ────────────────────────────
+(function () {
+  const banner = document.getElementById('mPromoBanner');
+  if (!banner) return;
+  if (sessionStorage.getItem('dr_m_promo_closed')) { banner.style.display = 'none'; return; }
+
+  document.getElementById('mPromoBannerClose')?.addEventListener('click', () => {
+    banner.style.maxHeight = '0';
+    banner.style.paddingBlock = '0';
+    banner.style.overflow = 'hidden';
+    sessionStorage.setItem('dr_m_promo_closed', '1');
+    setTimeout(() => banner.remove(), 420);
+  });
+
+  const timerEl = document.getElementById('mPromoTimer');
+  if (!timerEl) return;
+  const update = () => {
+    const now  = new Date();
+    const end  = new Date(now); end.setHours(23, 59, 59, 999);
+    const diff = Math.max(0, end - now);
+    const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+    const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+    const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+    timerEl.textContent = `${h}:${m}:${s}`;
+  };
+  update();
+  setInterval(update, 1000);
+})();
+
+// ── Next Appointment Widget ───────────────────────────
+(function () {
+  const widget = document.getElementById('mNextApptWidget');
+  if (!widget) return;
+  secureFetch('api/bookings.php?action=list')
+    .then(r => r.json())
+    .then(data => {
+      const list = Array.isArray(data) ? data : (data.bookings || []);
+      const upcoming = list
+        .filter(b => ['pending', 'confirmed', 'in_progress'].includes(b.status) && b.appointment_date)
+        .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date));
+      if (!upcoming.length) return;
+      const next = upcoming[0];
+      const d    = new Date(next.appointment_date);
+      const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+      const pkgEl  = document.getElementById('mNextApptPkg');
+      const dateEl = document.getElementById('mNextApptDate');
+      const linkEl = document.getElementById('mNextApptLink');
+      if (pkgEl)  pkgEl.textContent  = next.package_name || next.servicePackage || '—';
+      if (dateEl) dateEl.textContent = `${days[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`;
+      if (linkEl && next.id) linkEl.href = `booking-tracker.html?id=${next.id}`;
+      widget.style.display = '';
+    })
+    .catch(() => {});
+})();
+
+// ── Live Price Calculator ─────────────────────────────
+(function () {
+  const pkgSel  = document.getElementById('mCalcPkg');
+  const priceEl = document.getElementById('mCalcPrice');
+  const durEl   = document.getElementById('mCalcDur');
+  const bookBtn = document.getElementById('mCalcBook');
+  if (!pkgSel) return;
+
+  const durMap = {
+    'inside-out': '~ ٤٥ دقيقة', 'outside':  '~ ٢٠ دقيقة',
+    'deep':       '~ ٩٠ دقيقة', 'cover':    '~ ١٥ دقيقة',
+    'rims':       '~ ٢٠ دقيقة', 'engine':   '~ ٣٠ دقيقة',
+    'chemical':   'حسب الشغل',   'carpet':   'حسب المساحة',
+    'blanket':    '~ ٣٠ دقيقة',
+  };
+
+  let selectedCar = 'sedan';
+
+  const populate = () => {
+    pkgSel.innerHTML = appConfig.packages.map(p =>
+      `<option value="${p.code}">${p.name}${p.price > 0 ? ' — ' + p.price + ' ج' : ''}</option>`
+    ).join('');
+    update();
+  };
+
+  const update = () => {
+    const pkg = appConfig.packages.find(p => p.code === pkgSel.value);
+    const car = appConfig.carTypes.find(c => c.code === selectedCar);
+    if (!pkg) return;
+    const total = (pkg.price || 0) + (car?.extra || 0);
+    if (priceEl) priceEl.textContent = pkg.price === 0 ? 'حسب التقييم' : `${total} جنيه`;
+    if (durEl)   durEl.textContent   = durMap[pkg.code] || '—';
+    if (bookBtn) {
+      bookBtn.onclick = () => {
+        const sp = document.getElementById('servicePackage');
+        if (sp && pkgSel.value) { sp.value = pkgSel.value; sp.dispatchEvent(new Event('change', { bubbles: true })); }
+        const card = document.querySelector(`[data-car="${selectedCar}"]`);
+        if (card) card.click();
+      };
+    }
+  };
+
+  pkgSel.addEventListener('change', update);
+
+  document.querySelectorAll('[data-calc-car]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-calc-car]').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      selectedCar = btn.dataset.calcCar;
+      update();
+    });
+  });
+
+  // Repopulate when the real API config lands (watch servicePackage inner HTML change)
+  const spEl = document.getElementById('servicePackage');
+  if (spEl) new MutationObserver(populate).observe(spEl, { childList: true });
+
+  populate();
+})();
+
+// ── Package Duration Badges ───────────────────────────
+(function () {
+  const dur = {
+    'inside-out': '٤٥ دقيقة', 'outside':  '٢٠ دقيقة',
+    'deep':       '٩٠ دقيقة', 'cover':    '١٥ دقيقة',
+    'rims':       '٢٠ دقيقة', 'engine':   '٣٠ دقيقة',
+    'chemical':   'حسب الشغل', 'carpet':   'حسب المساحة',
+    'blanket':    '٣٠ دقيقة',
+  };
+  document.querySelectorAll('[data-package-card]').forEach(card => {
+    const code    = card.dataset.packageCard;
+    const durText = dur[code];
+    if (!durText) return;
+    const featEl = card.querySelector('.m-pkg-features');
+    if (!featEl) return;
+    const badge = document.createElement('span');
+    badge.className   = 'm-pkg-dur';
+    badge.textContent = `⏱ ${durText}`;
+    featEl.insertAdjacentElement('beforebegin', badge);
+  });
+})();
+
+// ── Slot Duration Hint (step 2) ───────────────────────
+(function () {
+  const hint = document.getElementById('mSlotDurHint');
+  const sp   = document.getElementById('servicePackage');
+  if (!hint || !sp) return;
+  const durMap = {
+    'inside-out': '~ ٤٥ دقيقة', 'outside': '~ ٢٠ دقيقة',
+    'deep':       '~ ٩٠ دقيقة', 'cover':   '~ ١٥ دقيقة',
+    'rims':       '~ ٢٠ دقيقة', 'engine':  '~ ٣٠ دقيقة',
+    'chemical':   'حسب الشغل',   'carpet':  'حسب المساحة',
+    'blanket':    '~ ٣٠ دقيقة',
+  };
+  const updateHint = () => {
+    const d = durMap[sp.value];
+    if (d) { hint.textContent = `⏱ المدة المتوقعة للخدمة: ${d}`; hint.style.display = ''; }
+    else     hint.style.display = 'none';
+  };
+  sp.addEventListener('change', updateHint);
+  updateHint();
+})();
+
+// ── Auto-fill from Previous Booking ──────────────────
+(function () {
+  const wrap = document.getElementById('mAutoFillWrap');
+  const btn  = document.getElementById('mAutoFillBtn');
+  if (!wrap || !btn) return;
+  secureFetch('api/bookings.php?action=list')
+    .then(r => r.json())
+    .then(data => {
+      const list = Array.isArray(data) ? data : (data.bookings || []);
+      if (!list.length) return;
+      const last = list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))[0];
+      if (!last.name && !last.email && !last.phone) return;
+      wrap.style.display = '';
+      btn.addEventListener('click', () => {
+        const fields = { name: last.name, email: last.email, phone: last.phone };
+        Object.entries(fields).forEach(([k, v]) => {
+          if (!v) return;
+          const el = document.getElementById(k);
+          if (el && !el.value) el.value = v;
+        });
+        if (last.plateNumber) {
+          const pn = document.getElementById('plateNumber');
+          if (pn && !pn.value) pn.value = last.plateNumber;
+        }
+        showToast('تم ملأ بياناتك من الحجز السابق ✓', 'success');
+        wrap.style.display = 'none';
+      });
+    })
+    .catch(() => {});
+})();
+
+// ── First-Time Onboarding Tooltip ────────────────────
+(function () {
+  const tip = document.getElementById('mOnboardingTip');
+  if (!tip || localStorage.getItem('dr_m_onboarded')) return;
+
+  const stickyCta = document.getElementById('stickyCta');
+  if (!stickyCta) return;
+
+  const show = () => {
+    tip.style.display = '';
+    tip.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => requestAnimationFrame(() => tip.classList.add('visible')));
+    const dismiss = () => {
+      tip.classList.remove('visible');
+      setTimeout(() => tip.remove(), 420);
+      localStorage.setItem('dr_m_onboarded', '1');
+    };
+    document.getElementById('mOnboardingClose')?.addEventListener('click', dismiss);
+    setTimeout(dismiss, 7000);
+    obs.disconnect();
+  };
+
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) show();
+  }, { threshold: 0.5 });
+
+  // Show when sticky CTA becomes visible (user has scrolled down)
+  obs.observe(stickyCta);
+})();

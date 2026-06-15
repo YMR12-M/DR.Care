@@ -2729,3 +2729,263 @@ body.page-exit { pointer-events:none !important; animation: page-out .28s cubic-
 }
 .m-date-slot-btn.selected .m-date-slot-btn__month { color: rgba(10,8,0,.55); }
 
+/* ══ v8.0 Customer Clarity & Feature Parity ═════════ */
+
+/* ── Promo Banner ── */
+.m-promo-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(201,162,0,.15) 0%, rgba(255,210,31,.06) 100%);
+  border-bottom: 1px solid rgba(255,210,31,.16);
+  padding: 9px 14px;
+  overflow: hidden;
+  max-height: 60px;
+  transition: max-height .4s ease, padding .4s ease, opacity .3s ease;
+}
+.m-promo-banner__badge {
+  background: var(--yellow);
+  color: #0a0800;
+  font-size: .6rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 30px;
+  flex-shrink: 0;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.m-promo-banner__text {
+  flex: 1;
+  min-width: 0;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-promo-banner__timer {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .78rem;
+  font-weight: 800;
+  color: var(--yellow);
+  letter-spacing: .04em;
+  flex-shrink: 0;
+}
+.m-promo-banner__close {
+  background: none;
+  border: none;
+  color: var(--muted-2);
+  cursor: pointer;
+  font-size: .8rem;
+  flex-shrink: 0;
+  padding: 4px 2px;
+  line-height: 1;
+}
+
+/* ── Next Appointment Widget ── */
+.m-next-appt-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,210,31,.06);
+  border: 1px solid rgba(255,210,31,.22);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  margin-top: 16px;
+  animation: m-panel-in .45s cubic-bezier(.22,1,.36,1) both;
+}
+.m-next-appt-widget__icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1; }
+.m-next-appt-widget__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.m-next-appt-widget__label {
+  font-size: .6rem;
+  font-weight: 900;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.m-next-appt-widget__pkg {
+  font-size: .88rem;
+  font-weight: 800;
+  color: var(--white, #f5f0e8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.m-next-appt-widget__date {
+  font-size: .72rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ── Price Calculator ── */
+.m-price-calc {
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-lg);
+  padding: 22px 18px;
+}
+.m-calc-cars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0 20px;
+}
+.m-calc-car-btn {
+  background: var(--panel-3);
+  border: 2px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  padding: 10px 5px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.4rem;
+  transition: border-color var(--transition-bounce), background var(--transition-bounce);
+}
+.m-calc-car-btn span:last-child {
+  font-size: .63rem;
+  font-weight: 700;
+  color: var(--muted);
+  font-family: var(--font, 'Cairo', sans-serif);
+  line-height: 1;
+}
+.m-calc-car-btn.active {
+  border-color: var(--yellow);
+  background: rgba(255,210,31,.08);
+}
+.m-calc-car-btn.active span:last-child { color: var(--yellow); }
+.m-calc-car-btn:active { transform: scale(0.95); }
+
+.m-calc-result {
+  background: var(--panel-3);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin: 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--line);
+}
+.m-calc-result__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .82rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.m-calc-result__row strong {
+  color: var(--yellow);
+  font-size: 1.2rem;
+  font-weight: 900;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ── Package Duration Badge ── */
+.m-pkg-dur {
+  display: inline-block;
+  font-size: .66rem;
+  font-weight: 700;
+  color: var(--muted-2);
+  padding: 2px 9px;
+  background: var(--panel-3);
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+
+/* ── Auto-fill Button ── */
+.m-auto-fill-btn {
+  width: 100%;
+  background: rgba(255,210,31,.05);
+  border: 1.5px dashed rgba(255,210,31,.28);
+  border-radius: var(--radius-sm);
+  color: var(--yellow);
+  font-size: .82rem;
+  font-weight: 700;
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-family: var(--font, 'Cairo', sans-serif);
+  transition: background var(--transition), border-color var(--transition);
+}
+.m-auto-fill-btn:hover { background: rgba(255,210,31,.11); border-color: rgba(255,210,31,.5); }
+.m-auto-fill-btn:active { transform: scale(0.98); }
+
+/* ── Slot Duration Hint ── */
+.m-slot-dur-hint {
+  display: block;
+  font-size: .74rem;
+  font-weight: 700;
+  color: var(--yellow);
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  background: rgba(255,210,31,.06);
+  border-radius: var(--radius-sm);
+  border-inline-start: 2px solid var(--yellow);
+}
+
+/* ── Onboarding Tooltip ── */
+.m-onboarding-tip {
+  position: fixed;
+  bottom: 86px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  z-index: 9200;
+  background: var(--yellow);
+  color: #0a0800;
+  border-radius: 14px;
+  padding: 10px 14px 10px 10px;
+  font-size: .84rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 30px rgba(255,210,31,.45);
+  opacity: 0;
+  transition: opacity .38s ease, transform .38s cubic-bezier(.22,1,.36,1);
+  font-family: var(--font, 'Cairo', sans-serif);
+  white-space: nowrap;
+}
+.m-onboarding-tip::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: var(--yellow);
+  border-bottom: none;
+}
+.m-onboarding-tip.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.m-onboarding-tip__close {
+  background: rgba(0,0,0,.14);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: .65rem;
+  flex-shrink: 0;
+  color: #0a0800;
+  font-family: monospace;
+}
+
