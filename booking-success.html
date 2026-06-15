@@ -9,6 +9,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Print styles ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .success-confetti,
+      .success-actions,
+      .site-header,
+      .site-footer { display: none !important; }
+      .success-card {
+        border: 2px solid #000 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        animation: none !important;
+      }
+      .success-icon-wrap { border: 2px solid #000 !important; background: #fff !important; }
+      .success-icon-wrap svg polyline { stroke: #000 !important; }
+      h1, p, label, span, strong { color: #000 !important; }
+      .tag-gold { background: #f5c400 !important; color: #000 !important; }
+      .success-detail-row { border-bottom: 1px solid #ddd !important; }
+    }
+  </style>
 </head>
 <body class="success-page">
 
@@ -65,7 +87,16 @@
     <div class="success-actions">
       <a href="customer-bookings.html" class="btn btn-primary">متابعة الحجوزات</a>
       <a href="index.html" class="btn btn-ghost">العودة للرئيسية</a>
+      <button type="button" class="btn btn-ghost" id="printBtn" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        طباعة التفاصيل
+      </button>
+      <button type="button" class="btn btn-ghost" id="shareSuccessBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        مشاركة
+      </button>
     </div>
+    <p id="shareMsg" role="status" aria-live="polite" style="font-size:.78rem;color:var(--muted);text-align:center;margin-top:8px;min-height:18px"></p>
   </div>
 
   <script>
@@ -137,6 +168,38 @@
 
       setTimeout(draw, 400);
     })();
+
+    /* Share button */
+    document.getElementById('shareSuccessBtn')?.addEventListener('click', async () => {
+      const msgEl = document.getElementById('shareMsg');
+      const pkg  = document.getElementById('detailPackage')?.textContent || '';
+      const car  = document.getElementById('detailCar')?.textContent || '';
+      const date = document.getElementById('detailDate')?.textContent || '';
+      const lines = ['✅ تم حجزي في DR.Care — مغسلة عربيات قليوب! 🚗'];
+      if (pkg)  lines.push(`الباقة: ${pkg}`);
+      if (car)  lines.push(`السيارة: ${car}`);
+      if (date) lines.push(`الموعد: ${date}`);
+      lines.push('احجز أنت كمان من: ' + location.origin + '/index.html#booking');
+      const text = lines.join('\n');
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'DR.Care — تم الحجز', text });
+          msgEl.textContent = 'شكراً على المشاركة!';
+        } catch (err) {
+          if (err.name !== 'AbortError') copyToClipboard(text, msgEl);
+        }
+      } else {
+        copyToClipboard(text, msgEl);
+      }
+      setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 3500);
+    });
+
+    function copyToClipboard(text, statusEl) {
+      navigator.clipboard.writeText(text)
+        .then(() => { if (statusEl) statusEl.textContent = 'تم نسخ التفاصيل — الصقها في واتساب!'; })
+        .catch(() => { if (statusEl) statusEl.textContent = 'حدث خطأ في النسخ'; });
+    }
 
     /* Page transition out support */
     document.addEventListener('click', (e) => {

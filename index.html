@@ -25,6 +25,17 @@
 </head>
 <body>
 
+  <!-- Skip Link (keyboard accessibility) -->
+  <a class="skip-link" href="#booking">انتقل للحجز</a>
+
+  <!-- PWA Splash Screen -->
+  <div id="splashScreen" aria-hidden="true" role="presentation">
+    <img src="assets/logo.jpg" alt="" class="splash-logo">
+    <span class="splash-name">DR.Care</span>
+    <span class="splash-tagline">مغسلة عربيات احترافية</span>
+    <div class="splash-loader"></div>
+  </div>
+
   <!-- Scroll Progress Bar -->
   <div id="scrollProgress" aria-hidden="true"></div>
 
@@ -621,138 +632,217 @@
         </div>
 
         <form class="booking-form reveal" id="bookingForm" novalidate style="transition-delay:.1s">
-          <div class="form-section-title">بياناتك الشخصية</div>
-          <div class="form-grid">
-            <label for="name">
-              الاسم
-              <input type="text" id="name" name="name" placeholder="اكتب اسمك الكريم" autocomplete="name" required>
-            </label>
-            <label for="email">
-              البريد الإلكتروني
-              <input type="email" id="email" name="email" placeholder="your@gmail.com" autocomplete="email" inputmode="email" required>
-            </label>
+
+          <!-- ── Progress indicator ── -->
+          <div class="bf-progress" id="bfProgress" aria-label="خطوات الحجز">
+            <div class="bf-prog-step active" id="bfInd1">
+              <div class="bf-prog-num" aria-label="الخطوة 1">١</div>
+              <span class="bf-prog-label">الخدمة</span>
+            </div>
+            <div class="bf-prog-line" id="bfLine1"></div>
+            <div class="bf-prog-step" id="bfInd2">
+              <div class="bf-prog-num" aria-label="الخطوة 2">٢</div>
+              <span class="bf-prog-label">الموعد</span>
+            </div>
+            <div class="bf-prog-line" id="bfLine2"></div>
+            <div class="bf-prog-step" id="bfInd3">
+              <div class="bf-prog-num" aria-label="الخطوة 3">٣</div>
+              <span class="bf-prog-label">التأكيد</span>
+            </div>
           </div>
-          <div class="form-grid">
-            <label for="phone">
-              رقم الموبايل
-              <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX" autocomplete="tel" inputmode="numeric" required>
-            </label>
+
+          <!-- ══ STEP 1: الخدمة ══ -->
+          <div class="bf-panel active" id="bfPanel1">
+            <div class="form-section-title">نوع عربيتك</div>
+
+            <!-- Visual car type selector -->
+            <div class="car-type-grid" id="carTypeGrid" role="group" aria-label="نوع العربية">
+              <button type="button" class="car-type-card" data-car="sedan" aria-pressed="false">
+                <span class="car-type-card__emoji">🚗</span>
+                <span class="car-type-card__name">سيدان</span>
+                <span class="car-type-card__extra" id="carExtra-sedan">سعر أساسي</span>
+              </button>
+              <button type="button" class="car-type-card" data-car="suv" aria-pressed="false">
+                <span class="car-type-card__emoji">🚙</span>
+                <span class="car-type-card__name">SUV</span>
+                <span class="car-type-card__extra" id="carExtra-suv">+ إضافة</span>
+              </button>
+              <button type="button" class="car-type-card" data-car="van" aria-pressed="false">
+                <span class="car-type-card__emoji">🚐</span>
+                <span class="car-type-card__name">فان</span>
+                <span class="car-type-card__extra" id="carExtra-van">+ إضافة</span>
+              </button>
+              <button type="button" class="car-type-card" data-car="pickup" aria-pressed="false">
+                <span class="car-type-card__emoji">🛻</span>
+                <span class="car-type-card__name">نقل خفيف</span>
+                <span class="car-type-card__extra" id="carExtra-pickup">+ إضافة</span>
+              </button>
+            </div>
+            <!-- hidden select for form submission compat -->
+            <select id="carType" name="carType" required style="display:none"></select>
+
+            <div class="form-section-title" style="margin-top:4px">اختار الباقة</div>
+
+            <!-- Smart recommendation -->
+            <div class="pkg-recommend" id="pkgRecommend">
+              <strong>💡 مقترح لـ <span id="pkgRecommendCar"></span></strong>
+              <span id="pkgRecommendText"></span>
+            </div>
+
+            <label for="servicePackage" style="display:block;font-size:.85rem;font-weight:700;color:var(--white);margin-bottom:6px">الباقة</label>
+            <select id="servicePackage" name="servicePackage" required></select>
+
+            <!-- Estimate preview -->
+            <div class="estimate" aria-live="polite" style="margin-top:16px">
+              <div class="estimate-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                السعر التقريبي
+              </div>
+              <strong id="estimateValue">0 جنيه</strong>
+            </div>
+
+            <div class="bf-nav">
+              <button type="button" class="btn btn-primary" id="bfNext1" style="flex:1;min-height:52px;font-size:1rem">
+                التالي: الموعد
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- ══ STEP 2: الموعد ══ -->
+          <div class="bf-panel" id="bfPanel2">
             <div id="apptPickerWrap">
-              <label for="apptDate" id="apptDateLabel" style="display:none">
-                تاريخ الموعد
-                <select id="apptDate" name="apptDate">
+              <!-- Visual date picker -->
+              <div id="apptDateLabel">
+                <span class="form-label-text">تاريخ الموعد</span>
+                <div id="dateSlotGrid" class="date-slot-grid" role="group" aria-label="اختار يوم الموعد"></div>
+                <select id="apptDate" name="apptDate" style="display:none">
                   <option value="">— اختار يوم —</option>
                 </select>
-              </label>
-              <!-- Visual time slot picker (replaces old select) -->
-              <div id="timeSlotLabel">
+              </div>
+
+              <!-- Visual time slot picker -->
+              <div id="timeSlotLabel" style="display:none">
                 <span class="form-label-text">وقت الموعد</span>
                 <div id="timeSlotGrid" class="time-slot-grid" role="group" aria-label="اختار وقت الموعد"></div>
                 <input type="hidden" id="apptTime" name="apptTime">
               </div>
-              <!-- hidden for legacy compat -->
               <label for="apptTime" id="apptTimeLabel" style="display:none"></label>
+
               <div class="form-info-note" id="apptFallback">
                 📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
               </div>
             </div>
+
+            <div class="bf-nav">
+              <button type="button" class="bf-back-btn" id="bfBack2" aria-label="رجوع للخطوة السابقة">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                رجوع
+              </button>
+              <button type="button" class="btn btn-primary" id="bfNext2" style="flex:1;min-height:52px;font-size:1rem">
+                التالي: بياناتك
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+            </div>
           </div>
 
-          <div class="form-section-title">تفاصيل الخدمة</div>
-          <div class="form-grid">
-            <label for="servicePackage">
-              الباقة
-              <select id="servicePackage" name="servicePackage" required></select>
-            </label>
-            <label for="carType">
-              نوع العربية
-              <select id="carType" name="carType" required></select>
-            </label>
-          </div>
-          <div class="form-grid">
-            <label for="branch">
-              الفرع
-              <select id="branch" name="branch" required></select>
-            </label>
+          <!-- ══ STEP 3: التأكيد ══ -->
+          <div class="bf-panel" id="bfPanel3">
+            <div class="form-section-title">بياناتك</div>
+            <div class="form-grid">
+              <label for="name">
+                الاسم
+                <input type="text" id="name" name="name" placeholder="اكتب اسمك الكريم" autocomplete="name" required>
+              </label>
+              <label for="email">
+                البريد الإلكتروني
+                <input type="email" id="email" name="email" placeholder="your@gmail.com" autocomplete="email" inputmode="email" required>
+              </label>
+            </div>
+            <div class="form-grid">
+              <label for="phone">
+                رقم الموبايل
+                <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX" autocomplete="tel" inputmode="numeric" required>
+              </label>
+              <label for="branch">
+                الفرع
+                <select id="branch" name="branch" required></select>
+              </label>
+            </div>
+
+            <div class="form-section-title">الدفع</div>
             <label for="paymentMethod">
               طريقة الدفع
               <select id="paymentMethod" name="paymentMethod" required></select>
             </label>
-          </div>
-          <div id="screenshotField" class="instapay-section" style="display:none">
 
-            <!-- Step 1 -->
-            <div class="ipay-step">
-              <div class="ipay-step__badge">١</div>
-              <div class="ipay-step__body">
-                <div class="ipay-step__title">حوّل المبلغ على رقم Instapay</div>
-                <div class="ipay-number-box">
-                  <span id="instapayNumberDisplay" class="ipay-number-box__num" dir="ltr">01XXXXXXXXX</span>
-                  <button type="button" id="copyInstapayBtn" class="ipay-number-box__copy">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    نسخ الرقم
-                  </button>
+            <div id="screenshotField" class="instapay-section" style="display:none">
+              <div class="ipay-step">
+                <div class="ipay-step__badge">١</div>
+                <div class="ipay-step__body">
+                  <div class="ipay-step__title">حوّل المبلغ على رقم Instapay</div>
+                  <div class="ipay-number-box">
+                    <span id="instapayNumberDisplay" class="ipay-number-box__num" dir="ltr">01XXXXXXXXX</span>
+                    <button type="button" id="copyInstapayBtn" class="ipay-number-box__copy">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      نسخ الرقم
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="ipay-warning">
+                <div class="ipay-warning__icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div class="ipay-warning__text">
+                  <strong>مطلوب:</strong> بعد التحويل لازم ترفع صورة الإيصال أو شاشة التأكيد من تطبيق البنك — من غير صورة مش هيتم تأكيد الحجز
+                </div>
+              </div>
+              <div class="ipay-step">
+                <div class="ipay-step__badge">٢</div>
+                <div class="ipay-step__body">
+                  <div class="ipay-step__title">ارفع صورة إيصال الدفع <span class="required-tag">مطلوب</span></div>
+                  <label for="paymentScreenshot" class="upload-zone">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span class="upload-zone__main">اضغط لرفع إيصال الدفع</span>
+                    <span class="upload-zone__sub">PNG أو JPG — الحد الأقصى 3MB</span>
+                  </label>
+                  <input type="file" id="paymentScreenshot" accept="image/*" class="upload-zone-input">
+                  <div id="screenshotPreview" class="screenshot-preview"></div>
                 </div>
               </div>
             </div>
 
-            <!-- Warning -->
-            <div class="ipay-warning">
-              <div class="ipay-warning__icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <label for="plateNumber">
+              رقم اللوحة (اختياري)
+              <input type="text" id="plateNumber" name="plateNumber" placeholder="مثلاً: أ ب ج 1234" autocapitalize="characters">
+            </label>
+            <label for="notes">
+              ملاحظات
+              <textarea id="notes" name="notes" rows="3" placeholder="مثلاً: عايز تركيز على الفرش أو الجنوط"></textarea>
+            </label>
+
+            <div class="coupon-row" id="couponRow">
+              <div class="coupon-input-wrap">
+                <input type="text" id="couponCode" name="couponCode" placeholder="كود الخصم (اختياري)" autocomplete="off" style="text-transform:uppercase">
+                <button type="button" id="applyCouponBtn" class="coupon-apply-btn">تطبيق</button>
               </div>
-              <div class="ipay-warning__text">
-                <strong>مطلوب:</strong> بعد التحويل لازم ترفع صورة الإيصال أو شاشة التأكيد من تطبيق البنك — من غير صورة مش هيتم تأكيد الحجز
-              </div>
+              <p class="coupon-msg" id="couponMsg" aria-live="polite"></p>
             </div>
 
-            <!-- Step 2 -->
-            <div class="ipay-step">
-              <div class="ipay-step__badge">٢</div>
-              <div class="ipay-step__body">
-                <div class="ipay-step__title">ارفع صورة إيصال الدفع <span class="required-tag">مطلوب</span></div>
-                <label for="paymentScreenshot" class="upload-zone">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  <span class="upload-zone__main">اضغط لرفع إيصال الدفع</span>
-                  <span class="upload-zone__sub">PNG أو JPG — الحد الأقصى 3MB</span>
-                </label>
-                <input type="file" id="paymentScreenshot" accept="image/*" class="upload-zone-input">
-                <div id="screenshotPreview" class="screenshot-preview"></div>
-              </div>
+            <div class="bf-nav">
+              <button type="button" class="bf-back-btn" id="bfBack3" aria-label="رجوع">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                رجوع
+              </button>
+              <button class="btn btn-primary submit-btn" type="submit" id="submitBtn" style="flex:1;min-height:52px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+                تأكيد الحجز
+              </button>
             </div>
-
-          </div>
-          <label for="plateNumber">
-            رقم اللوحة (اختياري)
-            <input type="text" id="plateNumber" name="plateNumber" placeholder="مثلاً: أ ب ج 1234" autocapitalize="characters">
-          </label>
-          <label for="notes">
-            ملاحظات
-            <textarea id="notes" name="notes" rows="3" placeholder="مثلاً: عايز تركيز على الفرش أو الجنوط"></textarea>
-          </label>
-
-          <!-- Coupon -->
-          <div class="coupon-row" id="couponRow">
-            <div class="coupon-input-wrap">
-              <input type="text" id="couponCode" name="couponCode" placeholder="كود الخصم (اختياري)" autocomplete="off" style="text-transform:uppercase">
-              <button type="button" id="applyCouponBtn" class="coupon-apply-btn">تطبيق</button>
-            </div>
-            <p class="coupon-msg" id="couponMsg" aria-live="polite"></p>
+            <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
           </div>
 
-          <div class="estimate" aria-live="polite">
-            <div class="estimate-label">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              السعر التقريبي
-            </div>
-            <strong id="estimateValue">0 جنيه</strong>
-          </div>
-
-          <button class="btn btn-primary submit-btn" type="submit" id="submitBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-            تأكيد الحجز
-          </button>
-          <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -798,6 +888,13 @@
           <a href="#packages">غسيل متخصص — 250 ج</a>
           <a href="#packages">غسيل جنوط — 100 ج</a>
           <a href="#packages">الغسيل الكيماوي</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>استكشف</h5>
+          <a href="gallery.html">معرض قبل وبعد</a>
+          <a href="faq.html">الأسئلة الشائعة</a>
+          <a href="referral.html">برنامج الإحالة</a>
         </div>
 
         <div class="footer-col">

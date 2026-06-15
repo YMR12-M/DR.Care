@@ -640,24 +640,92 @@
       }
     };
 
+    /* ── Toast helper ── */
+    const showToast = (msg, type = 'info') => {
+      let container = document.getElementById('bkToastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'bkToastContainer';
+        container.setAttribute('aria-live', 'polite');
+        container.setAttribute('aria-atomic', 'true');
+        Object.assign(container.style, {
+          position: 'fixed', bottom: '24px', left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: '99999', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', gap: '8px', pointerEvents: 'none'
+        });
+        document.body.appendChild(container);
+      }
+      const toast = document.createElement('div');
+      const colors = { success: 'var(--success)', error: 'var(--error)', info: 'var(--yellow)' };
+      Object.assign(toast.style, {
+        background: 'var(--panel)',
+        border: `1px solid ${colors[type] || colors.info}`,
+        color: 'var(--white)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '12px 20px',
+        fontFamily: 'var(--font)',
+        fontSize: '.88rem',
+        fontWeight: '700',
+        boxShadow: '0 8px 32px rgba(0,0,0,.45)',
+        pointerEvents: 'auto',
+        opacity: '0',
+        transform: 'translateY(12px)',
+        transition: 'opacity .25s ease, transform .25s ease',
+        maxWidth: '340px',
+        textAlign: 'center',
+        lineHeight: '1.5'
+      });
+      toast.textContent = msg;
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(12px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    };
+
+    /* ── doCancel helper ── */
+    const doCancel = async (id, triggerBtn) => {
+      if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = 'جاري الإلغاء...'; }
+      try {
+        const res  = await csrfFetch('api/customer-bookings.php', {
+          method: 'PATCH', body: JSON.stringify({ id: Number(id), action: 'cancel' })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          showToast(data.message || 'حدث خطأ أثناء الإلغاء', 'error');
+          return;
+        }
+        showToast('تم إلغاء الحجز بنجاح ✓', 'success');
+        await loadBookings();
+      } catch {
+        showToast('خطأ في الاتصال — حاول مرة ثانية', 'error');
+      } finally {
+        if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.textContent = 'إلغاء الحجز'; }
+      }
+    };
+
     /* ── All booking interactions (delegated) ── */
     document.getElementById('bookingsList').addEventListener('click', async (e) => {
 
-      /* Cancel booking */
+      /* Cancel booking — opens custom modal */
       const cancelBookingBtn = e.target.closest('[data-cancel-booking]');
       if (cancelBookingBtn) {
         const id = cancelBookingBtn.dataset.cancelBooking;
-        if (!confirm('هل أنت متأكد من إلغاء الحجز؟')) return;
-        cancelBookingBtn.disabled = true; cancelBookingBtn.textContent = 'جاري الإلغاء...';
-        try {
-          const res  = await csrfFetch('api/customer-bookings.php', {
-            method: 'PATCH', body: JSON.stringify({ id: Number(id), action: 'cancel' })
-          });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok || !data.ok) { alert(data.message || 'حدث خطأ'); return; }
-          await loadBookings();
-        } catch { alert('خطأ في الاتصال'); }
-        finally { cancelBookingBtn.disabled = false; cancelBookingBtn.textContent = 'إلغاء الحجز'; }
+        const modal = document.getElementById('cancelModal');
+        modal.style.display = 'grid';
+        document.getElementById('cancelModalClose').onclick = () => { modal.style.display = 'none'; };
+        document.getElementById('cancelModalConfirm').onclick = () => {
+          modal.style.display = 'none';
+          doCancel(id, cancelBookingBtn);
+        };
+        /* Close on backdrop click */
+        modal.onclick = (ev) => { if (ev.target === modal) modal.style.display = 'none'; };
         return;
       }
 
@@ -801,6 +869,19 @@
 
     document.addEventListener('DOMContentLoaded', checkSession);
   </script>
+  <!-- Cancel booking modal -->
+  <div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;place-items:center;backdrop-filter:blur(4px)" role="dialog" aria-modal="true" aria-labelledby="cancelModalTitle">
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-xl);padding:32px;max-width:380px;width:calc(100% - 32px);text-align:center">
+      <div style="font-size:2rem;margin-bottom:16px">⚠️</div>
+      <h3 id="cancelModalTitle" style="font-size:1.1rem;font-weight:900;margin-bottom:8px;color:var(--white)">إلغاء الحجز</h3>
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:24px;line-height:1.7">هل أنت متأكد من إلغاء هذا الحجز؟ هذا الإجراء لا يمكن التراجع عنه.</p>
+      <div style="display:flex;gap:12px">
+        <button id="cancelModalConfirm" class="btn btn-primary" style="flex:1;min-height:46px;background:var(--error);border-color:var(--error)">نعم، إلغاء الحجز</button>
+        <button id="cancelModalClose" class="btn btn-ghost" style="flex:1;min-height:46px">رجوع</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* Page transitions */
     document.addEventListener('click', (e) => {

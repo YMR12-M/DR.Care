@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd21f">
+  <meta name="description" content="الأسئلة الشائعة حول خدمات DR.Care — مغسلة عربيات مصرية في قليوب">
+  <title>DR.Care | الأسئلة الشائعة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── FAQ hero ── */
+    .faq-hero {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .faq-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 70%, rgba(255,210,31,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .faq-hero__kicker {
+      font-family: var(--font-en); font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow);
+      display: block; margin-bottom: 14px;
+    }
+    .faq-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900; letter-spacing: -0.02em;
+      color: var(--white); margin: 0 0 16px;
+    }
+    .faq-hero p {
+      font-size: 0.95rem; color: var(--muted);
+      max-width: 500px; margin: 0 auto; line-height: 1.8;
+    }
+
+    /* ── FAQ section ── */
+    .faq-section { padding: 64px 0 96px; }
+    .faq-inner { max-width: 740px; margin: 0 auto; }
+
+    /* ── Accordion ── */
+    .faq-list { display: flex; flex-direction: column; gap: 10px; margin-top: 0; }
+
+    .faq-item {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .faq-item.open {
+      border-color: var(--yellow-line);
+      box-shadow: var(--shadow-gold);
+    }
+
+    .faq-question {
+      width: 100%; text-align: start;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 20px 22px;
+      background: transparent; border: none; cursor: pointer;
+      font-family: var(--font); font-size: 1rem; font-weight: 800;
+      color: var(--white);
+      transition: color var(--transition), background var(--transition);
+    }
+    .faq-question:hover { background: var(--panel-2); }
+    .faq-item.open .faq-question { color: var(--yellow); }
+
+    .faq-icon {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      display: grid; place-items: center;
+      transition: background var(--transition), border-color var(--transition), transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .faq-item.open .faq-icon {
+      background: var(--yellow-soft);
+      border-color: var(--yellow-line);
+      transform: rotate(180deg);
+    }
+    .faq-icon svg { display: block; }
+    .faq-item.open .faq-icon svg { stroke: var(--yellow); }
+
+    .faq-answer {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1), padding 0.3s ease;
+      padding: 0 22px;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-bottom: 20px;
+    }
+    .faq-answer p {
+      font-size: 0.9rem; color: var(--muted); line-height: 1.9; margin: 0;
+      padding-top: 4px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+    .faq-answer p strong { color: var(--yellow); font-weight: 800; }
+
+    /* ── Category label ── */
+    .faq-category {
+      font-family: var(--font-en); font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted-2); margin: 32px 0 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .faq-category::after {
+      content: '';
+      flex: 1; height: 1px; background: var(--line);
+    }
+    .faq-category:first-child { margin-top: 0; }
+
+    /* ── CTA bottom ── */
+    .faq-cta {
+      margin-top: 56px; text-align: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 40px 32px;
+    }
+    .faq-cta h3 {
+      font-size: 1.2rem; font-weight: 900;
+      color: var(--white); margin: 0 0 10px;
+    }
+    .faq-cta p {
+      font-size: 0.88rem; color: var(--muted); margin: 0 0 24px; line-height: 1.8;
+    }
+    .faq-cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 600px) {
+      .faq-question { font-size: 0.92rem; padding: 16px 18px; }
+      .faq-answer { padding: 0 18px; }
+      .faq-item.open .faq-answer { padding-bottom: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <div class="header-start">
+        <a class="brand" href="index.html" aria-label="DR.Care الرئيسية">
+          <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
+          <span class="brand-text">
+            <strong>DR.Care</strong>
+            <small>مغسلة عربيات مصرية</small>
+          </span>
+        </a>
+      </div>
+      <nav class="main-nav" aria-label="روابط الموقع">
+        <a href="index.html">الرئيسية</a>
+        <a href="index.html#services">الخدمات</a>
+        <a href="index.html#packages">الباقات</a>
+        <a href="gallery.html">المعرض</a>
+        <a class="nav-cta" href="index.html#booking">احجز الآن</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <div class="faq-hero">
+      <div class="container">
+        <span class="faq-hero__kicker">FAQ · Frequently Asked Questions</span>
+        <h1>الأسئلة الشائعة</h1>
+        <p>كل حاجة عايز تعرفها عن خدماتنا وطريقة الحجز والأسعار</p>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" aria-labelledby="faqTitle">
+      <div class="container">
+        <div class="faq-inner">
+          <h2 id="faqTitle" class="sr-only">الأسئلة الشائعة</h2>
+
+          <p class="faq-category">الأسعار والخدمات</p>
+          <div class="faq-list reveal">
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>كام سعر الغسيل الداخلي والخارجي؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p><strong>150 جنيه للسيدان</strong>، وبتزيد حسب حجم السيارة — SUV بيجي بسعر مختلف. السعر شامل الغسيل الخارجي والتنظيف الداخلي والتنشيف.</p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>بياخد قد ايه الغسيل الخارجي؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>الغسيل الخارجي بياخد <strong>من 20 إلى 30 دقيقة</strong> حسب حجم العربية ومستوى الاتساخ.</p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>بياخد قد ايه Full Care؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>خدمة Full Care (داخلي وخارجي كامل) بتاخد <strong>من 45 دقيقة لساعة</strong> حسب حالة العربية ودرجة الاتساخ.</p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>ايه طرق الدفع المتاحة؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>بنقبل <strong>كاش</strong> أو <strong>Instapay</strong>. لو اخترت Instapay عند الحجز، لازم ترفع صورة إيصال التحويل لتأكيد الحجز.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="faq-category">الحجز والمتابعة</p>
+          <div class="faq-list reveal" style="transition-delay:.08s">
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>ازاي أتابع حالة حجزي؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>من خلال صفحة <strong>"حجوزاتي"</strong> بعد تسجيل الدخول — هتلاقي حالة الطلب بتتحدث في الوقت الفعلي.</p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>ممكن ألغي الحجز؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p><strong>أيوه</strong>، ممكن إلغاء أي حجز قبل ما يبدأ التنفيذ — من خلال صفحة حجوزاتي بضغطة واحدة.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="faq-category">الفرع والمواعيد</p>
+          <div class="faq-list reveal" style="transition-delay:.16s">
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>فين الفرع؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>فرعنا في <strong>قليوب، شارع العروبة</strong>. ممكن تفتح الخريطة من صفحة الرئيسية أو تتصل على 0103 795 7593.</p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>امتى بيكون الفرع مفتوح؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>الفرع مفتوح <strong>يومياً من 12 ظهراً لـ 10 مساءً</strong>. أما الحجز أونلاين فمتاح 24/7.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="faq-category">التطبيق والخدمات</p>
+          <div class="faq-list reveal" style="transition-delay:.24s">
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>هل في تطبيق؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p>في <strong>PWA (تطبيق ويب تقدمي)</strong> — يمكن تثبيته من متصفح الموبايل مباشرة بدون الحاجة لـ App Store. بيشتغل زي التطبيق العادي تماماً.</p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>هل غسيل المحرك آمن؟</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </button>
+              <div class="faq-answer" role="region">
+                <p><strong>آيوه تماماً</strong>، بنستخدم طريقة تنظيف آمنة مخصصة لحجرة المحرك — بتحمي الكابلات والأجزاء الإلكترونية وبنضمنلك سلامة المحرك بعد الغسيل.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CTA block -->
+          <div class="faq-cta reveal" style="transition-delay:.32s">
+            <h3>لسه عندك سؤال؟</h3>
+            <p>تواصل معنا مباشرة على واتساب أو احجز دلوقتي وفريقنا هيساعدك</p>
+            <div class="faq-cta-actions">
+              <a class="btn btn-primary" href="index.html#booking">احجز الآن</a>
+              <a class="btn btn-ghost" href="https://wa.me/201037957593" target="_blank" rel="noopener">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                واتساب
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>© 2026 DR.Care — جميع الحقوق محفوظة</p>
+        <div class="footer-links">
+          <a href="index.html">الرئيسية</a>
+          <a href="gallery.html">المعرض</a>
+          <a href="index.html#booking">احجز الآن</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* IntersectionObserver for .reveal */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* Accordion */
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        // Close all others
+        document.querySelectorAll('.faq-item.open').forEach(el => {
+          el.classList.remove('open');
+          el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+        // Toggle current
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
+    /* Header scroll */
+    window.addEventListener('scroll', () => {
+      document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 16);
+    }, { passive: true });
+
+    /* Page transition */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+      try { const d = new URL(href, location.href); if (d.origin !== location.origin) return; } catch { return; }
+      e.preventDefault();
+      document.body.classList.add('page-exit');
+      setTimeout(() => { window.location.href = href; }, 220);
+    }, true);
+  </script>
+</body>
+</html>
