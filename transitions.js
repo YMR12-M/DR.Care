@@ -128,29 +128,63 @@
       'position:fixed', 'inset:0', 'z-index:99997',
       'pointer-events:none',
       'display:flex', 'align-items:center', 'justify-content:center',
-      'background:rgba(10,8,0,.65)',
-      'backdrop-filter:blur(8px)', '-webkit-backdrop-filter:blur(8px)',
-      'opacity:0', 'transition:opacity .18s ease',
+      'background:rgba(10,8,0,.78)',
+      'backdrop-filter:blur(14px)', '-webkit-backdrop-filter:blur(14px)',
+      'opacity:0', 'transition:opacity .22s ease',
     ].join(';');
 
     const card = document.createElement('div');
     card.style.cssText = [
-      'background:rgba(22,20,16,.97)',
-      'border:1px solid rgba(255,210,31,.2)',
-      'border-radius:22px',
-      'padding:34px 40px',
+      'background:rgba(18,16,10,.98)',
+      'border:1px solid rgba(255,210,31,.18)',
+      'border-radius:26px',
+      'padding:28px 28px 24px',
       'text-align:center',
-      'max-width:280px', 'width:calc(100% - 48px)',
-      'box-shadow:0 28px 70px rgba(0,0,0,.75)',
-      'transform:translateY(24px) scale(.94)',
+      'max-width:300px', 'width:calc(100% - 40px)',
+      'box-shadow:0 32px 80px rgba(0,0,0,.85),0 0 0 1px rgba(255,210,31,.06)',
+      'transform:translateY(28px) scale(.94)',
       'opacity:0',
-      'transition:transform .32s cubic-bezier(.22,1,.36,1) .08s, opacity .26s ease .08s',
+      'transition:transform .38s cubic-bezier(.22,1,.36,1) .06s,opacity .28s ease .06s',
     ].join(';');
 
     card.innerHTML = `
-      <span style="font-size:2.8rem;display:block;margin-bottom:14px;line-height:1">${tip.icon}</span>
-      <span style="display:block;font-size:.62rem;font-weight:900;letter-spacing:.14em;color:#ffd21f;margin-bottom:10px;font-family:Montserrat,Arial,sans-serif">DR.CARE</span>
-      <p style="color:rgba(245,240,232,.92);font-size:.86rem;line-height:1.7;font-weight:600;margin:0">${tip.text}</p>
+      <!-- Brand badge -->
+      <div style="margin-bottom:20px">
+        <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,210,31,.1);border:1px solid rgba(255,210,31,.22);border-radius:30px;padding:5px 14px;font-size:.6rem;font-weight:900;letter-spacing:.14em;color:#ffd21f;font-family:Montserrat,Arial,sans-serif">
+          🚗 DR.CARE
+        </span>
+      </div>
+
+      <!-- Animated car wash scene -->
+      <div style="position:relative;height:64px;margin-bottom:20px;overflow:hidden">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px">
+          <div style="display:flex;gap:10px;margin-bottom:5px">
+            <span style="font-size:.95rem;animation:drDrop 1s ease-in-out infinite 0s">💧</span>
+            <span style="font-size:.75rem;animation:drDrop 1s ease-in-out infinite .25s">💧</span>
+            <span style="font-size:.85rem;animation:drDrop 1s ease-in-out infinite .5s">💧</span>
+            <span style="font-size:.7rem;animation:drDrop 1s ease-in-out infinite .75s">💧</span>
+          </div>
+          <span style="font-size:2.6rem;line-height:1;display:block;animation:drCarBob .9s ease-in-out infinite">🚗</span>
+        </div>
+      </div>
+
+      <!-- Inner progress bar -->
+      <div style="background:rgba(255,255,255,.07);border-radius:4px;height:4px;margin-bottom:22px;overflow:hidden">
+        <div id="drInnerBar" style="height:100%;width:0%;background:linear-gradient(90deg,#c9a200,#ffd21f,#ffe566,#ffd21f);background-size:200% 100%;animation:drBarShimmer 1.4s linear infinite;border-radius:4px;transition:width 4.5s cubic-bezier(.04,.9,.12,1)"></div>
+      </div>
+
+      <!-- Tip -->
+      <div style="margin-bottom:20px;padding:14px 10px;background:rgba(255,210,31,.04);border-radius:14px;border:1px solid rgba(255,210,31,.1)">
+        <span style="font-size:2rem;display:block;margin-bottom:8px;line-height:1">${tip.icon}</span>
+        <p style="font-size:.62rem;font-weight:900;letter-spacing:.1em;color:rgba(255,210,31,.7);margin:0 0 6px;font-family:Montserrat,Arial,sans-serif">تلميح · DR.CARE</p>
+        <p style="color:rgba(245,240,232,.88);font-size:.8rem;line-height:1.7;font-weight:600;margin:0">${tip.text}</p>
+      </div>
+
+      <!-- Loading text + countdown -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+        <span id="drLoadDots" style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:rgba(255,210,31,.45);font-family:Montserrat,Arial,sans-serif">جاري التحميل</span>
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(255,210,31,.1);border:1px solid rgba(255,210,31,.2);font-size:.78rem;font-weight:900;color:#ffd21f;font-family:Montserrat,Arial,sans-serif" id="drCountdown">5</span>
+      </div>
     `;
 
     overlay.appendChild(card);
@@ -162,8 +196,40 @@
       requestAnimationFrame(() => {
         card.style.transform = 'translateY(0) scale(1)';
         card.style.opacity   = '1';
+
+        /* Start inner bar fill */
+        setTimeout(() => {
+          const bar = document.getElementById('drInnerBar');
+          if (bar) bar.style.width = '96%';
+        }, 60);
+
+        /* Animated dots */
+        let d = 0;
+        const dotsEl = document.getElementById('drLoadDots');
+        const dotsForms = ['جاري التحميل', 'جاري التحميل .', 'جاري التحميل ..', 'جاري التحميل ...'];
+        setInterval(() => { if (dotsEl) dotsEl.textContent = dotsForms[d++ % 4]; }, 500);
+
+        /* Countdown 5 → 1 */
+        let count = 5;
+        const countEl = document.getElementById('drCountdown');
+        const tick = setInterval(() => {
+          count--;
+          if (countEl) countEl.textContent = count > 0 ? count : '✓';
+          if (count <= 0) clearInterval(tick);
+        }, 1000);
       });
     });
+
+    /* Drop + car bob keyframes */
+    if (!document.getElementById('drDropKF')) {
+      const st = document.createElement('style');
+      st.id = 'drDropKF';
+      st.textContent = [
+        '@keyframes drDrop{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-7px)}}',
+        '@keyframes drCarBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}',
+      ].join('');
+      document.head.appendChild(st);
+    }
   }
 
   /* ── Click handler ─────────────────────────────── */
