@@ -104,15 +104,21 @@
       </div>
       <div class="m-hero-shine" aria-hidden="true"></div>
       <div class="m-hero__content">
-        <p class="m-eyebrow">Car Wash · Detailing · Egyptian Care</p>
-        <h1 id="heroTitle" class="m-hero__title">DR<span class="m-hero__dot">.</span>Care</h1>
-        <p class="m-hero__lead">تجربة عناية بعربيتك معمولة للسوق المصري — حجز أونلاين، أسعار واضحة، ومتابعة لحظية.</p>
+        <div class="m-hero__eyebadge" aria-hidden="true">
+          <span>🚗</span> مغسلة عربيات مصرية
+        </div>
+        <h1 id="heroTitle" class="m-hero__headline">
+          عربيتك<br>
+          <em class="m-hero__headline-em">تستاهل الأحسن</em>
+        </h1>
+        <p class="m-eyebrow" style="margin-bottom:18px">DR.Care — Car Wash &amp; Detailing · قليوب</p>
+        <p class="m-hero__lead">غسيل احترافي في ٢٥ دقيقة، بأسعار ثابتة ومتابعة لحظية للطلب.</p>
         <div class="m-hero__actions">
-          <a class="m-btn m-btn--primary m-btn--lg" href="#booking">
+          <a class="m-btn m-btn--primary m-btn--xl" href="#booking">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-            احجز غسلة
+            احجز الآن
           </a>
-          <a class="m-btn m-btn--ghost m-btn--lg" href="#packages">الباقات</a>
+          <a class="m-btn m-btn--ghost m-btn--lg" href="#mPriceCalc">💰 الأسعار</a>
         </div>
         <!-- Next appointment widget — shown when logged in with upcoming booking -->
         <div class="m-next-appt-widget" id="mNextApptWidget" style="display:none" aria-label="حجزك القادم">
@@ -125,123 +131,92 @@
           <a class="m-btn m-btn--ghost m-btn--sm" id="mNextApptLink" href="mobile-bookings.html">تتبع</a>
         </div>
 
-        <div class="m-trust-items">
-          <div class="m-trust-item">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            أسعار ثابتة بدون مفاجآت
-          </div>
-          <div class="m-trust-item">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            متابعة الطلب لحظياً
-          </div>
-          <div class="m-trust-item">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            حجز أونلاين 24/7
-          </div>
+        <div class="m-hero__trust">
+          <span class="m-trust-pill">✓ بدون مفاجآت</span>
+          <span class="m-trust-pill">✓ متابعة لحظية</span>
+          <span class="m-trust-pill">✓ حجز ٢٤/٧</span>
         </div>
       </div>
       <div class="m-hero__stats" aria-label="أرقام تشغيلية">
         <div class="m-stat">
           <strong data-counter="25">25</strong>
-          <span>دقيقة للغسلة السريعة</span>
+          <span>دقيقة غسلة سريعة</span>
         </div>
         <div class="m-stat">
           <strong data-counter="4.9" data-decimal="1">4.9</strong>
-          <span>تقييم العملاء</span>
+          <span>⭐ تقييم العملاء</span>
         </div>
         <div class="m-stat">
           <strong>24/7</strong>
           <span>حجز أونلاين</span>
         </div>
       </div>
-      <div class="m-hero__footer">متاح في قليوب — شارع العروبة</div>
+      <div class="m-hero__footer">
+        <span>📍 قليوب — شارع العروبة</span>
+        <span class="m-hero__footer-sep">·</span>
+        <a href="tel:01037957593" class="m-hero__footer-call">📞 اتصل الآن</a>
+      </div>
     </section>
 
-    <!-- ══ INFO STRIP ══ -->
-    <div class="m-strip" aria-label="معلومات الفروع">
-      <div class="m-strip__item">
-        <span class="m-strip__icon" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </span>
-        <div>
-          <strong>فرع قليوب</strong>
-          <small>شارع العروبة</small>
-        </div>
-      </div>
-      <div class="m-strip__item">
-        <span class="m-strip__icon" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </span>
-        <div>
-          <strong>يومياً 12م – 10م</strong>
-          <small>استقبال الطلبات 24/7 أونلاين</small>
-        </div>
-      </div>
-      <div class="m-strip__item">
-        <span class="m-strip__icon" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        </span>
-        <div>
-          <strong>0103 795 7593</strong>
-          <small><a href="tel:01037957593">اتصل الآن</a></small>
-        </div>
-      </div>
+    <!-- ══ QUICK ACCESS BAR ══ -->
+    <div class="m-quick-bar" aria-label="وصول سريع">
+      <a class="m-quick-bar__item" href="https://maps.google.com/?q=شارع+العروبة+قسم+قليوب+محافظة+القليوبية+مصر" target="_blank" rel="noopener">
+        <span class="m-quick-bar__icon" aria-hidden="true">📍</span>
+        <strong>قليوب</strong>
+        <small>شارع العروبة</small>
+      </a>
+      <div class="m-quick-bar__sep" aria-hidden="true"></div>
+      <a class="m-quick-bar__item" href="#booking">
+        <span class="m-quick-bar__icon" aria-hidden="true">⏰</span>
+        <strong>١٢م – ١٠م</strong>
+        <small>يومياً</small>
+      </a>
+      <div class="m-quick-bar__sep" aria-hidden="true"></div>
+      <a class="m-quick-bar__item m-quick-bar__item--cta" href="tel:01037957593">
+        <span class="m-quick-bar__icon" aria-hidden="true">📞</span>
+        <strong>اتصل الآن</strong>
+        <small>01037957593</small>
+      </a>
     </div>
 
     <!-- ══ SERVICES ══ -->
     <section class="m-section" id="services" aria-labelledby="servicesTitle">
       <div class="m-section__head reveal">
         <p class="m-kicker">Our Services</p>
-        <h2 id="servicesTitle">من غسلة يومية لتفاصيل كاملة</h2>
-        <p class="m-section__sub">الخدمة متقسمة بطريقة سهلة للعميل وسهلة للتشغيل، عشان كل عربية تاخد وقتها الصح.</p>
+        <h2 id="servicesTitle">خدماتنا باختصار</h2>
+        <p class="m-section__sub">كل عربية بتاخد وقتها الصح ومعاملتها الصح — بدون تنازل في الجودة.</p>
       </div>
       <div class="m-services">
         <article class="m-service-card reveal" style="transition-delay:.05s">
-          <div class="m-service-card__icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-              <path d="M8 12s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>
-            </svg>
-          </div>
-          <div>
-            <h3>غسيل فوم خارجي</h3>
-            <p>فوم نشط، ضغط مياه محسوب، وتنشيف مايكروفايبر يحافظ على الدهان من أي خدش.</p>
+          <div class="m-service-card__icon" aria-hidden="true">💧</div>
+          <div class="m-service-card__body">
+            <h3>غسيل خارجي</h3>
+            <p>فوم + ضغط مياه + تنشيف مايكروفايبر</p>
+            <span class="m-service-card__price">من ١٠٠ ج</span>
           </div>
         </article>
         <article class="m-service-card reveal" style="transition-delay:.10s">
-          <div class="m-service-card__icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <rect x="3" y="3" width="18" height="18" rx="3"/>
-              <path d="M3 9h18M9 21V9"/><circle cx="15" cy="15" r="2"/>
-            </svg>
-          </div>
-          <div>
-            <h3>تنظيف داخلي وتعقيم</h3>
-            <p>شفط، تابلوه، فرش، أرضيات، وتعقيم للنقط المستخدمة يومياً بأعلى معايير النظافة.</p>
+          <div class="m-service-card__icon" aria-hidden="true">✨</div>
+          <div class="m-service-card__body">
+            <h3>تنظيف داخلي</h3>
+            <p>شفط + تابلوه + فرش + تعقيم</p>
+            <span class="m-service-card__price">شامل Inside &amp; Out</span>
           </div>
         </article>
         <article class="m-service-card reveal" style="transition-delay:.15s">
-          <div class="m-service-card__icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M12 3l1.9 5.87L20 9l-4.73 4.6 1.17 6.4L12 17.27 7.56 20 8.73 13.6 4 9l6.1-.13z"/>
-            </svg>
-          </div>
-          <div>
-            <h3>واكس وتلميع حماية</h3>
-            <p>لمعة عميقة وحماية احترافية من التراب، الشمس، ومياه الطرق المصرية.</p>
+          <div class="m-service-card__icon" aria-hidden="true">🏆</div>
+          <div class="m-service-card__body">
+            <h3>Deep Cleaning</h3>
+            <p>تنظيف عميق شامل داخلي وخارجي</p>
+            <span class="m-service-card__price">من ٢٥٠ ج</span>
           </div>
         </article>
         <article class="m-service-card reveal" style="transition-delay:.20s">
-          <div class="m-service-card__icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>
-              <line x1="12" y1="3" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21"/>
-              <line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/>
-            </svg>
-          </div>
-          <div>
+          <div class="m-service-card__icon" aria-hidden="true">⚙️</div>
+          <div class="m-service-card__body">
             <h3>جنوط وكاوتش</h3>
-            <p>تنظيف مخصص للجنوط وتلميع كاوتش بتشطيب واضح ولافت من أول نظرة.</p>
+            <p>تنظيف وتلميع الجنوط والإطارات</p>
+            <span class="m-service-card__price">من ١٠٠ ج</span>
           </div>
         </article>
       </div>

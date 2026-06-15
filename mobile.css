@@ -2989,3 +2989,214 @@ body.page-exit { pointer-events:none !important; animation: page-out .28s cubic-
   font-family: monospace;
 }
 
+/* ══ v9.0 Professional UX Redesign ══════════════════ */
+
+/* ── Hero — new elements ── */
+.m-hero {
+  padding-top: 62px;
+}
+.m-hero__content {
+  padding: 32px 24px 28px;
+}
+.m-hero__eyebadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,210,31,.1);
+  border: 1px solid rgba(255,210,31,.24);
+  border-radius: 30px;
+  padding: 5px 14px;
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--yellow);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.m-hero__headline {
+  font-size: clamp(2.5rem, 12.5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  margin-bottom: 10px;
+  color: var(--white, #f5f0e8);
+  font-style: normal;
+}
+.m-hero__headline-em {
+  display: block;
+  font-style: normal;
+  background: linear-gradient(135deg, #ffd21f 0%, #ffe566 55%, #ffb300 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.m-hero__lead {
+  font-size: .93rem;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 320px;
+  margin: 0 auto 26px;
+}
+.m-hero__actions { margin-bottom: 20px; }
+.m-hero__trust {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 18px;
+}
+.m-trust-pill {
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--line-2);
+  border-radius: 30px;
+  padding: 5px 12px;
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.m-hero__stats {
+  background: var(--panel);
+  border-top: 1px solid var(--line-2);
+}
+.m-stat { padding: 20px 12px; }
+.m-stat strong { font-size: 1.65rem; }
+.m-hero__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.m-hero__footer-sep { color: var(--line-2); }
+.m-hero__footer-call {
+  color: var(--yellow);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* ── Quick Access Bar (replaces info strip) ── */
+.m-quick-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--panel-2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+.m-quick-bar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 14px 10px;
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+  transition: background var(--transition);
+}
+.m-quick-bar__item:hover { background: var(--panel-3); }
+.m-quick-bar__item--cta strong { color: var(--yellow); }
+.m-quick-bar__icon { font-size: 1.2rem; line-height: 1; }
+.m-quick-bar__item strong {
+  display: block;
+  font-size: .78rem;
+  font-weight: 800;
+  color: var(--white, #f5f0e8);
+  line-height: 1.2;
+}
+.m-quick-bar__item small {
+  display: block;
+  font-size: .65rem;
+  color: var(--muted);
+  line-height: 1;
+}
+.m-quick-bar__sep {
+  width: 1px;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+/* ── Services → 2-column visual cards ── */
+.m-services {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.m-service-card {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 22px 14px 18px;
+  gap: 12px;
+  border-radius: var(--radius-lg);
+}
+.m-service-card__icon {
+  font-size: 2rem;
+  line-height: 1;
+  width: 52px;
+  height: 52px;
+  background: var(--yellow-soft);
+  border: 1px solid var(--yellow-line);
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+}
+.m-service-card__body { display: flex; flex-direction: column; gap: 4px; }
+.m-service-card h3 { font-size: .88rem; line-height: 1.3; margin: 0; }
+.m-service-card p  { font-size: .74rem; color: var(--muted); margin: 0; line-height: 1.5; }
+.m-service-card__price {
+  font-size: .72rem;
+  font-weight: 800;
+  color: var(--yellow);
+  font-family: 'Montserrat', sans-serif;
+  margin-top: 4px;
+}
+
+/* ── Section headers — bigger impact ── */
+.m-section__head h2 { font-size: clamp(1.75rem, 5.5vw, 2.2rem); }
+.m-kicker { margin-bottom: 6px; }
+
+/* ── Featured package — gold accent ── */
+.m-pkg-card--featured {
+  background: linear-gradient(160deg, rgba(255,210,31,.09) 0%, rgba(201,162,0,.04) 100%) !important;
+  border-color: rgba(255,210,31,.32) !important;
+  box-shadow: 0 2px 0 0 rgba(255,210,31,.5), 0 8px 32px rgba(255,210,31,.1) !important;
+}
+
+/* ── Process — cleaner timeline ── */
+.m-process { gap: 0; }
+.m-process-card {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: flex-start;
+}
+.m-process-card:last-child { border-bottom: none; }
+.m-process-card__num {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--yellow);
+  opacity: .35;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 50px;
+  text-align: center;
+  margin-top: 2px;
+}
+.m-process-card h3 { font-size: .95rem; }
+.m-process-card p  { font-size: .82rem; }
+
+/* ── Why Us — 2-column grid ── */
+.m-why-grid { grid-template-columns: repeat(2, 1fr) !important; }
+.m-why-card { padding: 18px 14px; }
+.m-why-card__icon { font-size: 1.6rem; margin-bottom: 8px; }
+.m-why-card h4 { font-size: .88rem; }
+.m-why-card p  { font-size: .76rem; }
+
+/* ── Section padding tightening ── */
+@media (max-width: 480px) {
+  .m-section { padding: 44px 18px; }
+}
+
+
