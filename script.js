@@ -1024,20 +1024,24 @@ document.getElementById('copyInstapayBtn')?.addEventListener('click', function (
   }).catch(() => {});
 });
 
-// ─── Page Transitions ─────────────────────────────
-document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href]');
-  if (!a) return;
-  const href = a.getAttribute('href');
-  if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
-  try {
-    const dest = new URL(href, location.href);
-    if (dest.origin !== location.origin) return;
-  } catch { return; }
-  e.preventDefault();
-  document.body.classList.add('page-exit');
-  setTimeout(() => { window.location.href = href; }, 220);
-}, true);
+// ─── Page Transitions ─── (delegated to transitions.js)
+// transitions.js sets window._drTransition = true when active.
+// This fallback only runs when transitions.js is not loaded.
+if (!window._drTransition) {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+    try {
+      const dest = new URL(href, location.href);
+      if (dest.origin !== location.origin) return;
+    } catch { return; }
+    e.preventDefault();
+    document.body.classList.add('page-exit');
+    setTimeout(() => { window.location.href = href; }, 280);
+  }, true);
+}
 
 // ─── Ripple Effect on Buttons ────────────────────
 document.addEventListener('click', (e) => {

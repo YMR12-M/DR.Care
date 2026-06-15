@@ -3818,16 +3818,35 @@ input.field-fail, select.field-fail { border-color: rgba(240,83,62,0.55) !import
 
 /* ── Page Transitions ───────────────────────────────── */
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  0%   { opacity: 0; transform: translateY(28px) scale(0.982); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes page-out {
-  to { opacity: 0; transform: translateY(-8px); }
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-20px) scale(0.975); }
 }
-body { animation: page-in 0.32s var(--transition) both; }
+body {
+  animation: page-in 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 body.page-exit {
+  pointer-events: none !important;
+  animation: page-out 0.28s cubic-bezier(0.55, 0, 1, 0.45) forwards !important;
+}
+
+/* ── Navigation Loading Bar ─────────────────────────── */
+#drLoadBar {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--yellow-2, #c9a200), var(--yellow, #ffd21f) 60%, #ffe566);
+  box-shadow: 0 0 12px rgba(255, 210, 31, 0.7), 0 0 4px rgba(255, 210, 31, 0.5);
+  z-index: 999999;
   pointer-events: none;
-  animation: page-out 0.22s ease forwards !important;
+  border-radius: 0 2px 2px 0;
+  will-change: width, opacity;
 }
 
 /* ── Ripple Effect ──────────────────────────────────── */

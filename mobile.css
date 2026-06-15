@@ -2434,10 +2434,10 @@ section[id] {
 /* ══ Mobile UX v5.0 additions ═══════════════════════ */
 
 /* Page transition */
-body { animation: page-in .3s ease both; }
-body.page-exit { pointer-events:none; animation: page-out .22s ease forwards !important; }
-@keyframes page-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
-@keyframes page-out { to { opacity:0; transform:translateY(-6px); } }
+body { animation: page-in .52s cubic-bezier(0.22, 1, 0.36, 1) both; }
+body.page-exit { pointer-events:none !important; animation: page-out .28s cubic-bezier(0.55, 0, 1, 0.45) forwards !important; }
+@keyframes page-in { 0% { opacity:0; transform:translateY(28px) scale(0.982); } 60% { opacity:1; } 100% { opacity:1; transform:none; } }
+@keyframes page-out { 0% { opacity:1; transform:none; } 100% { opacity:0; transform:translateY(-20px) scale(0.975); } }
 
 /* Ripple */
 @keyframes ripple-expand { to { transform:scale(1); opacity:0; } }

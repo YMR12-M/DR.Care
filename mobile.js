@@ -927,22 +927,22 @@ function showToast(msg, type = 'info', duration = 3500) {
 }
 window.showToast = showToast;
 
-// ── Page Transitions ──────────────────────────────────
-document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href]');
-  if (!a) return;
-  const href = a.getAttribute('href');
-  if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
-  try {
-    const dest = new URL(href, location.href);
-    if (dest.origin !== location.origin) return;
-  } catch { return; }
-  e.preventDefault();
-  document.body.style.opacity = '0';
-  document.body.style.transform = 'translateY(-8px)';
-  document.body.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-  setTimeout(() => { window.location.href = href; }, 220);
-}, true);
+// ── Page Transitions ─── (delegated to transitions.js)
+if (!window._drTransition) {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+    try {
+      const dest = new URL(href, location.href);
+      if (dest.origin !== location.origin) return;
+    } catch { return; }
+    e.preventDefault();
+    document.body.classList.add('page-exit');
+    setTimeout(() => { window.location.href = href; }, 280);
+  }, true);
+}
 
 // ── Ripple Effect ─────────────────────────────────────
 document.addEventListener('click', (e) => {
