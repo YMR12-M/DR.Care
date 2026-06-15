@@ -586,7 +586,7 @@ const loadReviews = async () => {
         <button class="m-btn m-btn--ghost m-btn--sm" onclick="loadReviews()">إعادة المحاولة</button>
       </div>`;
   }
-;
+};
 window.loadReviews = loadReviews;
 
 /* ── Scroll reveal ── */
