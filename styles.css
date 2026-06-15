@@ -3811,3 +3811,259 @@ input.field-fail, select.field-fail { border-color: rgba(240,83,62,0.55) !import
   .hero-actions { flex-direction: column; }
   .hero-actions .btn { width: 100%; }
 }
+
+/* ══════════════════════════════════════════════════════
+   UX/UI v5.0 — Advanced Polish Layer
+   ══════════════════════════════════════════════════════ */
+
+/* ── Page Transitions ───────────────────────────────── */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes page-out {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+body { animation: page-in 0.32s var(--transition) both; }
+body.page-exit {
+  pointer-events: none;
+  animation: page-out 0.22s ease forwards !important;
+}
+
+/* ── Ripple Effect ──────────────────────────────────── */
+.btn, .auth-btn, .nav-cta, .cp-tab, .tab-btn {
+  position: relative;
+  overflow: hidden;
+}
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-expand 0.55s linear;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+  z-index: 0;
+}
+.btn > *,
+.auth-btn > *,
+.nav-cta > * { position: relative; z-index: 1; }
+@keyframes ripple-expand {
+  to { transform: scale(1); opacity: 0; }
+}
+
+/* ── Responsive Typography with clamp() ────────────── */
+.hero-title      { font-size: clamp(2.2rem, 5vw, 4.4rem) !important; }
+.section-title   { font-size: clamp(1.5rem, 3vw, 2.2rem) !important; }
+.hero-sub        { font-size: clamp(0.95rem, 2vw, 1.12rem); }
+.cp-user-info strong { font-size: clamp(1.1rem, 2.5vw, 1.5rem) !important; }
+
+/* ── Visual Time Slot Picker ────────────────────────── */
+.form-label-text {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+#timeSlotLabel {
+  display: none;
+}
+.time-slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.time-slot-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+  color: var(--muted);
+  font-family: var(--font-en);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition),
+              color var(--transition), box-shadow var(--transition),
+              transform var(--transition-bounce);
+  min-height: 40px;
+}
+.time-slot-btn:hover {
+  border-color: var(--yellow-line);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+.time-slot-btn.selected {
+  background: var(--yellow);
+  color: #0a0800;
+  border-color: var(--yellow);
+  box-shadow: 0 4px 18px rgba(255, 210, 31, 0.4);
+  transform: translateY(-2px);
+}
+.time-slot-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.time-slot-empty {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+  font-style: italic;
+  padding: 6px 0;
+}
+
+/* ── Real-time Validation ───────────────────────────── */
+.field-valid   { border-color: rgba(111,207,71,0.5) !important; }
+.field-invalid { border-color: rgba(240,83,62,0.5)  !important; }
+.field-hint {
+  font-size: 0.73rem;
+  font-weight: 600;
+  margin-top: 4px;
+  line-height: 1.4;
+  display: none;
+}
+.field-hint.show   { display: block; }
+.field-hint--ok    { color: var(--success); }
+.field-hint--error { color: var(--error); }
+
+/* ── Password toggle on .cp-field ──────────────────── */
+.cp-field--pass {
+  position: relative;
+}
+.cp-field--pass input {
+  padding-inline-end: 46px;
+}
+.cp-field--pass .pass-toggle {
+  position: absolute;
+  inset-inline-start: 12px;
+  bottom: 12px;
+}
+
+/* ── Booking Success page ───────────────────────────── */
+.success-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--ink);
+  text-align: center;
+}
+.success-icon-wrap {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: rgba(111,207,71,0.12);
+  border: 2px solid rgba(111,207,71,0.3);
+  display: grid; place-items: center;
+  margin: 0 auto 28px;
+  animation: success-pop 0.5s var(--transition-bounce) both;
+}
+@keyframes success-pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.success-checkmark {
+  width: 44px; height: 44px;
+  stroke: var(--success);
+  stroke-width: 2.5;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw-check 0.45s 0.3s ease forwards;
+}
+@keyframes draw-check {
+  to { stroke-dashoffset: 0; }
+}
+.success-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  padding: 36px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+}
+.success-card h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: var(--white);
+}
+.success-card > p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 28px;
+  line-height: 1.75;
+}
+.success-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.88rem;
+}
+.success-detail-row:last-of-type { border-bottom: none; }
+.success-detail-row label { color: var(--muted); font-weight: 600; }
+.success-detail-row span  { font-weight: 800; color: var(--white); }
+.success-detail-row .tag-gold {
+  background: var(--yellow-soft);
+  color: var(--yellow);
+  border: 1px solid var(--yellow-line);
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.success-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.success-actions .btn { flex: 1; min-width: 140px; }
+.success-confetti {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; z-index: 9999;
+}
+
+/* ── Smooth reveal animations on more elements ──────── */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.5s ease, transform 0.5s var(--transition-bounce);
+}
+.reveal-left.in,
+.reveal-right.in,
+.reveal-scale.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Mobile toast support ───────────────────────────── */
+.m-toast-container {
+  position: fixed;
+  bottom: 90px;
+  inset-inline-end: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* ── Form label helper ──────────────────────────────── */
+label[for] > .form-label-text { margin-bottom: 0; }

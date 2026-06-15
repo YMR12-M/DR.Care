@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd21f">
+  <title>DR.Care | تم الحجز بنجاح ✓</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="success-page">
+
+  <!-- Confetti canvas -->
+  <canvas class="success-confetti" id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <div class="success-card" style="animation: page-in 0.4s var(--transition) both">
+    <!-- Icon -->
+    <div class="success-icon-wrap" id="successIcon">
+      <svg class="success-checkmark" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="14,27 22,36 38,18" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Heading -->
+    <h1>تم الحجز بنجاح! 🎉</h1>
+    <p>شكراً لاختيارك DR.Care — سنتواصل معك قريباً لتأكيد الموعد.</p>
+
+    <!-- Details (populated from URL params) -->
+    <div id="detailsSection" style="border-top:1px solid var(--line);padding-top:20px;margin-top:4px">
+      <div class="success-detail-row" id="rowPackage" style="display:none">
+        <label>الباقة</label>
+        <span id="detailPackage">—</span>
+      </div>
+      <div class="success-detail-row" id="rowCar" style="display:none">
+        <label>نوع العربية</label>
+        <span id="detailCar">—</span>
+      </div>
+      <div class="success-detail-row" id="rowDate" style="display:none">
+        <label>الموعد</label>
+        <span id="detailDate">—</span>
+      </div>
+      <div class="success-detail-row" id="rowPayment" style="display:none">
+        <label>الدفع</label>
+        <span id="detailPayment">—</span>
+      </div>
+      <div class="success-detail-row" id="rowStatus">
+        <label>الحالة</label>
+        <span class="tag-gold">قيد المراجعة</span>
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div style="background:var(--yellow-soft);border:1px solid var(--yellow-line);border-radius:var(--radius-sm);padding:14px 18px;margin-top:20px;text-align:start">
+      <p style="font-size:0.82rem;color:var(--muted);line-height:1.8;margin:0">
+        <strong style="color:var(--yellow);display:block;margin-bottom:6px">الخطوات التالية:</strong>
+        ✓ هتوصلك رسالة واتساب من الفريق لتأكيد الموعد<br>
+        ✓ احضر العربية في الموعد المتفق عليه<br>
+        ✓ ادفع عند الاستلام (كاش أو Instapay)
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="success-actions">
+      <a href="customer-bookings.html" class="btn btn-primary">متابعة الحجوزات</a>
+      <a href="index.html" class="btn btn-ghost">العودة للرئيسية</a>
+    </div>
+  </div>
+
+  <script>
+    /* Populate details from URL params */
+    const p = new URLSearchParams(location.search);
+    const show = (id, rowId, val) => {
+      if (!val) return;
+      const el = document.getElementById(id);
+      const row = document.getElementById(rowId);
+      if (el) el.textContent = val;
+      if (row) row.style.display = '';
+    };
+    show('detailPackage', 'rowPackage',  p.get('pkg'));
+    show('detailCar',     'rowCar',      p.get('car'));
+    show('detailPayment', 'rowPayment',  p.get('pay'));
+
+    const appt = p.get('appt');
+    if (appt) {
+      try {
+        const d = new Date(appt);
+        show('detailDate', 'rowDate', d.toLocaleString('ar-EG', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        }));
+      } catch {}
+    }
+
+    /* Confetti */
+    (function () {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const COLORS = ['#ffd21f', '#f5c400', '#ffffff', '#6fcf47', '#5ba4f5'];
+      const pieces = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        r: Math.random() * 6 + 3,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        speed: Math.random() * 3 + 1.5,
+        spin: (Math.random() - 0.5) * 0.15,
+        angle: Math.random() * Math.PI * 2
+      }));
+
+      let frame = 0;
+      const MAX_FRAMES = 180;
+
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, 1 - frame / MAX_FRAMES);
+          ctx.beginPath();
+          ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          p.y     += p.speed;
+          p.angle += p.spin;
+        });
+        frame++;
+        if (frame < MAX_FRAMES) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      };
+
+      setTimeout(draw, 400);
+    })();
+
+    /* Page transition out support */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+      try {
+        const dest = new URL(href, location.href);
+        if (dest.origin !== location.origin) return;
+      } catch { return; }
+      e.preventDefault();
+      document.body.classList.add('page-exit');
+      setTimeout(() => { window.location.href = href; }, 220);
+    }, true);
+  </script>
+</body>
+</html>

@@ -30,6 +30,9 @@
 </head>
 <body>
 
+  <!-- Toast container -->
+  <div id="toastContainer" aria-live="polite" aria-atomic="true" class="m-toast-container"></div>
+
   <!-- Scroll Progress Bar -->
   <div id="scrollProgress" aria-hidden="true"></div>
 
@@ -514,12 +517,13 @@
                 <option value="">— اختار يوم —</option>
               </select>
             </label>
-            <label for="apptTime" id="apptTimeLabel" class="m-form__label" style="display:none">
-              وقت الموعد
-              <select id="apptTime" name="apptTime">
-                <option value="">— اختار وقت —</option>
-              </select>
-            </label>
+            <!-- Visual time slot picker -->
+            <div id="timeSlotLabel" style="display:none">
+              <span class="m-form__label" style="display:block;margin-bottom:8px">وقت الموعد</span>
+              <div id="timeSlotGrid" class="m-time-slot-grid" role="group" aria-label="اختار وقت الموعد"></div>
+              <input type="hidden" id="apptTime" name="apptTime">
+            </div>
+            <label for="apptTime" id="apptTimeLabel" class="m-form__label" style="display:none"></label>
             <div class="m-form__info-note" id="apptFallback">
               📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
             </div>

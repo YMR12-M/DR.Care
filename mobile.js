@@ -796,13 +796,32 @@ const _mPopulateDates = () => {
 };
 
 const _mPopulateTimes = (dateStr) => {
-  if (!_mApptTime) return;
-  _mApptTime.innerHTML = '<option value="">— اختار وقت —</option>';
-  (_mAvailableSlots[dateStr] || []).filter(s => s.available > 0).forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.time;
-    opt.textContent = _mFmtTime(s.time);
-    _mApptTime.appendChild(opt);
+  const grid      = document.getElementById('timeSlotGrid');
+  const hidden    = document.getElementById('apptTime');
+  const slotLabel = document.getElementById('timeSlotLabel');
+  if (!grid || !hidden) return;
+
+  if (slotLabel) slotLabel.style.display = '';
+  hidden.value = '';
+  grid.innerHTML = '';
+
+  const slots = (_mAvailableSlots[dateStr] || []).filter(s => s.available > 0);
+  if (!slots.length) {
+    grid.innerHTML = '<p style="font-size:.82rem;color:var(--m-muted);font-weight:600;padding:6px 0">لا يوجد مواعيد متاحة في هذا اليوم</p>';
+    return;
+  }
+  slots.forEach(s => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'm-time-slot-btn';
+    btn.dataset.time = s.time;
+    btn.textContent = _mFmtTime(s.time);
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.m-time-slot-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      hidden.value = s.time;
+    });
+    grid.appendChild(btn);
   });
 };
 
@@ -821,12 +840,15 @@ const loadAppointmentSlots = async () => {
     if (dateLabel) dateLabel.style.display = '';
     _mApptDate.addEventListener('change', () => {
       const d      = _mApptDate.value;
-      const tLabel = document.getElementById('apptTimeLabel');
+      const tLabel = document.getElementById('timeSlotLabel');
       if (d) {
         _mPopulateTimes(d);
         if (tLabel) tLabel.style.display = '';
       } else {
-        if (_mApptTime) _mApptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+        const grid   = document.getElementById('timeSlotGrid');
+        const hidden = document.getElementById('apptTime');
+        if (grid)   grid.innerHTML = '';
+        if (hidden) hidden.value = '';
         if (tLabel) tLabel.style.display = 'none';
       }
     });
@@ -850,6 +872,97 @@ if (mScrollBar) {
     mScrollBar.style.transform = `scaleX(${total > 0 ? Math.min(window.scrollY / total, 1) : 0})`;
   }, { passive: true });
 }
+
+// ── Toast Notification System ─────────────────────────
+function showToast(msg, type = 'info', duration = 3500) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const icons = { success: '✓', error: '✕', info: '★' };
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = `<span class="toast__icon">${icons[type] || icons.info}</span><span class="toast__msg">${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+  }, duration);
+}
+window.showToast = showToast;
+
+// ── Page Transitions ──────────────────────────────────
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+  try {
+    const dest = new URL(href, location.href);
+    if (dest.origin !== location.origin) return;
+  } catch { return; }
+  e.preventDefault();
+  document.body.style.opacity = '0';
+  document.body.style.transform = 'translateY(-8px)';
+  document.body.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+  setTimeout(() => { window.location.href = href; }, 220);
+}, true);
+
+// ── Ripple Effect ─────────────────────────────────────
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.m-btn, .m-book-btn, .m-pkg-select, .m-time-slot-btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 2;
+  const ripple = document.createElement('span');
+  ripple.style.cssText = `
+    position:absolute;border-radius:50%;transform:scale(0);
+    animation:ripple-expand .55s linear;
+    background:rgba(255,255,255,.15);pointer-events:none;z-index:0;
+    width:${size}px;height:${size}px;
+    left:${e.clientX - rect.left - size / 2}px;
+    top:${e.clientY - rect.top - size / 2}px;
+  `;
+  const prevPos = btn.style.position;
+  if (!prevPos || prevPos === 'static') btn.style.position = 'relative';
+  btn.style.overflow = 'hidden';
+  btn.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+});
+
+// ── Real-time Validation ──────────────────────────────
+(function () {
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+
+  const addHint = (input, msg, ok) => {
+    let hint = input.parentElement?.querySelector('.m-field-hint');
+    if (!hint) {
+      hint = document.createElement('span');
+      hint.className = 'm-field-hint';
+      hint.style.cssText = 'display:block;font-size:.73rem;font-weight:600;margin-top:4px;';
+      input.parentElement?.appendChild(hint);
+    }
+    hint.textContent = msg;
+    hint.style.color = ok ? 'var(--m-success, #6fcf47)' : 'var(--m-error, #f0533e)';
+    hint.style.display = 'block';
+  };
+  const clearHint = (input) => {
+    const hint = input.parentElement?.querySelector('.m-field-hint');
+    if (hint) hint.style.display = 'none';
+  };
+
+  emailInput?.addEventListener('blur', () => {
+    const v = emailInput.value.trim();
+    if (!v) { clearHint(emailInput); return; }
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    addHint(emailInput, ok ? '✓ بريد صحيح' : 'صيغة البريد غير صحيحة', ok);
+  });
+  phoneInput?.addEventListener('blur', () => {
+    const v = phoneInput.value.trim();
+    if (!v) { clearHint(phoneInput); return; }
+    const ok = /^01[0125][0-9]{8}$/.test(v);
+    addHint(phoneInput, ok ? '✓ رقم صحيح' : 'يجب أن يبدأ بـ 01 ويكون 11 رقم', ok);
+  });
+})();
 
 // ── Counter Animation (hero stats) ───────────────────
 const mCounterEls = document.querySelectorAll('[data-counter]');

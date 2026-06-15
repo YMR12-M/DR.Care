@@ -414,6 +414,7 @@
   </style>
 </head>
 <body class="cp-page">
+  <div id="profileToast" aria-live="polite" aria-atomic="true" style="position:fixed;bottom:24px;inset-inline-end:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
 
   <!-- HEADER -->
   <header class="site-header" id="siteHeader">
@@ -503,17 +504,17 @@
               <div class="cp-card-body">
                 <div class="cp-msg" id="personalMessage" role="alert" aria-live="polite"></div>
                 <div class="cp-field">
-                  <label for="fullName">Full Name</label>
+                  <label for="fullName">الاسم الكامل</label>
                   <input type="text" id="fullName" placeholder="أحمد محمد" autocorrect="off">
                   <div class="cp-field-error" id="nameError"></div>
                 </div>
                 <div class="cp-field">
-                  <label for="email">Email Address</label>
+                  <label for="email">البريد الإلكتروني</label>
                   <input type="email" id="email" readonly>
                   <div class="cp-field-note">لا يمكن تعديل البريد الإلكتروني</div>
                 </div>
                 <div class="cp-field">
-                  <label for="phone">Phone Number</label>
+                  <label for="phone">رقم الموبايل</label>
                   <input type="tel" id="phone" placeholder="01012345678" inputmode="numeric">
                   <div class="cp-field-error" id="phoneError"></div>
                 </div>
@@ -543,19 +544,31 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-left:5px" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   بعد تغيير كلمة المرور هتحتاج تسجل دخول مرة تانية.
                 </div>
-                <div class="cp-field">
-                  <label for="currentPassword">Current Password</label>
+                <div class="cp-field cp-field--pass">
+                  <label for="currentPassword">كلمة المرور الحالية</label>
                   <input type="password" id="currentPassword" placeholder="••••••••" autocomplete="current-password">
+                  <button type="button" class="pass-toggle" data-target="currentPassword" aria-label="إظهار/إخفاء">
+                    <svg class="eye-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
                   <div class="cp-field-error" id="currentPassError"></div>
                 </div>
-                <div class="cp-field">
-                  <label for="newPassword">New Password</label>
+                <div class="cp-field cp-field--pass">
+                  <label for="newPassword">كلمة المرور الجديدة</label>
                   <input type="password" id="newPassword" placeholder="••••••••" autocomplete="new-password">
+                  <button type="button" class="pass-toggle" data-target="newPassword" aria-label="إظهار/إخفاء">
+                    <svg class="eye-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
                   <div class="cp-field-error" id="newPassError"></div>
                 </div>
-                <div class="cp-field">
-                  <label for="confirmPassword">Confirm Password</label>
+                <div class="cp-field cp-field--pass">
+                  <label for="confirmPassword">تأكيد كلمة المرور</label>
                   <input type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password">
+                  <button type="button" class="pass-toggle" data-target="confirmPassword" aria-label="إظهار/إخفاء">
+                    <svg class="eye-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
                   <div class="cp-field-error" id="confirmPassError"></div>
                 </div>
                 <div class="cp-btn-row">
@@ -920,9 +933,37 @@
       document.getElementById('passwordMessage').classList.remove('show');
     });
 
-    /* ── Logout ── */
+    /* ── Password visibility toggle ── */
+    document.querySelectorAll('.pass-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        if (!input) return;
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        btn.classList.toggle('is-visible', isPass);
+        btn.setAttribute('aria-label', isPass ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
+      });
+    });
+
+    /* ── Toast helper ── */
+    function showProfileToast(msg, type = 'info') {
+      const container = document.getElementById('profileToast');
+      if (!container) return;
+      const icons = { success: '✓', error: '✕', info: '★' };
+      const toast = document.createElement('div');
+      toast.className = `toast toast--${type}`;
+      toast.innerHTML = `<span class="toast__icon">${icons[type] || icons.info}</span><span class="toast__msg">${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('out');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+      }, 3500);
+    }
+
+    /* ── Logout (no confirm dialog) ── */
     document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-      if (!confirm('هل تريد تسجيل الخروج؟')) return;
+      const btn = document.getElementById('logoutBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'جاري الخروج...'; }
       await fetch('api/customer-login.php', {
         method: 'POST', credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
@@ -1113,6 +1154,18 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => { loadProfile(); loadReferral(); });
+
+    /* Page transitions */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+      try { const d = new URL(href, location.href); if (d.origin !== location.origin) return; } catch { return; }
+      e.preventDefault();
+      document.body.classList.add('page-exit');
+      setTimeout(() => { window.location.href = href; }, 220);
+    }, true);
   </script>
 </body>
 </html>

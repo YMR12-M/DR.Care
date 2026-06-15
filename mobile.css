@@ -2430,3 +2430,81 @@ section[id] {
   from { opacity: 0; transform: translateY(-50%) translateX(-4px); }
   to   { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
+
+/* ══ Mobile UX v5.0 additions ═══════════════════════ */
+
+/* Page transition */
+body { animation: page-in .3s ease both; }
+body.page-exit { pointer-events:none; animation: page-out .22s ease forwards !important; }
+@keyframes page-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@keyframes page-out { to { opacity:0; transform:translateY(-6px); } }
+
+/* Ripple */
+@keyframes ripple-expand { to { transform:scale(1); opacity:0; } }
+
+/* Mobile time slot grid */
+.m-time-slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.m-time-slot-btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  background: var(--m-panel, #141414);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  color: var(--m-muted, #9e9689);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color .22s ease, background .22s ease, color .22s ease, box-shadow .22s ease;
+  min-height: 44px;
+}
+.m-time-slot-btn:active { transform: scale(0.95); }
+.m-time-slot-btn.selected {
+  background: #ffd21f;
+  color: #0a0800;
+  border-color: #ffd21f;
+  box-shadow: 0 4px 16px rgba(255,210,31,.35);
+}
+
+/* Toast container */
+.m-toast-container {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  width: calc(100% - 32px);
+  max-width: 380px;
+}
+/* Reuse desktop toast styles (toast / toast--success etc are in styles.css; mobile doesn't load that) */
+.m-toast-container .toast {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-size: .88rem;
+  font-weight: 700;
+  color: #f7f5ee;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  animation: toast-in .3s ease;
+}
+.m-toast-container .toast__icon { font-size: 1rem; }
+.m-toast-container .toast--success { border-color: rgba(111,207,71,.3); }
+.m-toast-container .toast--success .toast__icon { color: #6fcf47; }
+.m-toast-container .toast--error { border-color: rgba(240,83,62,.3); }
+.m-toast-container .toast--error .toast__icon { color: #f0533e; }
+.m-toast-container .toast--info .toast__icon { color: #ffd21f; }
+.m-toast-container .toast.out { animation: toast-out .25s ease forwards; }
+@keyframes toast-in  { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+@keyframes toast-out { to { opacity:0; transform:translateY(12px); } }

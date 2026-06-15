@@ -563,15 +563,38 @@ const populateSlotDates = () => {
 };
 
 const populateSlotTimes = (dateStr) => {
-  if (!apptTime) return;
-  apptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+  const grid      = document.getElementById('timeSlotGrid');
+  const hidden    = document.getElementById('apptTime');
+  const slotLabel = document.getElementById('timeSlotLabel');
+  if (!grid || !hidden) return;
+
+  if (slotLabel) slotLabel.style.display = '';
+  hidden.value = '';
+  grid.innerHTML = '';
+
   const slots = (_availableSlots[dateStr] || []).filter(s => s.available > 0);
-  slots.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.time;
-    opt.textContent = formatSlotTime(s.time);
-    apptTime.appendChild(opt);
+  if (!slots.length) {
+    grid.innerHTML = '<p class="time-slot-empty">لا يوجد مواعيد متاحة في هذا اليوم</p>';
+    return;
+  }
+
+  slots.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'time-slot-btn';
+    btn.dataset.time = s.time;
+    btn.textContent = formatSlotTime(s.time);
+    btn.style.transitionDelay = `${i * 40}ms`;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      hidden.value = s.time;
+    });
+    grid.appendChild(btn);
   });
+
+  /* Stagger entrance */
+  requestAnimationFrame(() => grid.querySelectorAll('.time-slot-btn').forEach(b => b.style.transitionDelay = ''));
 };
 
 const loadAppointmentSlots = async () => {
@@ -590,12 +613,15 @@ const loadAppointmentSlots = async () => {
       if (document.getElementById('apptDateLabel')) document.getElementById('apptDateLabel').style.display = '';
       apptDate.addEventListener('change', () => {
         const d = apptDate.value;
-        const tLabel = document.getElementById('apptTimeLabel');
+        const tLabel = document.getElementById('timeSlotLabel');
         if (d) {
           populateSlotTimes(d);
           if (tLabel) tLabel.style.display = '';
         } else {
-          if (apptTime) apptTime.innerHTML = '<option value="">— اختار وقت —</option>';
+          const grid = document.getElementById('timeSlotGrid');
+          const hidden = document.getElementById('apptTime');
+          if (grid)   grid.innerHTML = '';
+          if (hidden) hidden.value = '';
           if (tLabel) tLabel.style.display = 'none';
         }
       });
@@ -690,19 +716,21 @@ if (bookingForm) {
 
       if (!response.ok) throw new Error(data.message || 'تعذر تسجيل الطلب حاليا.');
 
-      setMessage(
-        `✓ تم تسجيل الحجز رقم ${data.booking.id} بنجاح. السعر: ${data.booking.totalLabel}.`,
-        'success'
-      );
       bookingForm.reset();
       populateForm();
       setMinimumAppointment();
       appliedCoupon = null;
 
-      // Redirect to bookings page after 2 seconds
+      /* Redirect to success page with details */
+      const params = new URLSearchParams({
+        pkg: data.booking?.package_name || servicePackage?.options[servicePackage.selectedIndex]?.text || '',
+        car: carType?.options[carType.selectedIndex]?.text || '',
+        pay: paymentMethod?.value || '',
+      });
+      if (payload.appointment) params.set('appt', payload.appointment);
       setTimeout(() => {
-        window.location.href = 'customer-bookings.html';
-      }, 2000);
+        window.location.href = `booking-success.html?${params}`;
+      }, 600);
     } catch (error) {
       // Try to queue booking for background sync
       try {
@@ -957,3 +985,86 @@ document.getElementById('copyInstapayBtn')?.addEventListener('click', function (
     showToast('تم نسخ رقم Instapay', 'success');
   }).catch(() => {});
 });
+
+// ─── Page Transitions ─────────────────────────────
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+  try {
+    const dest = new URL(href, location.href);
+    if (dest.origin !== location.origin) return;
+  } catch { return; }
+  e.preventDefault();
+  document.body.classList.add('page-exit');
+  setTimeout(() => { window.location.href = href; }, 220);
+}, true);
+
+// ─── Ripple Effect on Buttons ────────────────────
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn, .auth-btn, .nav-cta, .cp-tab, .tab-btn, .package-action, .time-slot-btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 2;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+  btn.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+});
+
+// ─── Real-time Booking Form Validation ───────────
+(function () {
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+
+  const addHint = (input, msg, ok) => {
+    let hint = input.parentElement?.querySelector('.field-hint');
+    if (!hint) {
+      hint = document.createElement('span');
+      hint.className = 'field-hint';
+      input.parentElement?.appendChild(hint);
+    }
+    hint.textContent = msg;
+    hint.className = `field-hint show field-hint--${ok ? 'ok' : 'error'}`;
+    input.classList.toggle('field-valid',   ok);
+    input.classList.toggle('field-invalid', !ok);
+  };
+
+  const clearHint = (input) => {
+    const hint = input.parentElement?.querySelector('.field-hint');
+    if (hint) hint.className = 'field-hint';
+    input.classList.remove('field-valid', 'field-invalid');
+  };
+
+  emailInput?.addEventListener('blur', () => {
+    const v = emailInput.value.trim();
+    if (!v) { clearHint(emailInput); return; }
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    addHint(emailInput, ok ? '✓ بريد صحيح' : 'صيغة البريد الإلكتروني غير صحيحة', ok);
+  });
+  emailInput?.addEventListener('input', () => { if (emailInput.value === '') clearHint(emailInput); });
+
+  phoneInput?.addEventListener('blur', () => {
+    const v = phoneInput.value.trim();
+    if (!v) { clearHint(phoneInput); return; }
+    const ok = /^01[0125][0-9]{8}$/.test(v);
+    addHint(phoneInput, ok ? '✓ رقم صحيح' : 'يجب أن يبدأ بـ 01 ويكون 11 رقم', ok);
+  });
+  phoneInput?.addEventListener('input', () => { if (phoneInput.value === '') clearHint(phoneInput); });
+})();
+
+// ─── Extended Scroll Reveal ───────────────────────
+(function () {
+  const extraObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        extraObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal-left, .reveal-right, .reveal-scale').forEach(el => extraObs.observe(el));
+})();

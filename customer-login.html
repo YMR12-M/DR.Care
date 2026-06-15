@@ -176,6 +176,18 @@
       finally { btn.disabled=false; btn.textContent='تسجيل الدخول'; }
     });
 
+    /* Page transitions */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+      try { const d = new URL(href, location.href); if (d.origin !== location.origin) return; } catch { return; }
+      e.preventDefault();
+      document.body.classList.add('page-exit');
+      setTimeout(() => { window.location.href = href; }, 220);
+    }, true);
+
     document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('registerName').value.trim();

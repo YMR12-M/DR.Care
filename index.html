@@ -457,7 +457,7 @@
         </div>
 
         <div class="why-layout">
-          <div class="why-badge reveal">
+          <div class="why-badge reveal reveal-scale">
             <div class="why-badge__inner">
               <span class="why-badge__label">صُنع في قليوب</span>
               <strong class="why-badge__name">DR.Care</strong>
@@ -466,7 +466,7 @@
             </div>
           </div>
 
-          <div class="why-content reveal" style="transition-delay:.1s">
+          <div class="why-content reveal reveal-right" style="transition-delay:.1s">
             <div class="why-grid">
               <div class="why-card">
                 <div class="why-card__icon">⏱</div>
@@ -540,7 +540,7 @@
           <h2 id="branchesTitle">فروعنا على الخريطة</h2>
           <p class="section-copy">فرعنا في قسم قليوب — شارع العروبة.</p>
         </div>
-        <div class="branches-layout reveal">
+        <div class="branches-layout reveal reveal-left">
           <div class="branches-list">
             <div class="branch-card active" data-branch-desktop="0">
               <div class="branch-card__dot"></div>
@@ -644,12 +644,14 @@
                   <option value="">— اختار يوم —</option>
                 </select>
               </label>
-              <label for="apptTime" id="apptTimeLabel" style="display:none">
-                وقت الموعد
-                <select id="apptTime" name="apptTime">
-                  <option value="">— اختار وقت —</option>
-                </select>
-              </label>
+              <!-- Visual time slot picker (replaces old select) -->
+              <div id="timeSlotLabel">
+                <span class="form-label-text">وقت الموعد</span>
+                <div id="timeSlotGrid" class="time-slot-grid" role="group" aria-label="اختار وقت الموعد"></div>
+                <input type="hidden" id="apptTime" name="apptTime">
+              </div>
+              <!-- hidden for legacy compat -->
+              <label for="apptTime" id="apptTimeLabel" style="display:none"></label>
               <div class="form-info-note" id="apptFallback">
                 📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
               </div>
@@ -762,7 +764,7 @@
       <div class="container footer-top-inner">
         <div class="footer-brand">
           <a class="brand" href="#home" aria-label="DR.Care">
-            <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
+            <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img" loading="eager">
             <span class="brand-text">
               <strong>DR.Care</strong>
               <small>مغسلة عربيات مصرية</small>
