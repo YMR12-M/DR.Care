@@ -4338,3 +4338,200 @@ button:focus-visible, a:focus-visible {
   transition: top 0.2s ease;
 }
 .skip-link:focus { top: 16px; }
+
+/* ── Promo Banner ─────────────────────────────────── */
+.promo-banner {
+  background: linear-gradient(90deg, rgba(255,210,31,.1), rgba(255,210,31,.04));
+  border-bottom: 1px solid var(--yellow-line);
+  padding: 10px 48px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  position: relative;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.promo-banner__badge {
+  background: var(--yellow);
+  color: #0a0800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.promo-banner__timer {
+  font-family: var(--font-en);
+  color: var(--yellow);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.promo-banner__close {
+  position: absolute;
+  inset-inline-end: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted-2);
+  cursor: pointer;
+  font-size: 0.88rem;
+  padding: 4px 7px;
+  border-radius: 6px;
+  transition: color .2s, background .2s;
+}
+.promo-banner__close:hover { color: var(--white); background: var(--line); }
+.promo-banner.hidden { display: none !important; }
+
+/* ── Next Appointment Widget ─────────────────────── */
+.next-appt-widget {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  background: var(--panel-2);
+  border: 1.5px solid var(--yellow-line);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  max-width: 400px;
+  animation: splash-pop 0.5s 0.2s cubic-bezier(.34,1.56,.64,1) both;
+}
+.next-appt-widget__icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--yellow-soft);
+  border: 1.5px solid var(--yellow-line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.next-appt-widget__title {
+  font-size: 0.7rem; color: var(--muted); font-weight: 700; display: block;
+}
+.next-appt-widget__value {
+  font-size: 0.88rem; font-weight: 800; color: var(--white); display: block; margin-top: 3px;
+}
+.next-appt-widget__link {
+  margin-inline-start: auto; font-size: 0.75rem; font-weight: 700;
+  color: var(--yellow); white-space: nowrap; text-decoration: none; flex-shrink: 0;
+}
+.next-appt-widget__link:hover { text-decoration: underline; }
+
+/* ── Price Calculator ─────────────────────────────── */
+.price-calc {
+  margin-top: 48px;
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.price-calc__header {
+  background: var(--yellow-soft);
+  border-bottom: 1px solid var(--yellow-line);
+  padding: 20px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.price-calc__icon { font-size: 1.8rem; line-height: 1; }
+.price-calc__header h3 { font-size: 1rem; font-weight: 800; color: var(--white); margin: 0; }
+.price-calc__header p  { font-size: 0.78rem; color: var(--muted); margin: 3px 0 0; }
+.price-calc__body { padding: 24px; }
+.price-calc__row { margin-bottom: 20px; }
+.price-calc__row label {
+  display: block; font-size: 0.78rem; font-weight: 700;
+  color: var(--muted); margin-bottom: 8px;
+}
+.price-calc__select {
+  width: 100%;
+  background: var(--panel-3);
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  padding: 12px 14px;
+  font-family: var(--font-ar);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.price-calc__select:focus { border-color: var(--yellow); outline: none; }
+.price-calc__car-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.price-calc__car-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-3);
+  border: 1.5px solid var(--line-2);
+  color: var(--muted);
+  font-family: var(--font-ar);
+  font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+  transition: border-color .2s, color .2s, background .2s, transform .2s;
+}
+.price-calc__car-btn:hover { border-color: var(--yellow-line); color: var(--white); transform: translateY(-2px); }
+.price-calc__car-btn.selected {
+  border-color: var(--yellow); background: var(--yellow-soft); color: var(--yellow);
+  transform: translateY(-2px);
+}
+.price-calc__duration {
+  font-size: 0.78rem; color: var(--muted); display: flex; align-items: center;
+  gap: 6px; margin-bottom: 14px; padding: 8px 12px;
+  background: var(--panel-3); border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+.price-calc__duration strong { color: var(--yellow); }
+.price-calc__result {
+  background: var(--panel-3);
+  border: 1.5px solid var(--yellow-line);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.price-calc__result-label { font-size: 0.85rem; color: var(--muted); font-weight: 700; }
+.price-calc__result-value {
+  font-size: 1.4rem; font-weight: 900; color: var(--yellow);
+}
+.price-calc__result-value.bump { animation: bump .25s ease; }
+.price-calc__cta { width: 100%; justify-content: center; min-height: 50px; font-size: 1rem; }
+
+/* ── Onboarding Tooltip ───────────────────────────── */
+.onboarding-tip {
+  position: fixed;
+  bottom: 88px;
+  inset-inline-end: 90px;
+  background: var(--yellow);
+  color: #0a0800;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem; font-weight: 800;
+  z-index: 800;
+  box-shadow: 0 8px 32px rgba(255,210,31,.4);
+  animation: splash-pop 0.4s 1.5s cubic-bezier(.34,1.56,.64,1) both;
+  pointer-events: none;
+}
+.onboarding-tip::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  inset-inline-end: 18px;
+  border: 7px solid transparent;
+  border-top-color: var(--yellow);
+  border-bottom: none;
+}
+
+/* ── Estimated Duration hint in slots ─────────────── */
+.slot-duration-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: var(--panel-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+.slot-duration-hint strong { color: var(--yellow-2); }

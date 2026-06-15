@@ -11,180 +11,313 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    .tracker-page { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; }
+    /* ── Page shell ── */
+    .trk-page { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; }
 
-    /* ── Mobile improvements ── */
-    @media (max-width: 640px) {
-      .tracker-search { padding: 80px 0 28px; }
-      .tracker-search-inner { padding: 0 16px; }
-      .tracker-form { flex-direction: column; }
-      .tracker-form input, .tracker-form button { width: 100%; }
-      .tracker-card-head { flex-direction: column; align-items: flex-start; padding: 16px; }
-      .tracker-steps { padding: 20px 16px; }
-      .tracker-result { padding: 20px 0 40px; }
+    /* ── Hero band ── */
+    .trk-hero {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 96px 0 48px;
+      position: relative; overflow: hidden;
     }
-
-    /* ── Search section ── */
-    .tracker-search {
-      background: var(--panel); border-bottom: 1px solid var(--line);
-      padding: 48px 0 40px; position: relative; overflow: hidden;
-    }
-    .tracker-search::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 100%, rgba(255,210,31,0.07) 0%, transparent 60%);
+    .trk-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255,210,31,0.09) 0%, transparent 65%);
       pointer-events: none;
     }
-    .tracker-search-inner { position: relative; text-align: center; max-width: 520px; margin: 0 auto; }
-    .tracker-search .section-kicker { justify-content: center; }
-    .tracker-search h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; letter-spacing: -0.02em; margin: 8px 0 6px; }
-    .tracker-search p  { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
+    .trk-hero-inner {
+      position: relative; text-align: center; max-width: 560px; margin: 0 auto;
+      padding: 0 16px;
+    }
+    .trk-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-en); font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--yellow); border: 1px solid var(--yellow-line);
+      background: var(--yellow-soft); border-radius: 50px;
+      padding: 5px 14px; margin-bottom: 20px;
+    }
+    .trk-kicker::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--yellow); animation: kicker-blink 2s ease infinite;
+    }
+    @keyframes kicker-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .trk-hero h1 {
+      font-size: clamp(1.75rem, 4.5vw, 2.75rem); font-weight: 900;
+      letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 12px;
+    }
+    .trk-hero h1 span { color: var(--yellow); }
+    .trk-hero p {
+      color: var(--muted); font-size: 0.9rem; font-weight: 500;
+      line-height: 1.8; max-width: 400px; margin: 0 auto;
+    }
 
-    .tracker-form {
-      display: flex; gap: 10px; flex-wrap: wrap;
-    }
-    .tracker-form input {
-      flex: 1; min-width: 160px; height: 50px; margin: 0;
-      border-radius: var(--radius); font-family: var(--font-en);
-      font-weight: 700; font-size: 1rem; letter-spacing: 0.03em;
-    }
-    .tracker-form button {
-      height: 50px; padding: 0 24px;
-      background: var(--yellow); color: #0a0800;
-      border: none; border-radius: var(--radius);
-      font-weight: 800; font-size: 0.92rem; cursor: pointer;
-      transition: transform var(--transition), box-shadow var(--transition);
-      flex-shrink: 0;
-    }
-    .tracker-form button:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,210,31,0.35); }
+    /* ── Main tracker content ── */
+    .trk-main { flex: 1; padding: 48px 0 80px; }
+    .trk-container { max-width: 760px; margin: 0 auto; padding: 0 16px; }
 
-    /* ── Result ── */
-    .tracker-result { flex: 1; padding: 40px 0 64px; }
-    .tracker-card {
+    /* ── Booking summary card ── */
+    .trk-summary {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 28px;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+    }
+    .trk-summary-head {
+      padding: 20px 28px; background: var(--panel-2);
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .trk-bid {
+      font-family: var(--font-en); font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted-2); margin-bottom: 4px;
+    }
+    .trk-pkg { font-size: 1.05rem; font-weight: 900; letter-spacing: -0.01em; }
+    .trk-status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 50px;
+      font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+      border: 1px solid rgba(255,210,31,0.3);
+      background: rgba(255,210,31,0.08); color: var(--yellow);
+    }
+    .trk-status-pill.cancelled {
+      border-color: rgba(240,83,62,0.3); background: rgba(240,83,62,0.08); color: var(--error);
+    }
+    .trk-status-pill.completed {
+      border-color: rgba(111,207,71,0.3); background: rgba(111,207,71,0.08); color: var(--success);
+    }
+    .trk-status-pill::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+    }
+    .trk-status-pill:not(.cancelled):not(.completed)::before {
+      animation: kicker-blink 2s ease infinite;
+    }
+
+    .trk-summary-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .trk-sum-cell {
+      padding: 18px 20px;
+      border-inline-start: 1px solid var(--line);
+    }
+    .trk-sum-cell:first-child { border-inline-start: none; }
+    .trk-sum-cell label {
+      display: block; font-family: var(--font-en); font-size: 0.6rem;
+      font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted-2); margin-bottom: 5px;
+    }
+    .trk-sum-cell value {
+      display: block; font-size: 0.88rem; font-weight: 700; color: var(--white);
+    }
+    .trk-sum-cell.gold value { color: var(--yellow); }
+
+    /* ── Cancelled banner ── */
+    .trk-cancelled {
+      padding: 40px 24px; text-align: center;
+    }
+    .trk-cancelled-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(240,83,62,0.1); border: 2px solid rgba(240,83,62,0.3);
+      display: grid; place-items: center; font-size: 1.8rem;
+      margin: 0 auto 20px;
+    }
+    .trk-cancelled h3 { font-size: 1.15rem; font-weight: 900; color: var(--error); margin-bottom: 8px; }
+    .trk-cancelled p  { font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+
+    /* ── Stepper (desktop = vertical, mobile = horizontal) ── */
+    .trk-stepper-card {
       background: var(--panel); border: 1px solid var(--line);
       border-radius: var(--radius-xl); overflow: hidden;
-      box-shadow: var(--shadow);
+      box-shadow: 0 4px 40px rgba(0,0,0,0.5); margin-bottom: 24px;
+    }
+    .trk-stepper-title {
+      padding: 20px 28px; background: var(--panel-2);
+      border-bottom: 1px solid var(--line);
+      font-size: 0.78rem; font-weight: 700; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: var(--font-en); letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .trk-stepper-title span { color: var(--yellow); }
+
+    /* ── Desktop: vertical stepper ── */
+    .trk-steps-vert {
+      padding: 32px 36px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .trk-step-v {
+      display: flex; gap: 20px; align-items: flex-start; position: relative;
+    }
+    /* Connector line between steps */
+    .trk-step-v:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 48px;
+      inset-inline-start: 23px;
+      width: 2px; height: calc(100% - 12px);
+      background: var(--line-2);
+      transition: background 0.5s;
+    }
+    .trk-step-v.done:not(:last-child)::after,
+    .trk-step-v.active:not(:last-child)::after {
+      background: linear-gradient(to bottom, var(--yellow) 0%, var(--line-2) 100%);
+    }
+    .trk-step-v.done:not(:last-child)::after { background: var(--yellow); }
+
+    .trk-step-v__dot {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 2px solid var(--line-2); background: var(--panel-2);
+      display: grid; place-items: center; font-size: 1.15rem;
+      flex-shrink: 0; position: relative; z-index: 1;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+    .trk-step-v.done .trk-step-v__dot {
+      background: var(--yellow); border-color: var(--yellow); color: #0a0800;
+      box-shadow: 0 0 0 6px rgba(255,210,31,0.12), 0 4px 20px rgba(255,210,31,0.3);
+      font-size: 1rem;
+    }
+    .trk-step-v.active .trk-step-v__dot {
+      background: var(--panel-3); border-color: var(--yellow);
+      box-shadow: 0 0 0 6px rgba(255,210,31,0.12);
+      animation: pulse-ring 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%,100% { box-shadow: 0 0 0 4px rgba(255,210,31,0.12), 0 0 20px rgba(255,210,31,0.15); }
+      50%      { box-shadow: 0 0 0 10px rgba(255,210,31,0.06), 0 0 40px rgba(255,210,31,0.22); }
     }
 
-    .tracker-card-head {
-      padding: 24px 28px; border-bottom: 1px solid var(--line);
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      background: var(--panel-2);
+    .trk-step-v__body {
+      padding: 10px 0 36px; flex: 1;
     }
-    .tracker-booking-id {
-      font-family: var(--font-en); font-size: 0.65rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 4px;
+    .trk-step-v:last-child .trk-step-v__body { padding-bottom: 0; }
+    .trk-step-v__label {
+      font-size: 0.97rem; font-weight: 800; color: var(--muted);
+      line-height: 1.2; margin-bottom: 6px;
+      transition: color var(--transition);
     }
-    .tracker-booking-name { font-size: 1.05rem; font-weight: 900; letter-spacing: -0.01em; }
+    .trk-step-v.done .trk-step-v__label   { color: var(--white); }
+    .trk-step-v.active .trk-step-v__label { color: var(--yellow); }
+    .trk-step-v__sub {
+      font-size: 0.8rem; color: var(--muted-2); font-weight: 500;
+      line-height: 1.7; max-width: 380px;
+    }
+    .trk-step-v.active .trk-step-v__sub { color: var(--muted); }
+    .trk-step-v__badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 8px; padding: 3px 10px; border-radius: 50px;
+      font-size: 0.7rem; font-weight: 700;
+      background: var(--yellow-soft); color: var(--yellow);
+      border: 1px solid var(--yellow-line);
+    }
 
-    /* ── Progress timeline ── */
-    .tracker-timeline {
-      padding: 36px 28px;
+    /* ── Mobile: horizontal stepper ── */
+    .trk-steps-horiz { display: none; }
+    .trk-steps-horiz-inner {
+      display: flex; padding: 28px 20px 20px;
+      position: relative;
     }
-    .tracker-steps {
-      display: flex; position: relative;
-    }
-    .tracker-steps::before {
-      content: ''; position: absolute; top: 24px; inset-inline: 48px;
+    .trk-steps-horiz-inner::before {
+      content: ''; position: absolute;
+      top: 52px; inset-inline: 44px;
       height: 2px; background: var(--line-2);
     }
-    .tracker-progress-line {
-      position: absolute; top: 24px; inset-inline-start: 48px;
+    .trk-horiz-progress {
+      position: absolute; top: 52px; inset-inline-start: 44px;
       height: 2px; background: var(--yellow);
-      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
-      width: 0%;
+      transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
     }
-
-    .tracker-step {
+    .trk-step-h {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 12px; position: relative; z-index: 1;
+      align-items: center; gap: 10px; position: relative; z-index: 1;
     }
-
-    .tracker-step__dot {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: var(--panel-2); border: 2px solid var(--line-2);
-      display: grid; place-items: center;
-      font-size: 1.1rem; line-height: 1;
-      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+    .trk-step-h__dot {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--line-2); background: var(--panel-2);
+      display: grid; place-items: center; font-size: 0.95rem;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
     }
-
-    .tracker-step.done .tracker-step__dot {
-      background: var(--yellow); border-color: var(--yellow);
-      box-shadow: 0 0 20px rgba(255,210,31,0.35);
+    .trk-step-h.done .trk-step-h__dot {
+      background: var(--yellow); border-color: var(--yellow); color: #0a0800;
+      box-shadow: 0 0 16px rgba(255,210,31,0.35);
     }
-    .tracker-step.active .tracker-step__dot {
+    .trk-step-h.active .trk-step-h__dot {
       background: var(--panel-3); border-color: var(--yellow);
-      box-shadow: 0 0 0 4px rgba(255,210,31,0.15);
-      animation: step-pulse 2s ease-in-out infinite;
+      animation: pulse-ring 2.2s ease-in-out infinite;
     }
-    .tracker-step.cancelled .tracker-step__dot {
-      background: rgba(240,83,62,0.1); border-color: var(--error);
-    }
-
-    @keyframes step-pulse {
-      0%,100% { box-shadow: 0 0 0 4px rgba(255,210,31,0.15); }
-      50%      { box-shadow: 0 0 0 8px rgba(255,210,31,0.08); }
-    }
-
-    .tracker-step__label {
-      font-size: 0.78rem; font-weight: 700; color: var(--muted);
+    .trk-step-h__label {
+      font-size: 0.68rem; font-weight: 700; color: var(--muted);
       text-align: center; line-height: 1.4;
     }
-    .tracker-step.done .tracker-step__label   { color: var(--white); }
-    .tracker-step.active .tracker-step__label { color: var(--yellow); }
+    .trk-step-h.done .trk-step-h__label   { color: var(--white); }
+    .trk-step-h.active .trk-step-h__label { color: var(--yellow); }
 
-    /* ── Booking details ── */
-    .tracker-details {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 0; border-top: 1px solid var(--line);
+    .trk-step-h__sub {
+      padding: 0 20px 20px;
+      font-size: 0.8rem; color: var(--muted-2); text-align: center;
+      line-height: 1.7; display: none;
     }
-    .tracker-detail {
-      padding: 16px 20px; border-inline-start: 1px solid var(--line);
-    }
-    .tracker-detail:first-child { border-inline-start: none; }
-    .tracker-detail label {
-      display: block; font-family: var(--font-en);
-      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--muted-2); margin-bottom: 5px;
-    }
-    .tracker-detail value { display: block; font-size: 0.9rem; font-weight: 700; color: var(--white); }
-    .tracker-detail value.gold { color: var(--yellow); font-family: var(--font-en); font-size: 1rem; }
+    .trk-step-h__sub.visible { display: block; color: var(--muted); }
 
-    /* ── Auto-refresh indicator ── */
-    .tracker-refresh-bar {
+    /* ── Action buttons ── */
+    .trk-actions {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .trk-actions .btn { flex: 1; min-width: 160px; justify-content: center; }
+
+    /* ── Auto-refresh bar ── */
+    .trk-refresh {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      padding: 12px 20px; border-top: 1px solid var(--line);
+      padding: 13px 28px; border-top: 1px solid var(--line);
+      font-size: 0.74rem; color: var(--muted-2); font-weight: 600;
       background: rgba(255,255,255,0.01);
-      font-size: 0.75rem; color: var(--muted-2); font-weight: 600;
     }
-    .tracker-refresh-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--success); display: inline-block; margin-left: 6px;
-      animation: blink-dot 2s ease infinite;
+    .trk-live-dot {
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success); margin-inline-end: 6px;
+      animation: kicker-blink 2s ease infinite;
     }
-    @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .trk-refresh-countdown {
+      font-family: var(--font-en); font-size: 0.7rem;
+      color: var(--muted-2); font-weight: 600;
+    }
 
-    /* ── Empty / Error ── */
-    .tracker-empty {
-      padding: 64px 24px; text-align: center; color: var(--muted);
+    /* ── Error / empty state ── */
+    .trk-error {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-xl); padding: 56px 24px;
+      text-align: center; color: var(--muted);
+      box-shadow: 0 4px 40px rgba(0,0,0,0.5);
     }
-    .tracker-empty span { font-size: 3rem; display: block; margin-bottom: 16px; opacity: 0.35; }
-    .tracker-empty p    { font-size: 0.92rem; font-weight: 600; }
+    .trk-error .trk-error-icon {
+      font-size: 2.5rem; margin-bottom: 16px; display: block; opacity: 0.5;
+    }
+    .trk-error h3 { font-size: 1rem; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+    .trk-error p  { font-size: 0.85rem; max-width: 280px; margin: 0 auto; line-height: 1.8; }
 
-    @media (max-width: 600px) {
-      .tracker-details { grid-template-columns: 1fr 1fr; }
-      .tracker-step__label { font-size: 0.7rem; }
-      .tracker-step__dot { width: 40px; height: 40px; font-size: 0.95rem; }
-      .tracker-steps::before,
-      .tracker-progress-line { top: 20px; }
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .trk-hero { padding-top: 88px; padding-bottom: 36px; }
+      .trk-summary-grid { grid-template-columns: 1fr 1fr; }
+      .trk-sum-cell:nth-child(3) { border-inline-start: none; }
+      .trk-steps-vert  { display: none; }
+      .trk-steps-horiz { display: block; }
+      .trk-stepper-title { padding: 16px 20px; }
+      .trk-actions { flex-direction: column; }
+      .trk-actions .btn { flex: unset; width: 100%; }
+      .trk-summary-head { padding: 16px 20px; }
+      .trk-refresh { padding: 12px 20px; }
     }
   </style>
 </head>
-<body class="tracker-page">
+<body class="trk-page">
 
   <!-- HEADER -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
-      <a class="brand" id="trackerBrandLink" href="index.html" aria-label="DR.Care">
+      <a class="brand" href="index.html" aria-label="DR.Care">
         <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
         <span class="brand-text">
           <strong>DR.Care</strong>
@@ -199,167 +332,299 @@
     </div>
   </header>
 
-  <!-- SEARCH -->
-  <div class="tracker-search">
-    <div class="container tracker-search-inner">
-      <p class="section-kicker">Live Tracking</p>
-      <h1>تتبع طلبك لحظياً</h1>
-      <p>أدخل رقم الحجز ورقم موبايلك لمتابعة حالة الخدمة في الوقت الفعلي</p>
-
-      <div class="tracker-form">
-        <input type="text" id="trackId" placeholder="رقم الحجز" inputmode="numeric" maxlength="10">
-        <input type="tel"  id="trackPhone" placeholder="رقم الموبايل" inputmode="numeric" maxlength="11" style="font-family:var(--font)">
-        <button type="button" id="trackBtn">تتبع الطلب</button>
-      </div>
-      <p id="trackError" style="color:var(--error);font-size:.82rem;font-weight:700;margin-top:10px;min-height:18px"></p>
+  <!-- HERO -->
+  <div class="trk-hero">
+    <div class="trk-hero-inner">
+      <div class="trk-kicker">Live Tracking</div>
+      <h1>تتبع <span>طلبك</span> لحظياً</h1>
+      <p>حالة سيارتك في الوقت الفعلي — يتحدث تلقائياً كل دقيقة</p>
     </div>
   </div>
 
-  <!-- RESULT -->
-  <div class="tracker-result" id="trackerResult" style="display:none">
-    <div class="container" style="max-width:720px">
-      <div class="tracker-card" id="trackerCard"></div>
+  <!-- MAIN -->
+  <main class="trk-main" id="trkMain">
+    <div class="trk-container" id="trkContainer">
+      <!-- JS fills this -->
     </div>
-  </div>
+  </main>
 
   <script>
     'use strict';
 
-    const STEPS = [
-      { key: 'new',        label: 'طلب جديد',      icon: '📋' },
-      { key: 'confirmed',  label: 'تم التأكيد',     icon: '✅' },
-      { key: 'in_service', label: 'قيد التنفيذ',    icon: '🚗' },
-      { key: 'completed',  label: 'تم التسليم',     icon: '🌟' },
-    ];
-    const esc   = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const price = v => `${Number(v).toLocaleString('ar-EG')} جنيه`;
-    const fmtDate = v => v ? new Date(v).toLocaleString('ar-EG', { dateStyle:'medium', timeStyle:'short' }) : '—';
+    /* ─── Config ─── */
+    const REFRESH_INTERVAL = 60; // seconds
 
+    const STAGES = [
+      {
+        key:   'pending',
+        icon:  '📋',
+        label: 'تم استلام الحجز',
+        sub:   'تم استلام حجزك بنجاح وسيتم التواصل معك قريباً لتأكيد الموعد.'
+      },
+      {
+        key:   'confirmed',
+        icon:  '⏳',
+        label: 'قيد الانتظار',
+        sub:   'حجزك مؤكد وسيارتك في طابور الانتظار. استعد لتجربة غسيل رائعة!'
+      },
+      {
+        key:   'in_progress',
+        icon:  '🚗',
+        label: 'جاري الغسيل',
+        sub:   'فريقنا يعمل الآن على سيارتك بعناية فائقة.'
+      },
+      {
+        key:   'completed',
+        icon:  '✅',
+        label: 'جاهزة للاستلام',
+        sub:   'سيارتك جاهزة! تفضل لاستلامها متلألئة ونظيفة.'
+      },
+    ];
+
+    /* Map API status → stage index */
+    const STATUS_TO_IDX = {
+      pending:     0,
+      confirmed:   1,
+      in_progress: 2,
+      in_service:  2, // alias used in some API versions
+      completed:   3,
+    };
+
+    /* ─── URL params ─── */
+    const params  = new URLSearchParams(location.search);
+    const bookingId = params.get('id') || '';
+    const paramPkg  = params.get('pkg')    || '';
+    const paramCar  = params.get('car')    || '';
+    const paramAppt = params.get('appt')   || '';
+    const paramBranch = params.get('branch') || '';
+
+    /* ─── Helpers ─── */
+    const esc  = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const fmtDate = v => {
+      if (!v) return '—';
+      try { return new Date(v).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' }); }
+      catch { return v; }
+    };
+    const waLink = (id) => {
+      const msg = encodeURIComponent(`مرحباً، أريد الاستفسار عن حجزي رقم #${id}`);
+      return `https://wa.me/201000000000?text=${msg}`;
+    };
+
+    /* ─── Scroll header ─── */
     window.addEventListener('scroll', () => {
       document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 16);
     }, { passive: true });
 
-    let trackingId    = null;
-    let trackingPhone = null;
-    let refreshTimer  = null;
+    /* ─── Countdown timer ─── */
+    let countdownTimer = null;
+    let countdownSec   = REFRESH_INTERVAL;
 
-    const renderCard = (b) => {
-      const isCancelled = b.status === 'cancelled';
-      const stepIdx     = isCancelled ? -1 : STEPS.findIndex(s => s.key === b.status);
-      const progressPct = isCancelled ? 0 : Math.max(0, (stepIdx / (STEPS.length - 1)) * 100);
+    const startCountdown = () => {
+      clearInterval(countdownTimer);
+      countdownSec = REFRESH_INTERVAL;
+      const el = document.getElementById('trkCountdown');
+      if (el) el.textContent = `${countdownSec}s`;
+      countdownTimer = setInterval(() => {
+        countdownSec--;
+        const el = document.getElementById('trkCountdown');
+        if (el) el.textContent = `${countdownSec}s`;
+        if (countdownSec <= 0) { countdownSec = REFRESH_INTERVAL; }
+      }, 1000);
+    };
 
-      const stepsHtml = STEPS.map((s, i) => {
-        const isDone   = !isCancelled && i < stepIdx;
-        const isActive = !isCancelled && i === stepIdx;
-        const cls      = isCancelled ? '' : isDone ? 'done' : isActive ? 'active' : '';
+    /* ─── Render stepper (vertical — desktop) ─── */
+    const renderStepsVert = (activeIdx, isCancelled) => {
+      return STAGES.map((s, i) => {
+        const isDone   = !isCancelled && i < activeIdx;
+        const isActive = !isCancelled && i === activeIdx;
+        const cls      = isDone ? 'done' : isActive ? 'active' : '';
+        const icon     = isDone ? '✓' : s.icon;
+        const badge    = isActive ? `<div class="trk-step-v__badge">جارٍ الآن</div>` : '';
         return `
-          <div class="tracker-step ${cls}">
-            <div class="tracker-step__dot">${isDone ? '✓' : s.icon}</div>
-            <p class="tracker-step__label">${s.label}</p>
+          <div class="trk-step-v ${cls}">
+            <div class="trk-step-v__dot">${icon}</div>
+            <div class="trk-step-v__body">
+              <p class="trk-step-v__label">${s.label}</p>
+              <p class="trk-step-v__sub">${(isDone || isActive) ? s.sub : 'في انتظار اكتمال المرحلة السابقة'}</p>
+              ${badge}
+            </div>
+          </div>`;
+      }).join('');
+    };
+
+    /* ─── Render stepper (horizontal — mobile) ─── */
+    const renderStepsHoriz = (activeIdx, isCancelled) => {
+      const pct = isCancelled ? 0 : Math.max(0, (activeIdx / (STAGES.length - 1)) * 100);
+      const dots = STAGES.map((s, i) => {
+        const isDone   = !isCancelled && i < activeIdx;
+        const isActive = !isCancelled && i === activeIdx;
+        const cls      = isDone ? 'done' : isActive ? 'active' : '';
+        return `
+          <div class="trk-step-h ${cls}">
+            <div class="trk-step-h__dot">${isDone ? '✓' : s.icon}</div>
+            <p class="trk-step-h__label">${s.label}</p>
           </div>`;
       }).join('');
 
-      const statusLabel = isCancelled
-        ? '<span style="color:var(--error);font-weight:800">ملغي ✕</span>'
-        : STEPS[stepIdx]
-          ? `<span style="color:var(--yellow);font-weight:800">${STEPS[stepIdx].label}</span>`
-          : '—';
+      const activeSub = !isCancelled && STAGES[activeIdx]
+        ? `<p class="trk-step-h__sub visible">${STAGES[activeIdx].sub}</p>` : '';
 
       return `
-        <div class="tracker-card-head">
-          <div>
-            <p class="tracker-booking-id">Booking #${esc(b.id)}</p>
-            <p class="tracker-booking-name">${esc(b.package_name)}</p>
-          </div>
-          <div style="text-align:left">
-            <div style="font-size:.7rem;color:var(--muted-2);margin-bottom:4px">الحالة الحالية</div>
-            ${statusLabel}
-          </div>
+        <div class="trk-steps-horiz-inner">
+          <div class="trk-horiz-progress" style="width:${pct}%"></div>
+          ${dots}
         </div>
-
-        <div class="tracker-timeline">
-          <div class="tracker-steps" style="position:relative">
-            <div class="tracker-progress-line" style="width:${progressPct}%"></div>
-            ${stepsHtml}
-          </div>
-        </div>
-
-        <div class="tracker-details">
-          <div class="tracker-detail"><label>Package</label><value>${esc(b.package_name)}</value></div>
-          <div class="tracker-detail"><label>Car Type</label><value>${esc(b.car_type_name)}</value></div>
-          <div class="tracker-detail"><label>Branch</label><value>${esc(b.branch)}</value></div>
-          <div class="tracker-detail"><label>Appointment</label><value>${fmtDate(b.appointment)}</value></div>
-          <div class="tracker-detail"><label>Payment</label><value>${esc(b.payment_method || '—')}</value></div>
-          <div class="tracker-detail"><label>Total Price</label><value class="gold">${price(b.total_price)}</value></div>
-        </div>
-
-        <div class="tracker-refresh-bar">
-          <span><span class="tracker-refresh-dot"></span>يتحدث تلقائياً كل 15 ثانية</span>
-          <span id="lastUpdate">—</span>
-        </div>
-      `;
+        ${activeSub}`;
     };
 
+    /* ─── Render full tracker card ─── */
+    const renderTracker = (booking) => {
+      const st          = booking?.status || 'pending';
+      const isCancelled = st === 'cancelled';
+      const activeIdx   = isCancelled ? 0 : (STATUS_TO_IDX[st] ?? 0);
+
+      /* Summary info — prefer API data, fallback to URL params */
+      const pkg    = esc(booking?.package_name || paramPkg || '—');
+      const car    = esc(booking?.car_type_name || paramCar || '—');
+      const appt   = fmtDate(booking?.appointment || paramAppt);
+      const branch = esc(booking?.branch || paramBranch || '—');
+      const id     = esc(booking?.id || bookingId || '—');
+
+      const statusLabel = isCancelled ? 'تم الإلغاء'
+        : (STAGES[activeIdx]?.label || '—');
+      const pillCls = isCancelled ? 'cancelled' : st === 'completed' ? 'completed' : '';
+
+      const cancelledBlock = isCancelled ? `
+        <div class="trk-cancelled">
+          <div class="trk-cancelled-icon">❌</div>
+          <h3>تم إلغاء الحجز</h3>
+          <p>عذراً، تم إلغاء هذا الحجز. يمكنك إنشاء حجز جديد في أي وقت.</p>
+        </div>` : '';
+
+      const stepperBlock = !isCancelled ? `
+        <div class="trk-stepper-card">
+          <div class="trk-stepper-title">
+            Status Timeline
+            <span>${statusLabel}</span>
+          </div>
+          <div class="trk-steps-vert">
+            ${renderStepsVert(activeIdx, isCancelled)}
+          </div>
+          <div class="trk-steps-horiz">
+            ${renderStepsHoriz(activeIdx, isCancelled)}
+          </div>
+          <div class="trk-refresh">
+            <span><span class="trk-live-dot"></span>يتحدث تلقائياً كل دقيقة</span>
+            <span class="trk-refresh-countdown">التحديث خلال <span id="trkCountdown">${REFRESH_INTERVAL}s</span></span>
+          </div>
+        </div>` : '';
+
+      return `
+        <!-- Booking summary card -->
+        <div class="trk-summary">
+          <div class="trk-summary-head">
+            <div>
+              <p class="trk-bid">Booking #${id}</p>
+              <p class="trk-pkg">${pkg}</p>
+            </div>
+            <div class="trk-status-pill ${pillCls}">${statusLabel}</div>
+          </div>
+          <div class="trk-summary-grid">
+            <div class="trk-sum-cell">
+              <label>Package</label>
+              <value>${pkg}</value>
+            </div>
+            <div class="trk-sum-cell">
+              <label>Car Type</label>
+              <value>${car}</value>
+            </div>
+            <div class="trk-sum-cell">
+              <label>Appointment</label>
+              <value>${appt}</value>
+            </div>
+            <div class="trk-sum-cell gold">
+              <label>Branch</label>
+              <value>${branch}</value>
+            </div>
+          </div>
+          ${cancelledBlock}
+        </div>
+
+        ${stepperBlock}
+
+        <!-- Action buttons -->
+        <div class="trk-actions">
+          <a class="btn btn-ghost" href="customer-bookings.html">
+            ← الرجوع لحجوزاتي
+          </a>
+          <a class="btn btn-primary" href="${waLink(id)}" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            تواصل معنا عبر واتساب
+          </a>
+        </div>`;
+    };
+
+    /* ─── Render error state ─── */
+    const renderError = (msg) => `
+      <div class="trk-error">
+        <span class="trk-error-icon">📋</span>
+        <h3>تم استلام الحجز</h3>
+        <p>حجزك محجوز بنجاح. يمكنك تتبع الحالة بمجرد تأكيده من فريقنا.</p>
+      </div>
+      <div class="trk-actions" style="margin-top:24px">
+        <a class="btn btn-ghost" href="customer-bookings.html">← الرجوع لحجوزاتي</a>
+        <a class="btn btn-primary" href="${waLink(bookingId)}" target="_blank" rel="noopener">تواصل معنا عبر واتساب</a>
+      </div>`;
+
+    /* ─── Fetch booking status ─── */
+    let refreshTimer = null;
+
     const fetchStatus = async () => {
+      if (!bookingId) {
+        document.getElementById('trkContainer').innerHTML = renderError('لا يوجد رقم حجز');
+        return;
+      }
       try {
-        const res  = await fetch(`api/customer-bookings.php?track_id=${trackingId}&track_phone=${encodeURIComponent(trackingPhone)}`, {
-          credentials: 'same-origin', headers: { Accept: 'application/json' }
-        });
-        const data = await res.json().catch(() => ({}));
-
-        const booking = (data.bookings || []).find(b => String(b.id) === String(trackingId));
-        if (!booking && data.ok === false) throw new Error(data.message || 'الحجز غير موجود');
-
-        const card = document.getElementById('trackerCard');
-        if (card && booking) {
-          card.innerHTML = renderCard(booking);
-          const lu = document.getElementById('lastUpdate');
-          if (lu) lu.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+        const url = `api/bookings.php?id=${encodeURIComponent(bookingId)}&action=status`;
+        const res  = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json().catch(() => null);
+        const booking = data?.booking || data?.bookings?.[0] || null;
+        if (!booking) throw new Error('not found');
+        document.getElementById('trkContainer').innerHTML = renderTracker(booking);
+        startCountdown();
+      } catch {
+        /* On failure: if we have URL params, show a default first-stage tracker */
+        if (bookingId) {
+          document.getElementById('trkContainer').innerHTML = renderTracker({
+            id: bookingId, status: 'pending',
+            package_name: paramPkg, car_type_name: paramCar,
+            appointment: paramAppt, branch: paramBranch
+          });
+          startCountdown();
+        } else {
+          document.getElementById('trkContainer').innerHTML = renderError('');
         }
-      } catch (err) {
-        const card = document.getElementById('trackerCard');
-        if (card) card.innerHTML = `<div class="tracker-empty"><span>❌</span><p>${err.message}</p></div>`;
       }
     };
 
-    document.getElementById('trackBtn')?.addEventListener('click', async () => {
-      const id    = document.getElementById('trackId')?.value.trim();
-      const phone = document.getElementById('trackPhone')?.value.trim();
-      const errEl = document.getElementById('trackError');
+    /* ─── Init ─── */
+    fetchStatus();
+    refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
 
-      if (!id || isNaN(Number(id))) { errEl.textContent = 'أدخل رقم الحجز'; return; }
-      if (!phone || !/^01[0125][0-9]{8}$/.test(phone)) { errEl.textContent = 'أدخل رقم موبايل مصري صحيح'; return; }
-      errEl.textContent = '';
-
-      trackingId    = id;
-      trackingPhone = phone;
-
-      document.getElementById('trackerResult').style.display = '';
-      document.getElementById('trackerCard').innerHTML = `
-        <div class="tracker-empty"><span>⏳</span><p>جاري التحقق...</p></div>`;
-
-      await fetchStatus();
-
-      clearInterval(refreshTimer);
-      refreshTimer = setInterval(fetchStatus, 15000);
-    });
-
-    /* Pre-fill from URL param */
-    const urlId = new URLSearchParams(location.search).get('id');
-    if (urlId) {
-      const el = document.getElementById('trackId');
-      if (el) el.value = urlId;
-    }
-
-    /* Smart back link: mobile → mobile-bookings, desktop → customer-bookings */
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && window.innerWidth <= 900;
-    const brandLink = document.getElementById('trackerBrandLink');
-    if (isMobile && brandLink) brandLink.href = 'mobile-bookings.html';
-
-    /* Scroll header */
-    window.addEventListener('scroll', () => {
-      document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 16);
-    }, { passive: true });
+    /* ─── Page transition ─── */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+      try { const d = new URL(href, location.href); if (d.origin !== location.origin) return; } catch { return; }
+      e.preventDefault();
+      document.body.classList.add('page-exit');
+      setTimeout(() => { window.location.href = href; }, 220);
+    }, true);
   </script>
 </body>
 </html>

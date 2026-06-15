@@ -36,6 +36,14 @@
     <div class="splash-loader"></div>
   </div>
 
+  <!-- Promo Banner -->
+  <div class="promo-banner" id="promoBanner" role="note" aria-label="عرض خاص">
+    <span class="promo-banner__badge">عرض الصيف</span>
+    احجز Deep Cleaning الآن واحصل على خصم 15% — ينتهي العرض بعد
+    <span class="promo-banner__timer" id="promoTimer" aria-live="off">--:--:--</span>
+    <button class="promo-banner__close" id="promoBannerClose" type="button" aria-label="إغلاق">✕</button>
+  </div>
+
   <!-- Scroll Progress Bar -->
   <div id="scrollProgress" aria-hidden="true"></div>
 
@@ -158,6 +166,16 @@
             </a>
             <a class="btn btn-ghost" href="#packages">اختار باقتك</a>
           </div>
+          <!-- Next Appointment Widget — shown when logged in -->
+          <div class="next-appt-widget" id="nextApptWidget" style="display:none" aria-live="polite">
+            <div class="next-appt-widget__icon" aria-hidden="true">📅</div>
+            <div class="next-appt-widget__body">
+              <span class="next-appt-widget__title">موعدك القادم</span>
+              <span class="next-appt-widget__value" id="nextApptValue">—</span>
+            </div>
+            <a href="customer-bookings.html" class="next-appt-widget__link">عرض التفاصيل ←</a>
+          </div>
+
           <div class="hero-trust">
             <div class="hero-trust__item">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -455,6 +473,45 @@
           </div>
 
         </div>
+
+        <!-- ── Live Price Calculator ── -->
+        <div class="price-calc reveal" id="priceCalc" style="transition-delay:.15s">
+          <div class="price-calc__header">
+            <span class="price-calc__icon" aria-hidden="true">🧮</span>
+            <div>
+              <h3>احسب سعر خدمتك</h3>
+              <p>اختار الباقة ونوع عربيتك وشوف السعر الكامل فوراً</p>
+            </div>
+          </div>
+          <div class="price-calc__body">
+            <div class="price-calc__row">
+              <label for="calcPackage">الباقة</label>
+              <select id="calcPackage" class="price-calc__select" aria-label="اختيار الباقة للحساب"></select>
+            </div>
+            <div class="price-calc__row">
+              <label>نوع العربية</label>
+              <div class="price-calc__car-row" id="calcCarRow" role="group" aria-label="نوع العربية">
+                <button type="button" class="price-calc__car-btn selected" data-calc-car="sedan" aria-pressed="true">🚗 سيدان</button>
+                <button type="button" class="price-calc__car-btn" data-calc-car="suv" aria-pressed="false">🚙 SUV</button>
+                <button type="button" class="price-calc__car-btn" data-calc-car="van" aria-pressed="false">🚐 فان</button>
+                <button type="button" class="price-calc__car-btn" data-calc-car="pickup" aria-pressed="false">🛻 نقل خفيف</button>
+              </div>
+            </div>
+            <div class="price-calc__duration" id="calcDuration" style="display:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              وقت الخدمة المتوقع: <strong id="calcDurationVal">—</strong>
+            </div>
+            <div class="price-calc__result" aria-live="polite">
+              <span class="price-calc__result-label">السعر الإجمالي</span>
+              <span class="price-calc__result-value" id="calcResult">اختار الباقة</span>
+            </div>
+            <button type="button" class="btn btn-primary price-calc__cta" id="calcBookBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              احجز بهذه الباقة
+            </button>
+          </div>
+        </div>
+
       </div>
     </section>
 

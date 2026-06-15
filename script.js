@@ -402,9 +402,10 @@ const populateForm = () => {
   const numEl = document.getElementById('instapayNumberDisplay');
   if (numEl) numEl.textContent = appConfig.instapayNumber;
   updateEstimate();
-  /* Sync car type cards to default selection */
+  /* Sync car type cards + price calc after config loads */
   requestAnimationFrame(() => {
     if (carType?.value) carType.dispatchEvent(new Event('change', { bubbles: true }));
+    window._calcPopulateHook?.();
   });
 };
 
@@ -1235,4 +1236,252 @@ document.addEventListener('click', (e) => {
   } else {
     window.addEventListener('load', () => setTimeout(hide, 900));
   }
+})();
+
+// ─── Promo Banner Countdown + Dismiss ─────────────
+(function () {
+  const banner   = document.getElementById('promoBanner');
+  const closeBtn = document.getElementById('promoBannerClose');
+  const timerEl  = document.getElementById('promoTimer');
+  if (!banner) return;
+
+  if (sessionStorage.getItem('promo-dismissed')) {
+    banner.classList.add('hidden');
+    return;
+  }
+
+  closeBtn?.addEventListener('click', () => {
+    banner.classList.add('hidden');
+    sessionStorage.setItem('promo-dismissed', '1');
+  });
+
+  const tick = () => {
+    if (!timerEl) return;
+    const now = new Date();
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    const diff = Math.max(0, end - now);
+    const h = Math.floor(diff / 3_600_000);
+    const m = Math.floor((diff % 3_600_000) / 60_000);
+    const s = Math.floor((diff % 60_000) / 1000);
+    timerEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  };
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// ─── Next Appointment Widget ───────────────────────
+(function () {
+  const widget = document.getElementById('nextApptWidget');
+  const valEl  = document.getElementById('nextApptValue');
+  if (!widget) return;
+
+  fetch('api/customer-login.php?action=check', { credentials: 'same-origin' })
+    .then(r => r.json()).catch(() => null)
+    .then(data => {
+      if (!data?.authenticated) return null;
+      return fetch('api/bookings.php?action=list', { credentials: 'same-origin' }).then(r => r.json()).catch(() => null);
+    })
+    .then(data => {
+      if (!data?.bookings?.length) return;
+      const now = Date.now();
+      const upcoming = data.bookings
+        .filter(b => b.status !== 'cancelled' && b.status !== 'completed')
+        .filter(b => !b.appointment || new Date(b.appointment) > now)
+        .sort((a, b) => new Date(a.appointment || 0) - new Date(b.appointment || 0))[0];
+      if (!upcoming) return;
+      if (valEl) {
+        const appt = upcoming.appointment ? new Date(upcoming.appointment) : null;
+        valEl.textContent = appt
+          ? appt.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+          : (upcoming.package_name || 'حجز قادم');
+      }
+      widget.style.display = 'flex';
+    })
+    .catch(() => {});
+})();
+
+// ─── Live Price Calculator ─────────────────────────
+(function () {
+  const calcPkg    = document.getElementById('calcPackage');
+  const calcCarRow = document.getElementById('calcCarRow');
+  const calcResult = document.getElementById('calcResult');
+  const calcDur    = document.getElementById('calcDuration');
+  const calcDurVal = document.getElementById('calcDurationVal');
+  const calcBtn    = document.getElementById('calcBookBtn');
+  if (!calcPkg || !calcResult) return;
+
+  let calcCar = 'sedan';
+
+  const durMap = {
+    'inside-out': '~45 دقيقة', outside: '~20 دقيقة', deep: '~90 دقيقة',
+    cover: '~30 دقيقة', rims: '~30 دقيقة', engine: '~45 دقيقة',
+    chemical: 'يتحدد حسب الحالة', carpet: 'يتحدد حسب المتر', blanket: '~60 دقيقة',
+  };
+
+  const updateCalc = () => {
+    const code = calcPkg.value;
+    const pkg  = appConfig.packages.find(p => p.code === code);
+    const car  = appConfig.carTypes.find(c => c.code === calcCar);
+    if (!pkg) { calcResult.textContent = 'اختار الباقة'; return; }
+    if (pkg.price === 0) {
+      calcResult.textContent = code === 'carpet' ? '15 ج / متر' : 'حسب الشغل';
+    } else {
+      const total = Number(pkg.price) + Number(car?.extra ?? 0);
+      const newTxt = `${total.toLocaleString('ar-EG')} جنيه`;
+      if (calcResult.textContent !== newTxt) {
+        calcResult.textContent = newTxt;
+        calcResult.classList.remove('bump');
+        void calcResult.offsetWidth;
+        calcResult.classList.add('bump');
+      }
+    }
+    if (calcDur && calcDurVal) {
+      const dur = durMap[code];
+      if (dur) { calcDurVal.textContent = dur; calcDur.style.display = 'flex'; }
+      else      { calcDur.style.display = 'none'; }
+    }
+  };
+
+  const populateCalcSelect = () => {
+    if (!appConfig.packages.length) return;
+    calcPkg.innerHTML = appConfig.packages.map(p =>
+      `<option value="${p.code}">${p.name}${p.price > 0 ? ` — ${p.price} جنيه` : ''}</option>`
+    ).join('');
+    updateCalc();
+  };
+
+  calcPkg.addEventListener('change', updateCalc);
+
+  calcCarRow?.querySelectorAll('.price-calc__car-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calcCarRow.querySelectorAll('.price-calc__car-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-pressed', 'true');
+      calcCar = btn.dataset.calcCar;
+      updateCalc();
+      /* Sync booking form car type cards */
+      const ct = document.getElementById('carType');
+      if (ct) { ct.value = calcCar; ct.dispatchEvent(new Event('change', { bubbles: true })); }
+      document.querySelectorAll('.car-type-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.car === calcCar);
+        c.setAttribute('aria-pressed', String(c.dataset.car === calcCar));
+      });
+    });
+  });
+
+  calcBtn?.addEventListener('click', () => {
+    const code = calcPkg?.value;
+    if (code) {
+      const sp = document.getElementById('servicePackage');
+      if (sp) { sp.value = code; sp.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+    document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  /* Populate once config loads */
+  if (appConfig.packages.length) {
+    populateCalcSelect();
+  } else {
+    setTimeout(populateCalcSelect, 1500);
+  }
+  /* Also re-populate after loadConfig fires populateForm */
+  const _origPopulateForm = populateForm;
+  window._calcPopulateHook = populateCalcSelect;
+})();
+
+// ─── Estimated Duration in Time Slot Header ────────
+(function () {
+  const durMap = {
+    'inside-out': '~45 دقيقة', outside: '~20 دقيقة', deep: '~90 دقيقة',
+    cover: '~30 دقيقة', rims: '~30 دقيقة', engine: '~45 دقيقة',
+    chemical: 'يتحدد', carpet: 'يتحدد', blanket: '~60 دقيقة',
+  };
+
+  const updateDurationHint = () => {
+    const sp = document.getElementById('servicePackage');
+    const label = document.getElementById('timeSlotLabel');
+    if (!sp || !label) return;
+
+    let hint = label.querySelector('.slot-duration-hint');
+    const dur = durMap[sp.value];
+    if (!dur) { if (hint) hint.remove(); return; }
+
+    if (!hint) {
+      hint = document.createElement('p');
+      hint.className = 'slot-duration-hint';
+      label.insertBefore(hint, label.querySelector('.form-label-text')?.nextSibling || label.firstChild);
+    }
+    hint.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> وقت الخدمة المتوقع: <strong>${dur}</strong>`;
+  };
+
+  document.getElementById('servicePackage')?.addEventListener('change', updateDurationHint);
+})();
+
+// ─── Auto-fill from Previous Booking ──────────────
+(function () {
+  const bfPanel3 = document.getElementById('bfPanel3');
+  if (!bfPanel3) return;
+
+  fetch('api/bookings.php?action=list', { credentials: 'same-origin' })
+    .then(r => r.json()).catch(() => null)
+    .then(data => {
+      const last = data?.bookings?.[0];
+      if (!last) return;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-ghost';
+      btn.style.cssText = 'font-size:.8rem;padding:8px 14px;margin-bottom:16px;width:100%;';
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.26"/></svg> استخدم نفس بيانات حجزك الأخير`;
+      btn.addEventListener('click', () => {
+        const set = (id, val) => {
+          if (!val) return;
+          const el = document.getElementById(id);
+          if (el && !el.value) { el.value = val; el.classList.add('prefilled'); }
+        };
+        set('name',  last.customer_name);
+        set('email', last.customer_email);
+        set('phone', last.customer_phone);
+        if (last.branch) {
+          const br = document.getElementById('branch');
+          if (br) br.value = last.branch;
+        }
+        if (last.plate_number) set('plateNumber', last.plate_number);
+        showToast('تم ملء بياناتك من حجزك الأخير', 'success');
+        btn.remove();
+      });
+
+      const firstField = bfPanel3.querySelector('.form-section-title');
+      if (firstField) firstField.after(btn);
+    })
+    .catch(() => {});
+})();
+
+// ─── First-Time Onboarding Tooltip ────────────────
+(function () {
+  if (localStorage.getItem('onboarded')) return;
+  const bookingEl = document.getElementById('booking');
+  if (!bookingEl) return;
+
+  const tip = document.createElement('div');
+  tip.className = 'onboarding-tip';
+  tip.textContent = '👇 احجز غسلتك هنا بسهولة';
+  tip.setAttribute('aria-hidden', 'true');
+  tip.setAttribute('role', 'presentation');
+  document.body.appendChild(tip);
+
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      tip.remove();
+      localStorage.setItem('onboarded', '1');
+      obs.disconnect();
+    }
+  }, { threshold: 0.4 });
+  obs.observe(bookingEl);
+
+  setTimeout(() => { tip.style.opacity = '0'; tip.style.transition = 'opacity .4s'; setTimeout(() => tip.remove(), 400); }, 6000);
 })();

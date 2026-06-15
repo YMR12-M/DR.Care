@@ -246,6 +246,82 @@
 
     .cx-review-actions { display: flex; gap: 8px; }
 
+    /* ── Review modal ── */
+    .rv-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9990;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      place-items: center;
+    }
+    .rv-overlay.open { display: grid; }
+    .rv-modal {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius-xl); padding: 36px 32px;
+      max-width: 420px; width: calc(100% - 32px);
+      position: relative; text-align: center;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,210,31,0.06);
+      animation: rv-in 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes rv-in { from { opacity:0; transform:scale(0.9) translateY(16px); } to { opacity:1; transform:none; } }
+    .rv-close {
+      position: absolute; top: 16px; inset-inline-end: 18px;
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1.2rem; line-height: 1; padding: 4px; border-radius: 50%;
+      transition: color var(--transition), background var(--transition);
+    }
+    .rv-close:hover { color: var(--white); background: var(--panel-3); }
+    .rv-modal__icon {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--yellow-soft); border: 1px solid var(--yellow-line);
+      display: grid; place-items: center; font-size: 1.5rem;
+      margin: 0 auto 20px;
+    }
+    .rv-modal h3 {
+      font-size: 1.1rem; font-weight: 900; margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .rv-modal .rv-sub {
+      font-size: 0.84rem; color: var(--muted); margin-bottom: 24px; line-height: 1.7;
+    }
+    /* Stars */
+    .rv-stars {
+      display: flex; justify-content: center; gap: 4px;
+      flex-direction: row-reverse;
+      margin-bottom: 20px;
+    }
+    .rv-stars input { display: none; }
+    .rv-stars label {
+      font-size: 2rem; cursor: pointer;
+      color: var(--line-2);
+      transition: color 0.1s, transform 0.12s;
+    }
+    .rv-stars input:checked ~ label,
+    .rv-stars label:hover,
+    .rv-stars label:hover ~ label { color: var(--yellow); }
+    .rv-stars label:hover { transform: scale(1.2); }
+    /* Textarea */
+    .rv-textarea {
+      width: 100%; background: var(--panel-2); border: 1px solid var(--line-2);
+      border-radius: var(--radius); color: var(--white); font-family: var(--font);
+      font-size: 0.88rem; padding: 12px 14px; resize: vertical; min-height: 90px;
+      outline: none; transition: border-color var(--transition); margin-bottom: 16px;
+    }
+    .rv-textarea:focus { border-color: var(--yellow-line); }
+    .rv-textarea::placeholder { color: var(--muted-2); }
+    /* Error msg */
+    .rv-msg {
+      font-size: 0.8rem; font-weight: 700; margin-bottom: 12px;
+      min-height: 18px; transition: color var(--transition);
+    }
+    .rv-msg.error { color: var(--error); }
+    .rv-msg.success { color: var(--success); }
+    /* Success state */
+    .rv-success-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(111,207,71,0.1); border: 2px solid rgba(111,207,71,0.3);
+      display: grid; place-items: center; font-size: 1.6rem;
+      margin: 0 auto 20px; animation: rv-in 0.4s ease both;
+    }
+
     /* ── Tracker link ── */
     .cx-tracker-link {
       display: inline-flex; align-items: center; gap: 6px;
@@ -463,7 +539,7 @@
         const reviewBadge  = b.review
           ? `<div class="cx-review-done"><span class="cx-stars">${starsHtml(b.review.rating)}</span> تم التقييم</div>`
           : isCompleted
-            ? `<button class="btn btn-ghost" style="min-height:36px;font-size:.78rem;padding:0 14px" data-review-btn="${b.id}">⭐ قيّم الخدمة</button>`
+            ? `<button class="btn btn-ghost" style="min-height:36px;font-size:.78rem;padding:0 14px" data-open-review="${b.id}">قيّم خدمتنا ⭐</button>`
             : '';
 
         const actionsBar = isCancellable ? `
@@ -514,20 +590,6 @@
           ${b.notes ? `<div class="cx-booking-notes"><strong>Notes</strong>${esc(b.notes)}</div>` : ''}
           ${actionsBar}
           ${reviewBadge ? `<div class="cx-review-bar">${reviewBadge}</div>` : ''}
-          ${isCompleted && !b.review ? `
-          <div class="cx-review-form" id="review-form-${b.id}">
-            <div class="cx-stars-input">
-              ${[5,4,3,2,1].map(i => `
-                <input type="radio" name="rating-${b.id}" id="star-${b.id}-${i}" value="${i}">
-                <label for="star-${b.id}-${i}" title="${i} نجوم">★</label>
-              `).join('')}
-            </div>
-            <textarea class="cx-review-textarea" id="comment-${b.id}" placeholder="شارك تجربتك (اختياري)..." maxlength="500"></textarea>
-            <div class="cx-review-actions">
-              <button class="btn btn-primary" style="min-height:38px;font-size:.82rem;flex:1" data-submit-review="${b.id}">إرسال التقييم</button>
-              <button class="btn btn-ghost" style="min-height:38px;font-size:.82rem" data-cancel-review="${b.id}">إلغاء</button>
-            </div>
-          </div>` : ''}
         </div>`;
       }).join('');
     };
@@ -775,48 +837,12 @@
         return;
       }
 
-      const reviewBtn   = e.target.closest('[data-review-btn]');
-      const cancelBtn   = e.target.closest('[data-cancel-review]');
-      const submitBtn   = e.target.closest('[data-submit-review]');
-
-      if (reviewBtn) {
-        const id   = reviewBtn.dataset.reviewBtn;
-        const form = document.getElementById(`review-form-${id}`);
-        if (form) { form.classList.toggle('open'); reviewBtn.style.display = 'none'; }
+      /* Open review modal */
+      const openReviewBtn = e.target.closest('[data-open-review]');
+      if (openReviewBtn) {
+        const id = openReviewBtn.dataset.openReview;
+        openReviewModal(id);
         return;
-      }
-
-      if (cancelBtn) {
-        const id   = cancelBtn.dataset.cancelReview;
-        const form = document.getElementById(`review-form-${id}`);
-        if (form) form.classList.remove('open');
-        const btn  = document.querySelector(`[data-review-btn="${id}"]`);
-        if (btn)  btn.style.display = '';
-        return;
-      }
-
-      if (submitBtn) {
-        const id      = submitBtn.dataset.submitReview;
-        const ratingEl= document.querySelector(`input[name="rating-${id}"]:checked`);
-        const comment = document.getElementById(`comment-${id}`)?.value.trim() || '';
-        if (!ratingEl) { alert('اختار تقييمك أولاً'); return; }
-
-        submitBtn.disabled = true; submitBtn.textContent = 'جاري الإرسال...';
-        try {
-          const res  = await csrfFetch('api/reviews.php', {
-            method: 'POST',
-            body: JSON.stringify({ booking_id: Number(id), rating: Number(ratingEl.value), comment })
-          });
-          const data = await res.json();
-          if (!res.ok || !data.ok) { alert(data.message || 'حدث خطأ'); return; }
-          /* Update UI inline */
-          const card = document.getElementById(`booking-${id}`);
-          const bar  = card?.querySelector('.cx-review-bar');
-          const form = document.getElementById(`review-form-${id}`);
-          if (bar)  bar.innerHTML  = `<div class="cx-review-done"><span class="cx-stars">${'★'.repeat(Number(ratingEl.value))}${'☆'.repeat(5-Number(ratingEl.value))}</span> شكراً على تقييمك!</div>`;
-          if (form) form.remove();
-        } catch { alert('خطأ في الاتصال'); }
-        finally  { submitBtn.disabled = false; submitBtn.textContent = 'إرسال التقييم'; }
       }
     });
 
@@ -869,6 +895,29 @@
 
     document.addEventListener('DOMContentLoaded', checkSession);
   </script>
+  <!-- Review modal -->
+  <div id="reviewModal" class="rv-overlay" role="dialog" aria-modal="true" aria-labelledby="rvModalTitle">
+    <div class="rv-modal" id="rvModalInner">
+      <button class="rv-close" id="rvClose" aria-label="إغلاق">✕</button>
+      <!-- Default state -->
+      <div id="rvBody">
+        <div class="rv-modal__icon">⭐</div>
+        <h3 id="rvModalTitle">قيّم تجربتك</h3>
+        <p class="rv-sub">رأيك يساعدنا نتحسن — شاركنا تقييمك بصدق</p>
+        <div class="rv-stars" id="rvStarsWrap">
+          <input type="radio" name="rv-rating" id="rv-s5" value="5"><label for="rv-s5" title="ممتاز">★</label>
+          <input type="radio" name="rv-rating" id="rv-s4" value="4"><label for="rv-s4" title="جيد جداً">★</label>
+          <input type="radio" name="rv-rating" id="rv-s3" value="3"><label for="rv-s3" title="جيد">★</label>
+          <input type="radio" name="rv-rating" id="rv-s2" value="2"><label for="rv-s2" title="مقبول">★</label>
+          <input type="radio" name="rv-rating" id="rv-s1" value="1"><label for="rv-s1" title="سيء">★</label>
+        </div>
+        <textarea class="rv-textarea" id="rvComment" placeholder="شارك تجربتك مع DR.Care (اختياري)..." maxlength="500"></textarea>
+        <p class="rv-msg" id="rvMsg"></p>
+        <button class="btn btn-primary" id="rvSubmit" style="width:100%;min-height:46px;font-size:.92rem">إرسال التقييم</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Cancel booking modal -->
   <div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;place-items:center;backdrop-filter:blur(4px)" role="dialog" aria-modal="true" aria-labelledby="cancelModalTitle">
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-xl);padding:32px;max-width:380px;width:calc(100% - 32px);text-align:center">
@@ -881,6 +930,93 @@
       </div>
     </div>
   </div>
+
+  <script>
+    /* ── Review modal ── */
+    let _rvBookingId = null;
+
+    const openReviewModal = (bookingId) => {
+      _rvBookingId = bookingId;
+      /* Reset modal to default state */
+      document.getElementById('rvBody').innerHTML = `
+        <div class="rv-modal__icon">⭐</div>
+        <h3 id="rvModalTitle">قيّم تجربتك</h3>
+        <p class="rv-sub">رأيك يساعدنا نتحسن — شاركنا تقييمك بصدق</p>
+        <div class="rv-stars" id="rvStarsWrap">
+          <input type="radio" name="rv-rating" id="rv-s5" value="5"><label for="rv-s5" title="ممتاز">★</label>
+          <input type="radio" name="rv-rating" id="rv-s4" value="4"><label for="rv-s4" title="جيد جداً">★</label>
+          <input type="radio" name="rv-rating" id="rv-s3" value="3"><label for="rv-s3" title="جيد">★</label>
+          <input type="radio" name="rv-rating" id="rv-s2" value="2"><label for="rv-s2" title="مقبول">★</label>
+          <input type="radio" name="rv-rating" id="rv-s1" value="1"><label for="rv-s1" title="سيء">★</label>
+        </div>
+        <textarea class="rv-textarea" id="rvComment" placeholder="شارك تجربتك مع DR.Care (اختياري)..." maxlength="500"></textarea>
+        <p class="rv-msg" id="rvMsg"></p>
+        <button class="btn btn-primary" id="rvSubmit" style="width:100%;min-height:46px;font-size:.92rem">إرسال التقييم</button>`;
+      /* Re-bind submit button */
+      document.getElementById('rvSubmit')?.addEventListener('click', submitReview);
+      document.getElementById('reviewModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeReviewModal = () => {
+      document.getElementById('reviewModal').classList.remove('open');
+      document.body.style.overflow = '';
+      _rvBookingId = null;
+    };
+
+    const submitReview = async () => {
+      const ratingEl = document.querySelector('input[name="rv-rating"]:checked');
+      const comment  = document.getElementById('rvComment')?.value.trim() || '';
+      const msgEl    = document.getElementById('rvMsg');
+      const submitBtn = document.getElementById('rvSubmit');
+
+      if (!ratingEl) {
+        if (msgEl) { msgEl.textContent = 'اختار تقييمك أولاً ⭐'; msgEl.className = 'rv-msg error'; }
+        return;
+      }
+      if (msgEl) { msgEl.textContent = ''; msgEl.className = 'rv-msg'; }
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'جاري الإرسال...'; }
+
+      try {
+        const res  = await csrfFetch('api/reviews.php', {
+          method: 'POST',
+          body: JSON.stringify({ booking_id: Number(_rvBookingId), rating: Number(ratingEl.value), comment, action: 'add' })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          if (msgEl) { msgEl.textContent = data.message || 'حدث خطأ — حاول مرة ثانية'; msgEl.className = 'rv-msg error'; }
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'إرسال التقييم'; }
+          return;
+        }
+        /* Show success state inside modal */
+        const stars = '★'.repeat(Number(ratingEl.value)) + '☆'.repeat(5 - Number(ratingEl.value));
+        document.getElementById('rvBody').innerHTML = `
+          <div class="rv-success-icon">✓</div>
+          <h3>شكراً لتقييمك!</h3>
+          <p class="rv-sub" style="margin-bottom:8px">
+            <span style="color:var(--yellow);letter-spacing:3px;font-size:1.2rem">${stars}</span>
+          </p>
+          <p class="rv-sub">رأيك يهمنا وسنعمل على تحسين خدمتنا باستمرار.</p>`;
+        /* Update booking card in background */
+        const card = document.getElementById(`booking-${_rvBookingId}`);
+        const bar  = card?.querySelector('.cx-review-bar');
+        if (bar) bar.innerHTML = `<div class="cx-review-done"><span class="cx-stars">${stars}</span> تم التقييم</div>`;
+        /* Auto-close after 2.5s */
+        setTimeout(closeReviewModal, 2500);
+      } catch {
+        if (msgEl) { msgEl.textContent = 'خطأ في الاتصال — حاول مرة ثانية'; msgEl.className = 'rv-msg error'; }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'إرسال التقييم'; }
+      }
+    };
+
+    /* Close on backdrop click or close button */
+    document.getElementById('rvClose')?.addEventListener('click', closeReviewModal);
+    document.getElementById('reviewModal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('reviewModal')) closeReviewModal();
+    });
+    /* Bind initial submit button */
+    document.getElementById('rvSubmit')?.addEventListener('click', submitReview);
+  </script>
 
   <script>
     /* Page transitions */

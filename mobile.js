@@ -786,12 +786,50 @@ const _mFmtTime = (t) => {
 const _mPopulateDates = () => {
   if (!_mApptDate) return;
   _mApptDate.innerHTML = '<option value="">— اختار يوم —</option>';
-  Object.keys(_mAvailableSlots).sort().forEach(date => {
-    if (!_mAvailableSlots[date].some(s => s.available > 0)) return;
+
+  const dateGrid = document.getElementById('mDateSlotGrid');
+  if (dateGrid) dateGrid.innerHTML = '';
+
+  const availableDates = Object.keys(_mAvailableSlots).sort().filter(date =>
+    _mAvailableSlots[date].some(s => s.available > 0)
+  );
+
+  availableDates.forEach((date, i) => {
+    // Populate hidden select
     const opt = document.createElement('option');
     opt.value = date;
     opt.textContent = _mFmtDate(date);
     _mApptDate.appendChild(opt);
+
+    if (!dateGrid) return;
+
+    const d = new Date(date + 'T00:00:00');
+    const dayName  = d.toLocaleDateString('ar-EG', { weekday: 'short' });
+    const dayNum   = d.getDate();
+    const monthLbl = d.toLocaleDateString('ar-EG', { month: 'short' });
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'm-date-slot-btn';
+    btn.dataset.date = date;
+    btn.setAttribute('aria-label', `${_mFmtDate(date)}`);
+    btn.innerHTML = `<span class="m-date-slot-btn__day">${dayName}</span><span class="m-date-slot-btn__num">${dayNum}</span><span class="m-date-slot-btn__month">${monthLbl}</span>`;
+    btn.style.transitionDelay = `${i * 40}ms`;
+    btn.addEventListener('click', () => {
+      dateGrid.querySelectorAll('.m-date-slot-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-pressed', 'true');
+      _mApptDate.value = date;
+      _mApptDate.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    dateGrid.appendChild(btn);
+  });
+
+  requestAnimationFrame(() => {
+    if (dateGrid) dateGrid.querySelectorAll('.m-date-slot-btn').forEach(b => b.style.transitionDelay = '');
   });
 };
 
@@ -987,3 +1025,120 @@ if (mCounterEls.length) {
   );
   mCounterEls.forEach(el => mCountObs.observe(el));
 }
+
+// ── Car Type Visual Cards + Smart Recommendation ─────
+(function () {
+  const grid   = document.getElementById('mCarTypeGrid');
+  const select = document.getElementById('carType');
+  if (!grid || !select) return;
+
+  const recommend = {
+    sedan:  { pkg: 'inside-out', text: 'الغسيل الداخلي والخارجي مثالي لعربيتك' },
+    suv:    { pkg: 'inside-out', text: 'الغسيل الشامل مع تركيز على الجنوط والإطارات' },
+    van:    { pkg: 'deep',       text: 'Deep Cleaning الأنسب للمساحات الداخلية الكبيرة' },
+    pickup: { pkg: 'outside',    text: 'الغسيل الخارجي يكفي لأغلب أحوال نقل الخفيف' },
+  };
+
+  const pkgRecommend    = document.getElementById('mPkgRecommend');
+  const pkgRecommendCar = document.getElementById('mPkgRecommendCar');
+  const pkgRecommendTxt = document.getElementById('mPkgRecommendText');
+
+  const syncCards = (value) => {
+    grid.querySelectorAll('.m-car-type-card').forEach(card => {
+      const match = card.dataset.car === value;
+      card.classList.toggle('selected', match);
+      card.setAttribute('aria-pressed', String(match));
+    });
+  };
+
+  const applyRecommendation = (carCode) => {
+    const rec = recommend[carCode];
+    if (!rec || !pkgRecommend) return;
+    const nameEl = grid.querySelector(`[data-car="${carCode}"] .m-car-type-card__name`);
+    if (pkgRecommendCar) pkgRecommendCar.textContent = nameEl?.textContent || carCode;
+    if (pkgRecommendTxt) pkgRecommendTxt.textContent = rec.text;
+    pkgRecommend.style.display = '';
+    const sp = document.getElementById('servicePackage');
+    if (sp && rec.pkg && sp.querySelector(`option[value="${rec.pkg}"]`)) {
+      sp.value = rec.pkg;
+      sp.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  };
+
+  grid.querySelectorAll('.m-car-type-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const code = card.dataset.car;
+      syncCards(code);
+      select.value = code;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      applyRecommendation(code);
+    });
+  });
+
+  select.addEventListener('change', () => syncCards(select.value));
+})();
+
+// ── Multi-Step Booking Form Navigation ───────────────
+(function () {
+  const panels = [
+    document.getElementById('mBfPanel1'),
+    document.getElementById('mBfPanel2'),
+    document.getElementById('mBfPanel3'),
+  ];
+  const stepEls = [
+    document.getElementById('mBfInd1'),
+    document.getElementById('mBfInd2'),
+    document.getElementById('mBfInd3'),
+  ];
+  const lineEls = [
+    document.getElementById('mBfLine1'),
+    document.getElementById('mBfLine2'),
+  ];
+
+  if (!panels[0]) return;
+
+  let current = 0;
+
+  const goTo = (next, back = false) => {
+    panels[current].classList.remove('active');
+    panels[current].classList.remove('going-back');
+    panels[next].classList.toggle('going-back', back);
+    panels[next].classList.add('active');
+    current = next;
+
+    stepEls.forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i < current) s.classList.add('done');
+      else if (i === current) s.classList.add('active');
+    });
+    lineEls.forEach((l, i) => l.classList.toggle('done', i < current));
+
+    // Scroll booking section into view
+    const bookingEl = document.getElementById('booking');
+    if (bookingEl) {
+      const top = bookingEl.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
+
+  document.getElementById('mBfNext1')?.addEventListener('click', () => {
+    const ct = document.getElementById('carType');
+    const sp = document.getElementById('servicePackage');
+    if (!ct?.value) { showToast('اختار نوع العربية الأول', 'error'); return; }
+    if (!sp?.value) { showToast('اختار الباقة المناسبة', 'error'); return; }
+    goTo(1);
+  });
+
+  document.getElementById('mBfBack2')?.addEventListener('click', () => goTo(0, true));
+
+  document.getElementById('mBfNext2')?.addEventListener('click', () => {
+    const hasDates = Object.keys(_mAvailableSlots).length > 0;
+    const dateVal  = document.getElementById('apptDate')?.value;
+    const timeVal  = document.getElementById('apptTime')?.value;
+    if (hasDates && !dateVal) { showToast('اختار يوم الموعد', 'error'); return; }
+    if (hasDates && dateVal && !timeVal) { showToast('اختار وقت الموعد', 'error'); return; }
+    goTo(2);
+  });
+
+  document.getElementById('mBfBack3')?.addEventListener('click', () => goTo(1, true));
+})();

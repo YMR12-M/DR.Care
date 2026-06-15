@@ -2508,3 +2508,224 @@ body.page-exit { pointer-events:none; animation: page-out .22s ease forwards !im
 .m-toast-container .toast.out { animation: toast-out .25s ease forwards; }
 @keyframes toast-in  { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
 @keyframes toast-out { to { opacity:0; transform:translateY(12px); } }
+
+/* ══ v6.0 Multi-Step Booking Form ══════════════════ */
+
+/* ── Progress indicator ── */
+.m-bf-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.m-bf-prog-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.m-bf-prog-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 0.82rem; font-weight: 900;
+  background: var(--panel-3);
+  border: 2px solid var(--line-2);
+  color: var(--muted-2);
+  transition: background var(--transition), border-color var(--transition),
+              color var(--transition), box-shadow var(--transition);
+  font-family: var(--font, "Cairo", sans-serif);
+}
+.m-bf-prog-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted-2);
+  transition: color var(--transition);
+  white-space: nowrap;
+}
+.m-bf-prog-step.active .m-bf-prog-num {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: #0a0800;
+  box-shadow: 0 0 0 4px rgba(255,210,31,.2);
+}
+.m-bf-prog-step.active .m-bf-prog-label { color: var(--white, #f5f0e8); }
+.m-bf-prog-step.done .m-bf-prog-num {
+  background: var(--yellow-2);
+  border-color: var(--yellow-2);
+  color: #0a0800;
+}
+.m-bf-prog-step.done .m-bf-prog-label { color: var(--muted); }
+.m-bf-prog-line {
+  flex: 1;
+  height: 2px;
+  background: var(--line-2);
+  border-radius: 2px;
+  margin: 0 5px;
+  margin-bottom: 18px;
+  transition: background 0.4s ease;
+}
+.m-bf-prog-line.done { background: var(--yellow-2); }
+
+/* ── Step panels ── */
+.m-bf-panel { display: none; }
+.m-bf-panel.active {
+  display: block;
+  animation: m-panel-in 0.3s ease both;
+}
+@keyframes m-panel-in {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.m-bf-panel.going-back { animation-name: m-panel-in-back; }
+@keyframes m-panel-in-back {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Step nav buttons ── */
+.m-bf-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  align-items: stretch;
+}
+.m-bf-back-btn {
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--radius-lg);
+  color: var(--muted);
+  font-family: var(--font, "Cairo", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 50px;
+  transition: border-color var(--transition), color var(--transition),
+              background var(--transition);
+}
+.m-bf-back-btn:hover { border-color: var(--yellow-line); color: var(--white, #f5f0e8); }
+
+/* ── Visual Car Type Cards (2-column on mobile) ── */
+.m-car-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 8px 0 18px;
+}
+.m-car-type-card {
+  background: var(--panel-2);
+  border: 2px solid var(--line-2);
+  border-radius: var(--radius-lg);
+  padding: 16px 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition-bounce), background var(--transition-bounce),
+              box-shadow var(--transition-bounce), transform var(--transition-bounce);
+}
+.m-car-type-card:active { transform: scale(0.97); }
+.m-car-type-card.selected {
+  border-color: var(--yellow);
+  background: rgba(255,210,31,.06);
+  box-shadow: 0 5px 20px rgba(255,210,31,.18);
+  transform: translateY(-2px);
+}
+.m-car-type-card__emoji {
+  font-size: 1.9rem;
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.m-car-type-card__name {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--white, #f5f0e8);
+  display: block;
+}
+.m-car-type-card__extra {
+  font-size: .66rem;
+  color: var(--muted-2);
+  margin-top: 4px;
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+}
+.m-car-type-card.selected .m-car-type-card__extra { color: var(--yellow); }
+
+/* ── Smart Package Recommendation ── */
+.m-pkg-recommend {
+  background: var(--yellow-soft);
+  border: 1px solid var(--yellow-line);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  font-size: .8rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.7;
+  display: none;
+}
+.m-pkg-recommend strong { color: var(--yellow); display: block; margin-bottom: 3px; }
+
+/* ── Visual Date Picker ── */
+.m-date-slot-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  gap: 8px;
+  margin: 8px 0 16px;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.m-date-slot-grid::-webkit-scrollbar { display: none; }
+.m-date-slot-btn {
+  padding: 10px 13px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+  cursor: pointer;
+  text-align: center;
+  min-width: 66px;
+  flex-shrink: 0;
+  transition: border-color var(--transition-bounce), background var(--transition-bounce),
+              color var(--transition-bounce), box-shadow var(--transition-bounce),
+              transform var(--transition-bounce);
+}
+.m-date-slot-btn:active { transform: scale(0.95); }
+.m-date-slot-btn.selected {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  box-shadow: 0 4px 16px rgba(255,210,31,.4);
+  transform: translateY(-2px);
+}
+.m-date-slot-btn__day {
+  display: block;
+  font-size: .62rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.m-date-slot-btn.selected .m-date-slot-btn__day { color: rgba(10,8,0,.6); }
+.m-date-slot-btn__num {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--white, #f5f0e8);
+}
+.m-date-slot-btn.selected .m-date-slot-btn__num { color: #0a0800; }
+.m-date-slot-btn__month {
+  display: block;
+  font-size: .62rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.m-date-slot-btn.selected .m-date-slot-btn__month { color: rgba(10,8,0,.55); }
+
