@@ -211,7 +211,7 @@ const requireLogin = async () => {
   const ok = await checkSession();
   if (ok) return true;
   setMessage('عشان تعمل حجز لازم تسجل أو تسجل دخول أولاً.', 'error');
-  const returnTo = encodeURIComponent('mobile.html#booking');
+  const returnTo = encodeURIComponent('mobile-booking.html');
   setTimeout(() => { window.location.href = `customer-login.html?return=${returnTo}`; }, 900);
   return false;
 };
@@ -1231,12 +1231,7 @@ if (mCounterEls.length) {
     if (priceEl) priceEl.textContent = pkg.price === 0 ? 'حسب التقييم' : `${total} جنيه`;
     if (durEl)   durEl.textContent   = durMap[pkg.code] || '—';
     if (bookBtn) {
-      bookBtn.onclick = () => {
-        const sp = document.getElementById('servicePackage');
-        if (sp && pkgSel.value) { sp.value = pkgSel.value; sp.dispatchEvent(new Event('change', { bubbles: true })); }
-        const card = document.querySelector(`[data-car="${selectedCar}"]`);
-        if (card) card.click();
-      };
+      bookBtn.href = `mobile-booking.html?pkg=${encodeURIComponent(pkgSel.value)}&car=${encodeURIComponent(selectedCar || 'sedan')}`;
     }
   };
 
