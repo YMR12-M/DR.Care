@@ -196,8 +196,8 @@
     navBar.style.animation = 'drBarShimmer 1.2s linear infinite';
     document.documentElement.appendChild(navBar);
     requestAnimationFrame(() => {
-      navBar.style.transition = 'width .34s cubic-bezier(.3,.8,.4,1)';
-      navBar.style.width      = '72%';
+      navBar.style.transition = 'width 4.6s cubic-bezier(.05,.8,.2,1)';
+      navBar.style.width      = '88%';
     });
 
     /* Overlay + tip */
@@ -206,7 +206,7 @@
     /* Body exit animation */
     document.body.classList.add('page-exit');
 
-    setTimeout(() => { window.location.href = href; }, 310);
+    setTimeout(() => { window.location.href = href; }, 5000);
   }, true);
 
   /* ── Shimmer keyframe injected once ─────────────── */
