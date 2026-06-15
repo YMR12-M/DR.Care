@@ -361,6 +361,38 @@
   .mbx-dot:nth-child(2) { animation-delay:.2s; }
   .mbx-dot:nth-child(3) { animation-delay:.4s; }
   @keyframes mbx-bounce { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+
+  /* ── Skeleton ── */
+  @keyframes mbx-skel-shimmer {
+    0%   { background-position:200% 0; }
+    100% { background-position:-200% 0; }
+  }
+  .mbx-skel-line {
+    border-radius:6px; display:block;
+    background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.1) 40%,rgba(255,255,255,.04) 80%);
+    background-size:200% 100%;
+    animation:mbx-skel-shimmer 1.6s linear infinite;
+  }
+  .mbx-skel-card {
+    background:var(--panel-2); border:1px solid var(--line-1);
+    border-radius:18px; padding:16px 16px 16px 20px;
+    position:relative; overflow:hidden;
+  }
+  .mbx-skel-card__stripe {
+    position:absolute; top:0; bottom:0; inset-inline-start:0; width:4px;
+    background:rgba(255,210,31,.18); border-radius:2px;
+    animation:mbx-skel-shimmer 1.6s linear infinite;
+    background-size:200% 100%;
+  }
+
+  /* ── Friendly empty state ── */
+  .mbx-empty-state {
+    text-align:center; padding:52px 20px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .mbx-empty-state__icon { font-size:3.5rem; display:block; margin-bottom:4px; line-height:1; }
+  .mbx-empty-state__title { font-size:1.05rem; font-weight:800; color:var(--fg); display:block; }
+  .mbx-empty-state__desc  { font-size:.82rem; color:var(--muted); font-weight:600; line-height:1.6; max-width:260px; margin:0 0 8px; }
   </style>
 </head>
 <body>
@@ -470,7 +502,7 @@
 
       <!-- Quick actions -->
       <div class="mbx-action-strip">
-        <a class="m-btn m-btn--primary m-btn--sm" href="mobile.html#booking">
+        <a class="m-btn m-btn--primary m-btn--sm" href="mobile-booking.html">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
           حجز جديد
         </a>
@@ -494,10 +526,8 @@
       <div class="mbx-list-wrap">
         <p class="mbx-list-title">حجوزاتك</p>
         <div class="mbx-list" id="bookingsList">
-          <div class="mbx-loading">
-            <div class="mbx-dot"></div><div class="mbx-dot"></div><div class="mbx-dot"></div>
-            <span>جاري التحميل...</span>
-          </div>
+          <div class="mbx-skel-card"><div class="mbx-skel-card__stripe"></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div class="mbx-skel-line" style="width:50px;height:11px"></div><div class="mbx-skel-line" style="width:120px;height:13px;flex:1"></div><div class="mbx-skel-line" style="width:48px;height:20px;border-radius:50px"></div></div><div class="mbx-skel-line" style="width:100%;height:38px;border-radius:10px;margin-bottom:12px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div></div></div>
+          <div class="mbx-skel-card"><div class="mbx-skel-card__stripe"></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div class="mbx-skel-line" style="width:50px;height:11px"></div><div class="mbx-skel-line" style="width:120px;height:13px;flex:1"></div><div class="mbx-skel-line" style="width:48px;height:20px;border-radius:50px"></div></div><div class="mbx-skel-line" style="width:100%;height:38px;border-radius:10px;margin-bottom:12px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div><div class="mbx-skel-line" style="height:36px;border-radius:8px"></div></div></div>
         </div>
       </div>
 
@@ -575,13 +605,23 @@
     const filtered = getFiltered();
 
     if (!filtered.length) {
-      const empty = allBookings.length===0;
-      list.innerHTML = `
-        <div class="mbx-empty">
-          <span class="mbx-empty__icon">${empty?'📋':'🔍'}</span>
-          <p>${empty?'لا توجد حجوزات حتى الآن':'لا توجد نتائج في هذا التبويب'}</p>
-          ${empty?`<a class="m-btn m-btn--primary" href="mobile.html#booking">احجز الآن</a>`:''}
-        </div>`;
+      const noBookingsAtAll = allBookings.length===0;
+      if (noBookingsAtAll) {
+        list.innerHTML = `
+          <div class="mbx-empty-state">
+            <span class="mbx-empty-state__icon">🚗</span>
+            <strong class="mbx-empty-state__title">لا توجد حجوزات بعد</strong>
+            <p class="mbx-empty-state__desc">احجز غسلة عربيتك الأولى مع DR.Care — سهل وسريع!</p>
+            <a class="m-btn m-btn--primary" href="mobile-booking.html">احجز الآن</a>
+          </div>`;
+      } else {
+        list.innerHTML = `
+          <div class="mbx-empty-state">
+            <span class="mbx-empty-state__icon">🔍</span>
+            <strong class="mbx-empty-state__title">لا توجد نتائج</strong>
+            <p class="mbx-empty-state__desc">مفيش حجوزات في هذا التبويب حالياً</p>
+          </div>`;
+      }
       return;
     }
 
@@ -801,13 +841,30 @@
     } catch { dateEl.innerHTML = '<option value="">خطأ في التحميل</option>'; }
   };
 
+  const skeletonCards = (n=3) => Array.from({length:n}, () => `
+    <div class="mbx-skel-card">
+      <div class="mbx-skel-card__stripe"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div class="mbx-skel-line" style="width:50px;height:11px"></div>
+        <div class="mbx-skel-line" style="width:120px;height:13px;flex:1"></div>
+        <div class="mbx-skel-line" style="width:48px;height:20px;border-radius:50px"></div>
+      </div>
+      <div class="mbx-skel-line" style="width:100%;height:38px;border-radius:10px;margin-bottom:12px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="mbx-skel-line" style="height:36px;border-radius:8px"></div>
+        <div class="mbx-skel-line" style="height:36px;border-radius:8px"></div>
+        <div class="mbx-skel-line" style="height:36px;border-radius:8px"></div>
+        <div class="mbx-skel-line" style="height:36px;border-radius:8px"></div>
+      </div>
+    </div>`).join('');
+
   const loadBookings = async () => {
     const list=document.getElementById('bookingsList');
-    list.innerHTML='<div class="mbx-loading"><div class="mbx-dot"></div><div class="mbx-dot"></div><div class="mbx-dot"></div><span>جاري التحميل...</span></div>';
+    list.innerHTML = skeletonCards(3);
     try {
       const res=await fetch('api/customer-bookings.php',{credentials:'same-origin'});
       const data=await res.json().catch(()=>({}));
-      if(!res.ok||!data.ok){list.innerHTML=`<div class="mbx-empty"><span class="mbx-empty__icon">⚠️</span><p>${esc(data.message||'خطأ')}</p></div>`;return;}
+      if(!res.ok||!data.ok){list.innerHTML=`<div class="mbx-empty-state"><span class="mbx-empty-state__icon">⚠️</span><strong class="mbx-empty-state__title">${esc(data.message||'خطأ في التحميل')}</strong></div>`;return;}
       allBookings=data.bookings||[];
 
       await Promise.all(allBookings.filter(b=>b.status==='completed').map(b=>
@@ -828,8 +885,9 @@
       if(allBookings.length)document.getElementById('summaryStrip').style.display='';
 
       renderList();
-    }catch{list.innerHTML='<div class="mbx-empty"><span class="mbx-empty__icon">❌</span><p>خطأ في الاتصال</p></div>';}
+    }catch{list.innerHTML='<div class="mbx-empty-state"><span class="mbx-empty-state__icon">😕</span><strong class="mbx-empty-state__title">خطأ في الاتصال</strong><p class="mbx-empty-state__desc">تحقق من الإنترنت وحاول مرة أخرى</p><button class="m-btn m-btn--ghost m-btn--sm" onclick="window._loadBookings()">إعادة المحاولة</button></div>';}
   };
+  window._loadBookings = loadBookings;
 
   /* ── Push notifications ── */
   const VAPID='BNlzhcWCcY69QxDJcesUQybT8K-NVh4ka4EjwbaHdjW4ibISDgZ1_E4EhkE81yDuJ1CKzerVVHSs3jA7nY4kT3U';

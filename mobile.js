@@ -82,6 +82,25 @@ const setMessage = (text, type) => {
   if (type === 'error' && navigator.vibrate) navigator.vibrate(200);
 };
 
+const showBookingSuccess = (data) => {
+  const overlay = document.getElementById('bk-success-overlay');
+  if (!overlay) {
+    setMessage(`✓ تم تسجيل الحجز رقم ${data.booking?.id} بنجاح.`, 'success');
+    setTimeout(() => { window.location.href = 'mobile-bookings.html'; }, 2000);
+    return;
+  }
+  const id    = data.booking?.id;
+  const label = data.booking?.totalLabel;
+  const pkg   = data.booking?.package_name || '';
+  document.getElementById('bk-success-id').textContent    = `#${id}`;
+  document.getElementById('bk-success-price').textContent = label ? `السعر: ${label}` : '';
+  const waMsg = encodeURIComponent(`مرحبا DR.Care 👋\nتم حجزي رقم #${id}${pkg ? ' — ' + pkg : ''}\nفي انتظار التأكيد 🚗`);
+  const waBtn = document.getElementById('bk-success-wa');
+  if (waBtn) waBtn.href = `https://wa.me/201037957593?text=${waMsg}`;
+  overlay.classList.add('show');
+  if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+};
+
 const renderSelect = (el, items, getValue, getLabel, selected) => {
   if (!el) return;
   el.innerHTML = items.map(item => {
@@ -454,17 +473,12 @@ bookingForm?.addEventListener('submit', async (e) => {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.message || 'تعذر تسجيل الطلب الآن.');
 
-    setMessage(
-      `✓ تم تسجيل الحجز رقم ${data.booking.id} بنجاح. السعر: ${data.booking.totalLabel}.`,
-      'success'
-    );
+    showBookingSuccess(data);
     bookingForm.reset();
     appliedCoupon = null;
     populateForm();
     setMinimumAppointment();
     resetCoupon();
-
-    setTimeout(() => { window.location.href = 'mobile-bookings.html'; }, 2000);
 
   } catch (error) {
     // Try background sync via IDB if available
@@ -497,6 +511,18 @@ const loadReviews = async () => {
   const summary = document.getElementById('reviewsSummary');
   if (!grid) return;
 
+  /* Skeleton placeholders while loading */
+  grid.innerHTML = [1,2,3].map(() => `
+    <div class="m-review-skel">
+      <div class="m-skel-line" style="width:80px;height:14px;margin-bottom:10px"></div>
+      <div class="m-skel-line" style="width:100%;height:12px;margin-bottom:6px"></div>
+      <div class="m-skel-line" style="width:75%;height:12px;margin-bottom:14px"></div>
+      <div style="display:flex;justify-content:space-between">
+        <div class="m-skel-line" style="width:60px;height:10px"></div>
+        <div class="m-skel-line" style="width:50px;height:10px"></div>
+      </div>
+    </div>`).join('');
+
   try {
     const res  = await fetch('api/reviews.php', { headers: { Accept: 'application/json' } });
     const data = await res.json().catch(() => ({}));
@@ -504,9 +530,11 @@ const loadReviews = async () => {
 
     if (!reviews.length) {
       grid.innerHTML = `
-        <div class="m-reviews-empty">
-          <span>⭐</span>
-          <p>لا توجد تقييمات حتى الآن — كن أول من يقيّم!</p>
+        <div class="m-reviews-empty-state">
+          <div class="m-reviews-empty-state__icon">⭐</div>
+          <strong class="m-reviews-empty-state__title">لا توجد تقييمات بعد</strong>
+          <p class="m-reviews-empty-state__desc">كن أول من يشارك تجربته مع DR.Care — احجز الآن وقيّم الخدمة!</p>
+          <a class="m-btn m-btn--primary m-btn--sm" href="mobile-booking.html">احجز الآن</a>
         </div>`;
       return;
     }
@@ -551,12 +579,15 @@ const loadReviews = async () => {
 
   } catch {
     if (grid) grid.innerHTML = `
-      <div class="m-reviews-empty">
-        <span>⭐</span>
-        <p>تعذر تحميل التقييمات حالياً</p>
+      <div class="m-reviews-empty-state">
+        <div class="m-reviews-empty-state__icon">😕</div>
+        <strong class="m-reviews-empty-state__title">تعذر تحميل التقييمات</strong>
+        <p class="m-reviews-empty-state__desc">تحقق من اتصالك بالإنترنت وحاول مرة أخرى</p>
+        <button class="m-btn m-btn--ghost m-btn--sm" onclick="loadReviews()">إعادة المحاولة</button>
       </div>`;
   }
-};
+;
+window.loadReviews = loadReviews;
 
 /* ── Scroll reveal ── */
 const revealObserver = new IntersectionObserver(

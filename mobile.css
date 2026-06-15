@@ -3468,3 +3468,63 @@ body.page-exit { pointer-events:none !important; animation: page-out .28s cubic-
 /* Package list item dur text — slightly muted */
 .v10-pkg-item__info small { color: rgba(245,240,232,.45); font-weight: 600; font-size: .7rem; }
 
+/* ═══════════════════════════════════════════════════════
+   v10.2 — Skeleton loading + improved empty states
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Skeleton shimmer base ── */
+@keyframes skel-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.m-skel-line {
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.04) 0%,
+    rgba(255,255,255,.1)  40%,
+    rgba(255,255,255,.04) 80%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s linear infinite;
+  display: block;
+}
+
+.m-review-skel {
+  background: var(--panel-2);
+  border: 1px solid var(--line-1);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+/* ── Reviews empty state ── */
+.m-reviews-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.m-reviews-empty-state__icon {
+  font-size: 3rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 4px;
+  filter: grayscale(.4);
+}
+.m-reviews-empty-state__title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--fg);
+  display: block;
+}
+.m-reviews-empty-state__desc {
+  font-size: .82rem;
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.6;
+  max-width: 260px;
+  margin: 0 0 6px;
+}
+
