@@ -46,7 +46,7 @@ function SectionSub({ text }) {
   );
 }
 
-function useCountUp(target, duration = 800) {
+function useCountUp(target, duration = 900, decimals = 0) {
   const [val, setVal] = useState(0);
   const started = useRef(false);
   useEffect(() => {
@@ -55,12 +55,26 @@ function useCountUp(target, duration = 800) {
     const start = performance.now();
     const tick = (now) => {
       const p = Math.min((now - start) / duration, 1);
-      setVal(Math.round(p * target));
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(parseFloat((eased * target).toFixed(decimals)));
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [target, duration]);
+  }, [target, duration, decimals]);
   return val;
+}
+
+function useReveal() {
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      }),
+      { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
 }
 
 function Stars({ rating }) {
@@ -202,7 +216,9 @@ export default function HomeScreen() {
   const [reviewsError, setReviewsError] = useState(false);
   const scrollRef = useRef(null);
 
-  const count25 = useCountUp(25, 900);
+  const count25  = useCountUp(25,  900, 0);
+  const count49  = useCountUp(4.9, 1100, 1);
+  useReveal();
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -336,9 +352,10 @@ export default function HomeScreen() {
             🚗 مغسلة عربيات مصرية
           </div>
 
-          <h1 className="text-4xl font-black leading-tight mb-3" style={{ color: 'var(--white)' }}>
-            عربيتك{' '}
-            <em className="not-italic" style={{ color: 'var(--white-2)' }}>تستاهل الأحسن</em>
+          <h1 className="text-4xl font-black leading-tight mb-3">
+            <span style={{ color: 'var(--white)' }}>عربيتك</span>
+            <br />
+            <em className="not-italic text-gradient-yellow">تستاهل الأحسن</em>
           </h1>
 
           <p className="text-sm font-bold mb-2" style={{ color: 'var(--muted)' }}>
@@ -382,23 +399,22 @@ export default function HomeScreen() {
 
           {/* Stats bar */}
           <div
-            className="flex rounded-2xl overflow-hidden"
+            className="flex rounded-2xl overflow-hidden reveal"
             style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
           >
-            <div className="flex-1 flex flex-col items-center gap-0.5 text-center py-4">
-              <span className="text-xl font-black" style={{ color: 'var(--yellow)' }}>{count25}</span>
-              <span className="text-[10px] leading-tight px-1" style={{ color: 'var(--muted)' }}>دقيقة غسلة سريعة</span>
-            </div>
-            <div style={{ width: '1px', background: 'var(--line)' }} />
-            <div className="flex-1 flex flex-col items-center gap-0.5 text-center py-4">
-              <span className="text-xl font-black" style={{ color: 'var(--yellow)' }}>4.9</span>
-              <span className="text-[10px] leading-tight px-1" style={{ color: 'var(--muted)' }}>⭐ تقييم العملاء</span>
-            </div>
-            <div style={{ width: '1px', background: 'var(--line)' }} />
-            <div className="flex-1 flex flex-col items-center gap-0.5 text-center py-4">
-              <span className="text-xl font-black" style={{ color: 'var(--yellow)' }}>24/7</span>
-              <span className="text-[10px] leading-tight px-1" style={{ color: 'var(--muted)' }}>حجز أونلاين</span>
-            </div>
+            {[
+              { val: count25,         unit: '',    label: 'دقيقة غسلة' },
+              { val: count49,         unit: '⭐',  label: 'تقييم العملاء' },
+              { val: '24/7',          unit: '',    label: 'حجز أونلاين' },
+            ].map((s, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center text-center py-4 relative">
+                {i > 0 && <div className="absolute right-0 top-3 bottom-3 w-px" style={{ background: 'var(--line)' }} />}
+                <span className="text-2xl font-black leading-none" style={{ color: 'var(--yellow)', textShadow: '0 0 20px rgba(255,210,31,0.3)' }}>
+                  {s.val}{s.unit}
+                </span>
+                <span className="text-[10px] leading-tight px-1 mt-1" style={{ color: 'var(--muted)' }}>{s.label}</span>
+              </div>
+            ))}
           </div>
 
           <div className="flex items-center gap-4 mt-5 flex-wrap">
@@ -448,30 +464,40 @@ export default function HomeScreen() {
 
       {/* E. Services Section */}
       <section className="px-5 py-10" style={{ background: 'var(--black)' }}>
-        <SectionLabel text="OUR SERVICES" />
-        <SectionTitle text="خدماتنا باختصار" />
-        <SectionSub text="كل عربية بتاخد وقتها الصح" />
+        <div className="reveal">
+          <SectionLabel text="OUR SERVICES" />
+          <SectionTitle text="خدماتنا باختصار" />
+          <SectionSub text="كل عربية بتاخد وقتها الصح" />
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          {services.map(s => (
+          {services.map((s, i) => (
             <button
               key={s.code}
               type="button"
               onClick={() => navigate('/book', { state: { service: s.code } })}
-              className="text-right rounded-2xl p-4 active:scale-95 transition-transform relative"
-              style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
+              className={`text-right rounded-2xl p-4 active:scale-95 transition-all duration-150 relative overflow-hidden reveal reveal-delay-${i % 3}`}
+              style={{
+                background: s.hot ? 'linear-gradient(135deg, rgba(255,210,31,0.08) 0%, rgba(255,210,31,0.03) 100%)' : 'var(--panel-2)',
+                border: s.hot ? '1px solid var(--yellow-line)' : '1px solid var(--line)',
+              }}
             >
               {s.hot && (
                 <span
-                  className="absolute top-2 left-2 text-[9px] font-black px-1.5 py-0.5 rounded-full"
+                  className="absolute top-2.5 left-2.5 text-[9px] font-black px-2 py-0.5 rounded-full"
                   style={{ background: 'var(--yellow)', color: '#0a0800' }}
                 >
-                  🔥 طلوب
+                  🔥 الأكثر طلباً
                 </span>
               )}
-              <span className="text-2xl block mb-2">{s.icon}</span>
-              <p className="text-sm font-black mb-0.5" style={{ color: 'var(--white)' }}>{s.name}</p>
-              <p className="text-[10px] mb-2 leading-tight" style={{ color: 'var(--muted)' }}>{s.desc}</p>
-              <p className="text-sm font-black" style={{ color: 'var(--yellow)' }}>{s.price}</p>
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center text-xl mb-3"
+                style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+              >
+                {s.icon}
+              </div>
+              <p className="text-sm font-black mb-1 leading-tight" style={{ color: s.hot ? 'var(--yellow)' : 'var(--white)' }}>{s.name}</p>
+              <p className="text-[10px] mb-2 leading-relaxed" style={{ color: 'var(--muted)' }}>{s.desc}</p>
+              <p className="text-xs font-black" style={{ color: 'var(--yellow)' }}>{s.price}</p>
             </button>
           ))}
         </div>
@@ -479,15 +505,23 @@ export default function HomeScreen() {
 
       {/* F. Packages Section */}
       <section id="packages-section" className="px-5 py-10" style={{ background: 'var(--panel)' }}>
-        <SectionLabel text="PACKAGES & PRICING" />
-        <SectionTitle text="خدماتنا وأسعارها" />
-        <SectionSub text="أسعار واضحة" />
+        <div className="reveal">
+          <SectionLabel text="PACKAGES & PRICING" />
+          <SectionTitle text="خدماتنا وأسعارها" />
+          <SectionSub text="أسعار واضحة — اختار واحجز في ثواني" />
+        </div>
 
         {/* Featured card */}
         <div
-          className="rounded-2xl p-5 mb-4"
-          style={{ background: 'var(--yellow-soft)', border: '2px solid var(--yellow-line)' }}
+          className="rounded-2xl p-5 mb-4 reveal relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,210,31,0.12) 0%, rgba(255,210,31,0.04) 100%)',
+            border: '1.5px solid var(--yellow-line)',
+            boxShadow: '0 0 40px rgba(255,210,31,0.08), 0 0 80px rgba(255,210,31,0.04)',
+          }}
         >
+          <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none opacity-20"
+            style={{ background: 'var(--yellow)', transform: 'translate(30%, -30%)' }} />
           <div className="flex items-start justify-between mb-3">
             <div>
               <span className="text-2xl block mb-1">✨</span>
@@ -506,9 +540,12 @@ export default function HomeScreen() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-1 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
             {['✓ غسيل خارجي', '✓ تنظيف داخلي', '✓ مايكروفايبر', '⏱ ٤٥ دقيقة'].map(f => (
-              <p key={f} className="text-xs font-bold" style={{ color: 'var(--muted)' }}>{f}</p>
+              <span key={f} className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(255,210,31,0.12)', border: '1px solid rgba(255,210,31,0.2)', color: 'var(--yellow-2)' }}>
+                {f}
+              </span>
             ))}
           </div>
           <button
@@ -583,19 +620,28 @@ export default function HomeScreen() {
 
       {/* H. Why Us */}
       <section className="px-5 py-10" style={{ background: 'var(--panel)' }}>
-        <SectionLabel text="WHY DR.CARE" />
-        <SectionTitle text="ليه DR.Care؟" />
-        <SectionSub text="مبنية على التفاصيل" />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="reveal">
+          <SectionLabel text="WHY DR.CARE" />
+          <SectionTitle text="ليه DR.Care؟" />
+          <SectionSub text="مبنية على التفاصيل اللي بتفرق للعميل المصري" />
+        </div>
+        <div className="flex flex-col gap-3">
           {whyItems.map((w, i) => (
             <div
               key={i}
-              className="rounded-2xl p-4"
+              className={`flex items-start gap-4 rounded-2xl p-4 reveal reveal-delay-${i % 3}`}
               style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
             >
-              <span className="text-2xl block mb-2">{w.icon}</span>
-              <p className="text-sm font-black mb-1 leading-tight" style={{ color: 'var(--white)' }}>{w.title}</p>
-              <p className="text-[11px] leading-relaxed" style={{ color: 'var(--muted)' }}>{w.desc}</p>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}
+              >
+                {w.icon}
+              </div>
+              <div className="flex-1 pt-0.5">
+                <p className="text-sm font-black mb-1" style={{ color: 'var(--white)' }}>{w.title}</p>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>{w.desc}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -603,30 +649,40 @@ export default function HomeScreen() {
 
       {/* I. Process Section */}
       <section className="px-5 py-10" style={{ background: 'var(--black)' }}>
-        <SectionLabel text="HOW IT WORKS" />
-        <SectionTitle text="من الحجز للتسليم" />
-        <SectionSub text="٤ خطوات بسيطة" />
-        <div className="relative">
-          <div
-            className="absolute top-6 right-6 bottom-6 w-px"
-            style={{ background: 'var(--line)' }}
-          />
-          <div className="flex flex-col gap-6">
-            {steps.map((step, i) => (
-              <div key={i} className="flex gap-4 items-start relative">
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm flex-shrink-0 z-10"
-                  style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}
-                >
-                  {step.n}
-                </div>
-                <div className="pt-2">
-                  <p className="text-sm font-black mb-0.5" style={{ color: 'var(--white)' }}>{step.title}</p>
-                  <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>{step.desc}</p>
-                </div>
+        <div className="reveal">
+          <SectionLabel text="HOW IT WORKS" />
+          <SectionTitle text="من الحجز للتسليم" />
+          <SectionSub text="٤ خطوات بسيطة وعربيتك تبقى زي الفل" />
+        </div>
+        <div className="flex flex-col">
+          {steps.map((step, i) => (
+            <div key={i} className={`flex gap-4 items-start relative reveal reveal-delay-${i % 3}`}
+              style={{ paddingBottom: i < steps.length - 1 ? '28px' : '0' }}>
+              {/* connector */}
+              {i < steps.length - 1 && (
+                <div className="absolute top-12 bottom-0 w-px"
+                  style={{
+                    right: '23px',
+                    background: 'linear-gradient(to bottom, var(--yellow-line) 0%, rgba(255,210,31,0.05) 100%)'
+                  }}
+                />
+              )}
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm flex-shrink-0 z-10"
+                style={{
+                  background: i === 0 ? 'var(--yellow)' : 'var(--yellow-soft)',
+                  border: '1px solid var(--yellow-line)',
+                  color: i === 0 ? '#0a0800' : 'var(--yellow)',
+                }}
+              >
+                {step.n}
               </div>
-            ))}
-          </div>
+              <div className="flex-1 pt-2">
+                <p className="text-sm font-black mb-1" style={{ color: 'var(--white)' }}>{step.title}</p>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>{step.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -773,32 +829,34 @@ export default function HomeScreen() {
       </section>
 
       {/* L. Final CTA */}
-      <section className="px-5 py-10" style={{ background: 'var(--panel)' }}>
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-black mb-2" style={{ color: 'var(--white)' }}>جاهز تحجز دورك؟</h2>
+      <section className="px-5 py-12 relative overflow-hidden reveal" style={{ background: 'var(--panel)' }}>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full blur-3xl opacity-15 pointer-events-none"
+          style={{ background: 'var(--yellow)' }} />
+        <div className="relative text-center mb-7">
+          <p className="text-[10px] font-black tracking-[0.18em] mb-3" style={{ color: 'var(--yellow)' }}>BOOK NOW</p>
+          <h2 className="text-3xl font-black mb-2 leading-tight" style={{ color: 'var(--white)' }}>
+            جاهز تحجز<br />دورك؟
+          </h2>
           <p className="text-sm" style={{ color: 'var(--muted)' }}>
             ٣ خطوات سريعة — تأكيد فوري — بدون مفاجآت
           </p>
         </div>
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
+        <div className="flex flex-wrap justify-center gap-2 mb-7">
           {['✓ تأكيد فوري', '✓ كاش أو Instapay', '✓ متابعة لحظية'].map(b => (
-            <span
-              key={b}
-              className="text-xs font-bold px-3 py-1.5 rounded-full"
-              style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}
-            >
+            <span key={b} className="text-xs font-bold px-3 py-1.5 rounded-full"
+              style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}>
               {b}
             </span>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => navigate('/book')}
-          className="w-full btn-yellow py-5 rounded-2xl text-lg font-black active:scale-95 transition-transform"
-        >
+        <button type="button" onClick={() => navigate('/book')}
+          className="w-full btn-yellow py-5 rounded-2xl text-lg font-black active:scale-95 transition-transform relative">
+          <svg className="inline ml-2 mb-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+          </svg>
           ابدأ الحجز الآن
         </button>
-        <p className="text-center text-xs mt-3" style={{ color: 'var(--muted)' }}>⏱ أقل من دقيقتين</p>
+        <p className="text-center text-xs mt-3" style={{ color: 'var(--muted-2)' }}>⏱ أقل من دقيقتين</p>
       </section>
 
       {/* M. Footer */}

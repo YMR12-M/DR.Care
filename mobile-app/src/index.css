@@ -65,7 +65,29 @@ body::before {
   padding-bottom: calc(64px + var(--safe-bottom));
 }
 
-/* yellow glow on active elements */
+/* ── Scroll reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+
+/* ── Gradient text ── */
+.text-gradient-yellow {
+  background: linear-gradient(135deg, #ffd21f 0%, #f5c400 60%, #c99500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── yellow glow on active elements ── */
 .btn-yellow {
   background: var(--yellow);
   color: #0a0800;
