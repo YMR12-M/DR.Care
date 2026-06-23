@@ -19,6 +19,8 @@ offline-cache/
 
 # Node / frontend dependencies
 node_modules/
+mobile-app/node_modules/
+mobile-app/dist/
 
 # PHP / Composer
 vendor/
