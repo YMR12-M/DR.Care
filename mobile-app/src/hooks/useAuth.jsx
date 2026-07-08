@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     fetch('../api/customer-login.php?action=check', { credentials: 'same-origin' })
       .then(r => r.json())
-      .then(d => setUser(d.logged_in ? d : null))
+      .then(d => setUser(d.authenticated ? d : null))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);

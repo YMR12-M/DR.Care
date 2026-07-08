@@ -849,8 +849,8 @@ export default function BookingScreen() {
         body:    JSON.stringify(payload),
       });
       const d = await res.json();
-      if (d.success || d.booking_id) {
-        navigate('/booking-success', { state: { booking: d } });
+      if (d.ok && d.booking?.id) {
+        navigate('/booking-success', { state: { booking: d.booking } });
       } else {
         setStatusMsg({ ok: false, text: d.message || 'حصل خطأ، حاول تاني' });
       }

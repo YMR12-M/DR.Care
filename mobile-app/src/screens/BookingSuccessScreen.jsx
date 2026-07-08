@@ -24,11 +24,11 @@ export default function BookingSuccessScreen() {
         شكراً ليك! هنتواصل معاك قريباً لتأكيد الموعد
       </p>
 
-      {booking.booking_id && (
+      {booking.id && (
         <div className="rounded-2xl p-4 w-full mb-6 text-right relative"
           style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>
           <p className="text-xs mb-1" style={{ color: 'var(--muted)' }}>رقم الحجز</p>
-          <p className="text-xl font-black" style={{ color: 'var(--yellow)' }}>#{booking.booking_id}</p>
+          <p className="text-xl font-black" style={{ color: 'var(--yellow)' }}>#{booking.id}</p>
         </div>
       )}
 

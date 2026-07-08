@@ -176,12 +176,19 @@ if ($method === 'PATCH') {
   $detail = [];
 
   if (array_key_exists('status', $input)) {
-    $allowed = ['new', 'confirmed', 'in_service', 'completed', 'cancelled'];
-    $status  = trim($input['status']);
-    if (!in_array($status, $allowed, true)) jsonResponse(['ok' => false, 'message' => 'حالة غير صالحة'], 400);
+    $status = trim($input['status']);
+    if (!BookingStateMachine::isValidState($status)) jsonResponse(['ok' => false, 'message' => 'حالة غير صالحة'], 400);
+    try {
+      BookingStateMachine::assertTransition($existing['status'], $status, 'pos');
+    } catch (BookingTransitionException $e) {
+      jsonResponse(['ok' => false, 'message' => $e->getMessage()], 409);
+    }
     $sets[]  = 'status = ?';
     $params[] = $status;
     $detail['status'] = ['from' => $existing['status'], 'to' => $status];
+    if (BookingStateMachine::clearsPaymentScreenshot($status)) {
+      $sets[] = 'payment_screenshot = NULL';
+    }
   }
 
   if (array_key_exists('payment_status', $input)) {
@@ -198,6 +205,10 @@ if ($method === 'PATCH') {
   $params[] = $id;
   $pdo->prepare('UPDATE bookings SET ' . implode(', ', $sets) . ' WHERE id = ?')->execute($params);
   logAudit($pdo, 'pos', null, 'booking.updated', 'booking', $id, $detail);
+
+  if (array_key_exists('status', $input)) {
+    BookingStateMachine::applyStatusSideEffects($pdo, $id, $existing['status'], $status);
+  }
 
   jsonResponse(['ok' => true, 'message' => 'تم التحديث']);
 }

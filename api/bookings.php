@@ -251,13 +251,17 @@ if ($method === 'PATCH') {
   $detail = [];
 
   if (array_key_exists('status', $input)) {
-    $allowed = ['new', 'confirmed', 'in_service', 'completed', 'cancelled'];
-    if (!in_array($input['status'], $allowed, true))
+    if (!BookingStateMachine::isValidState($input['status']))
       jsonResponse(['ok' => false, 'message' => 'حالة غير صالحة'], 400);
+    try {
+      BookingStateMachine::assertTransition($existing['status'], $input['status'], 'admin');
+    } catch (BookingTransitionException $e) {
+      jsonResponse(['ok' => false, 'message' => $e->getMessage()], 409);
+    }
     $sets[] = 'status = :status';
     $params[':status'] = $input['status'];
     $detail['status'] = ['from' => $existing['status'], 'to' => $input['status']];
-    if (in_array($input['status'], ['completed', 'cancelled'], true)) {
+    if (BookingStateMachine::clearsPaymentScreenshot($input['status'])) {
       $sets[] = 'payment_screenshot = NULL';
     }
   }
@@ -297,59 +301,8 @@ if ($method === 'PATCH') {
   $pdo->prepare('UPDATE bookings SET ' . implode(', ', $sets) . ' WHERE id = :id')->execute($params);
   logAudit($pdo, 'admin', $_SESSION['admin_id'] ?? null, 'booking.updated', 'booking', $id, $detail);
 
-  /* ── Award loyalty points on completion ── */
-  if (
-    isset($input['status']) &&
-    $input['status'] === 'completed' &&
-    $existing['status'] !== 'completed'
-  ) {
-    $bk = $pdo->prepare('SELECT customer_id, total_price, package_name FROM bookings WHERE id = :id');
-    $bk->execute([':id' => $id]);
-    $bkRow = $bk->fetch(PDO::FETCH_ASSOC);
-
-    if ($bkRow && $bkRow['customer_id']) {
-      /* 1 point per 10 ج, minimum 5 points */
-      $earned = max(5, (int)floor((float)$bkRow['total_price'] / 10));
-
-      /* Check not already awarded for this booking */
-      $already = $pdo->prepare('SELECT id FROM loyalty_points WHERE booking_id = :bid AND source = :src');
-      $already->execute([':bid' => $id, ':src' => 'booking']);
-      if (!$already->fetch()) {
-        $pdo->prepare("
-          INSERT INTO loyalty_points (customer_id, points, source, booking_id, note)
-          VALUES (:cid, :pts, 'booking', :bid, :note)
-        ")->execute([
-          ':cid'  => (int)$bkRow['customer_id'],
-          ':pts'  => $earned,
-          ':bid'  => $id,
-          ':note' => "حجز مكتمل: {$bkRow['package_name']}",
-        ]);
-      }
-
-      maybeRewardReferral($pdo, (int)$bkRow['customer_id']);
-    }
-  }
-
-  /* ── WhatsApp notification to customer on status change ── */
-  if (isset($input['status']) && $detail['status']['from'] !== $detail['status']['to']) {
-    $bkWa = $pdo->prepare('SELECT name, phone, package_name, branch FROM bookings WHERE id = :id');
-    $bkWa->execute([':id' => $id]);
-    $bkData = $bkWa->fetch(PDO::FETCH_ASSOC);
-
-    if ($bkData) {
-      $n = $bkData['name'];
-      $p = $bkData['package_name'];
-      $b = $bkData['branch'];
-      $waMessages = [
-        'confirmed'  => "مرحباً {$n}،\n\nتم تأكيد حجزك في DR.Care ✅\nرقم الحجز: #{$id}\nالباقة: {$p}\nالفرع: {$b}\n\nفي انتظارك! 🚗",
-        'in_service' => "مرحباً {$n}،\n\nعربيتك دلوقتي بتتغسل في DR.Care 🚿✨\nرقم الحجز: #{$id}\n\nهنعلّمك لما تخلص!",
-        'completed'  => "مرحباً {$n}،\n\nتم تسليم عربيتك بنجاح! ✅🎉\nرقم الحجز: #{$id}\n\nشكراً لثقتك في DR.Care. نتمنى نشوفك تاني! 🚗",
-        'cancelled'  => "مرحباً {$n}،\n\nللأسف تم إلغاء حجزك #{$id} في DR.Care.\n\nلو عندك أي استفسار تواصل معنا. نتمنى نخدمك تاني! 🚗",
-      ];
-      if (isset($waMessages[$input['status']])) {
-        sendWhatsApp($bkData['phone'], $waMessages[$input['status']]);
-      }
-    }
+  if (array_key_exists('status', $input)) {
+    BookingStateMachine::applyStatusSideEffects($pdo, $id, $existing['status'], $input['status']);
   }
 
   jsonResponse(['ok' => true, 'message' => 'تم التحديث']);

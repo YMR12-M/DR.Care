@@ -4,11 +4,11 @@ import { useAuth } from '../hooks/useAuth';
 import { secureFetch } from '../lib/api';
 
 const STATUS_MAP = {
-  pending:     { label: 'في الانتظار',   bg: 'rgba(255,210,31,0.12)', color: '#ffd21f' },
-  confirmed:   { label: 'مؤكد',          bg: 'rgba(91,164,245,0.12)', color: '#5ba4f5' },
-  in_progress: { label: 'جاري التنفيذ', bg: 'rgba(170,59,255,0.12)', color: '#aa3bff' },
-  completed:   { label: 'مكتمل',         bg: 'rgba(111,207,71,0.12)', color: '#6fcf47' },
-  cancelled:   { label: 'ملغي',          bg: 'rgba(240,83,62,0.12)',  color: '#f0533e' },
+  new:        { label: 'في الانتظار',   bg: 'rgba(255,210,31,0.12)', color: '#ffd21f' },
+  confirmed:  { label: 'مؤكد',          bg: 'rgba(91,164,245,0.12)', color: '#5ba4f5' },
+  in_service: { label: 'جاري التنفيذ', bg: 'rgba(170,59,255,0.12)', color: '#aa3bff' },
+  completed:  { label: 'مكتمل',         bg: 'rgba(111,207,71,0.12)', color: '#6fcf47' },
+  cancelled:  { label: 'ملغي',          bg: 'rgba(240,83,62,0.12)',  color: '#f0533e' },
 };
 
 function BookingCard({ booking }) {
@@ -71,7 +71,7 @@ export default function BookingsScreen() {
   useEffect(() => {
     if (authLoading) return;
     if (!user)       { setLoading(false); return; }
-    secureFetch('../api/bookings.php?action=list')
+    secureFetch('../api/customer-bookings.php')
       .then(r => r.json())
       .then(d => setBookings(d.bookings || []))
       .catch(() => {})

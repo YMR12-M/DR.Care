@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace DRCare\Tests\Integration;
 
 use DRCare\Tests\Support\ApiTestCase;
+use DRCare\Tests\Support\HttpClient;
+use PDO;
 
 final class PosApiTest extends ApiTestCase
 {
@@ -69,5 +71,70 @@ final class PosApiTest extends ApiTestCase
         );
         $this->assertSame(200, $search['status']);
         $this->assertNotEmpty($search['body']['bookings']);
+    }
+
+    public function testPosRejectsInvalidStatusTransition(): void
+    {
+        $client = new HttpClient(self::baseUrl());
+        $create = $client->post('/api/pos.php', [
+            'token' => self::POS_TOKEN,
+            'name' => 'عميل انتقال POS',
+            'phone' => '01055556666',
+            'packageCode' => 'outside',
+            'carType' => 'sedan',
+            'branch' => 'قليوب — شارع العروبة',
+            'paymentMethod' => 'كاش',
+        ]);
+        $bookingId = $create['body']['booking']['id'] ?? null;
+        $this->assertNotNull($bookingId);
+
+        // Cannot skip new -> completed directly.
+        $skip = $client->patch('/api/pos.php', [
+            'token' => self::POS_TOKEN,
+            'id' => $bookingId,
+            'status' => 'completed',
+        ]);
+        $this->assertSame(409, $skip['status']);
+
+        $client->cleanup();
+    }
+
+    public function testPosCompletionAwardsLoyaltyPointsWhenLinkedToCustomer(): void
+    {
+        $client = new HttpClient(self::baseUrl());
+        $create = $client->post('/api/pos.php', [
+            'token' => self::POS_TOKEN,
+            'name' => 'عميل ولاء POS',
+            'phone' => '01033334444',
+            'packageCode' => 'outside',
+            'carType' => 'sedan',
+            'branch' => 'قليوب — شارع العروبة',
+            'paymentMethod' => 'كاش',
+        ]);
+        $bookingId = $create['body']['booking']['id'] ?? null;
+        $this->assertNotNull($bookingId);
+
+        // Link this POS booking to a customer, as claim-booking.php would.
+        $registration = $this->registerCustomer($client);
+        $pdo = new PDO('sqlite:' . self::dbPath());
+        $customerId = (int) $pdo->query(
+            "SELECT id FROM customer_users WHERE email = " . $pdo->quote($registration['email'])
+        )->fetchColumn();
+        $pdo->prepare('UPDATE bookings SET customer_id = ? WHERE id = ?')->execute([$customerId, $bookingId]);
+
+        foreach (['confirmed', 'in_service', 'completed'] as $status) {
+            $step = $client->patch('/api/pos.php', [
+                'token' => self::POS_TOKEN,
+                'id' => $bookingId,
+                'status' => $status,
+            ]);
+            $this->assertSame(200, $step['status'], $step['raw'] ?? '');
+        }
+
+        $points = $pdo->prepare('SELECT COUNT(*) FROM loyalty_points WHERE booking_id = ? AND source = ?');
+        $points->execute([$bookingId, 'booking']);
+        $this->assertSame(1, (int) $points->fetchColumn());
+
+        $client->cleanup();
     }
 }

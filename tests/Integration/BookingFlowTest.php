@@ -110,4 +110,71 @@ final class BookingFlowTest extends ApiTestCase
 
         $customer->cleanup();
     }
+
+    public function testAdminCannotSkipOrReverseStatusTransitions(): void
+    {
+        $customer = new HttpClient(self::baseUrl());
+        $email = $this->uniqueEmail();
+        $this->registerCustomer($customer, $email);
+        $created = $this->createBooking($customer, ['email' => $email]);
+        $bookingId = $created['response']['body']['booking']['id'] ?? null;
+
+        $admin = self::$adminClient;
+        $this->loginAdmin($admin);
+        $csrf = $this->csrfToken($admin);
+
+        // Cannot skip new -> in_service directly.
+        $skip = $admin->patch('/api/bookings.php', [
+            'id' => $bookingId,
+            'status' => 'in_service',
+        ], ['X-CSRF-Token' => $csrf]);
+        $this->assertSame(409, $skip['status']);
+
+        // Walk the happy path to completed.
+        foreach (['confirmed', 'in_service', 'completed'] as $status) {
+            $step = $admin->patch('/api/bookings.php', [
+                'id' => $bookingId,
+                'status' => $status,
+            ], ['X-CSRF-Token' => $csrf]);
+            $this->assertSame(200, $step['status'], $step['raw'] ?? '');
+        }
+
+        // Cannot reverse a completed booking back to new.
+        $reverse = $admin->patch('/api/bookings.php', [
+            'id' => $bookingId,
+            'status' => 'new',
+        ], ['X-CSRF-Token' => $csrf]);
+        $this->assertSame(409, $reverse['status']);
+
+        $customer->cleanup();
+    }
+
+    public function testCustomerCannotCancelBookingInService(): void
+    {
+        $customer = new HttpClient(self::baseUrl());
+        $email = $this->uniqueEmail();
+        $this->registerCustomer($customer, $email);
+        $created = $this->createBooking($customer, ['email' => $email]);
+        $bookingId = $created['response']['body']['booking']['id'] ?? null;
+
+        $admin = self::$adminClient;
+        $this->loginAdmin($admin);
+        $adminCsrf = $this->csrfToken($admin);
+        foreach (['confirmed', 'in_service'] as $status) {
+            $step = $admin->patch('/api/bookings.php', [
+                'id' => $bookingId,
+                'status' => $status,
+            ], ['X-CSRF-Token' => $adminCsrf]);
+            $this->assertSame(200, $step['status'], $step['raw'] ?? '');
+        }
+
+        $customerCsrf = $this->csrfToken($customer);
+        $cancel = $customer->patch('/api/customer-bookings.php', [
+            'id' => $bookingId,
+            'action' => 'cancel',
+        ], ['X-CSRF-Token' => $customerCsrf]);
+        $this->assertSame(422, $cancel['status']);
+
+        $customer->cleanup();
+    }
 }

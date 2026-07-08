@@ -467,7 +467,7 @@ GET /api/pos.php?action=today&token=...
 ### 8.5 `PATCH api/bookings.php`
 
 - مسؤول فقط
-- `{ id, status }` — لا تحقق من قائمة الحالات في bookings.php (يقبل أي نص؛ الواجهة تقيّد)
+- `{ id, status }` — يُتحقق أولاً من أن `status` ضمن enum الحالات الخمس، **ثم** من صحة الانتقال نفسه عبر `BookingStateMachine::assertTransition()` (`api/BookingStateMachine.php`) — مصدر الحقيقة الوحيد، يُستدعى أيضاً من `api/pos.php` و`api/customer-bookings.php`. انتقال غير منطقي (مثل `completed → new` أو تخطي حالة كـ `new → completed`) يُرفض بـ `409`. التفاصيل الكاملة (الحالات، الانتقالات المسموحة، الآثار الجانبية) في `BOOKING_WORKFLOW.md`.
 
 ---
 

@@ -65,15 +65,20 @@ if ($method === 'PATCH') {
         || ($email && $booking['email'] === $email);
   if (!$owned) jsonResponse(['ok' => false, 'message' => 'غير مصرح'], 403);
 
-  $cancellable = in_array($booking['status'], ['new', 'confirmed'], true);
+  $cancellable = BookingStateMachine::canTransition($booking['status'], 'cancelled', 'customer');
 
   /* ── Cancel ── */
   if ($action === 'cancel') {
     if (!$cancellable)
       jsonResponse(['ok' => false, 'message' => 'لا يمكن إلغاء هذا الحجز في حالته الحالية'], 422);
 
-    $pdo->prepare('UPDATE bookings SET status = :s WHERE id = :id')
-        ->execute([':s' => 'cancelled', ':id' => $id]);
+    $sets = ['status = :s'];
+    $params = [':s' => 'cancelled', ':id' => $id];
+    if (BookingStateMachine::clearsPaymentScreenshot('cancelled')) {
+      $sets[] = 'payment_screenshot = NULL';
+    }
+    $pdo->prepare('UPDATE bookings SET ' . implode(', ', $sets) . ' WHERE id = :id')
+        ->execute($params);
     logAudit($pdo, 'customer', $customerId, 'booking.cancelled', 'booking', $id, ['status' => ['from' => $booking['status'], 'to' => 'cancelled']]);
     jsonResponse(['ok' => true, 'message' => 'تم إلغاء الحجز بنجاح']);
   }

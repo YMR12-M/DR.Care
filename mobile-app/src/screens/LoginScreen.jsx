@@ -22,8 +22,14 @@ export default function LoginScreen() {
         body: JSON.stringify({ action: 'login', email: form.email, password: form.password }),
       });
       const d = await res.json();
-      if (d.success) { setUser(d); navigate(-1); }
-      else setError(d.message || 'بيانات غير صحيحة');
+      if (d.ok) {
+        const check = await fetch('../api/customer-login.php?action=check', { credentials: 'same-origin' });
+        const profile = await check.json();
+        setUser(profile.authenticated ? profile : null);
+        navigate(-1);
+      } else {
+        setError(d.message || 'بيانات غير صحيحة');
+      }
     } catch {
       setError('مفيش اتصال بالإنترنت');
     } finally {

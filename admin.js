@@ -93,6 +93,15 @@ const STATUS_LABELS = {
   cancelled:  'ملغي'
 };
 
+// يطابق جدول الانتقالات في api/BookingStateMachine.php — تحديث هنا لو الـ backend اتغير
+const STATUS_TRANSITIONS = {
+  new:        ['confirmed', 'cancelled'],
+  confirmed:  ['in_service', 'cancelled'],
+  in_service: ['completed', 'cancelled'],
+  completed:  [],
+  cancelled:  [],
+};
+
 const PAYMENT_LABELS = { pending: 'انتظار', paid: 'مدفوع', waived: 'معفو' };
 const PAYMENT_COLORS = { pending: '#e67e22', paid: '#27ae60', waived: '#7f8c8d' };
 
@@ -359,8 +368,8 @@ const renderTable = () => {
       <!-- Actions -->
       <div class="bk-card__actions">
         <select class="bk-status-select" data-booking-id="${b.id}" aria-label="حالة الطلب #${b.id}">
-          ${Object.entries(STATUS_LABELS).map(([val, lbl]) =>
-            `<option value="${val}"${b.status === val ? ' selected' : ''}>${lbl}</option>`
+          ${[b.status, ...(STATUS_TRANSITIONS[b.status] || [])].map((val) =>
+            `<option value="${val}"${b.status === val ? ' selected' : ''}>${STATUS_LABELS[val] || val}</option>`
           ).join('')}
         </select>
         <button class="bk-view-btn details-btn" type="button" data-booking-id="${b.id}" aria-label="عرض تفاصيل #${b.id}">
@@ -504,9 +513,11 @@ const showBookingDetails = (booking) => {
 
       <p class="modal-section-title">تغيير الحالة</p>
       <div class="modal-actions">
-        ${Object.entries(STATUS_LABELS).map(([s, l]) =>
-          `<button type="button" class="quick-action" data-status="${s}" data-booking-id="${booking.id}">${l}</button>`
-        ).join('')}
+        ${(STATUS_TRANSITIONS[booking.status] || []).length === 0
+          ? `<span style="font-size:.8rem;color:var(--muted)">الحجز في حالة نهائية</span>`
+          : (STATUS_TRANSITIONS[booking.status] || []).map((s) =>
+              `<button type="button" class="quick-action" data-status="${s}" data-booking-id="${booking.id}">${STATUS_LABELS[s]}</button>`
+            ).join('')}
         <button type="button" id="printBookingBtn" class="quick-action" style="background:rgba(255,255,255,.04);color:var(--muted);border-color:var(--line-2)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:middle;margin-left:5px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           طباعة

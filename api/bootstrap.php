@@ -674,3 +674,5 @@ function validateCsrfToken(): void {
     jsonResponse(['ok' => false, 'message' => 'طلب غير صالح (CSRF).'], 403);
   }
 }
+
+require_once __DIR__ . '/BookingStateMachine.php';
