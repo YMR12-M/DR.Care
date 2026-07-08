@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { secureFetch } from '../lib/api';
 
 function MenuItem({ icon, label, onClick, danger }) {
   return (
@@ -22,6 +23,15 @@ export default function ProfileScreen() {
   const navigate              = useNavigate();
   const { user, loading, logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [loyaltyBalance, setLoyaltyBalance] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    secureFetch('../api/loyalty.php')
+      .then(r => r.json())
+      .then(d => setLoyaltyBalance(d?.balance || 0))
+      .catch(() => {});
+  }, [user]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -83,13 +93,13 @@ export default function ProfileScreen() {
             {user.phone && <p className="text-sm" style={{ color: 'var(--muted)' }}>{user.phone}</p>}
           </div>
         </div>
-        {user.loyalty_points > 0 && (
+        {loyaltyBalance > 0 && (
           <div className="relative mt-4 rounded-xl p-3 flex items-center gap-2"
             style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}>
             <span className="text-xl">⭐</span>
             <div>
               <p className="text-xs" style={{ color: 'var(--muted)' }}>نقاط الولاء</p>
-              <p className="font-black" style={{ color: 'var(--yellow)' }}>{user.loyalty_points} نقطة</p>
+              <p className="font-black" style={{ color: 'var(--yellow)' }}>{loyaltyBalance} نقطة</p>
             </div>
           </div>
         )}
@@ -100,7 +110,7 @@ export default function ProfileScreen() {
         <MenuItem icon="📋" label="حجوزاتي"       onClick={() => navigate('/bookings')} />
         <MenuItem icon="👤" label="تعديل البيانات" onClick={() => navigate('/edit-profile')} />
         <MenuItem icon="🎁" label="كوبونات الخصم"  onClick={() => navigate('/coupons')} />
-        <MenuItem icon="📞" label="تواصل معنا"     onClick={() => window.open('tel:+201000000000')} />
+        <MenuItem icon="📞" label="تواصل معنا"     onClick={() => window.open('tel:+201037957593')} />
       </div>
 
       <div className="mx-4 mt-3 rounded-2xl overflow-hidden" style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>

@@ -10,10 +10,14 @@ import BookingScreen from './screens/BookingScreen';
 import BookingsScreen from './screens/BookingsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
+import CouponsScreen from './screens/CouponsScreen';
 import BookingSuccessScreen from './screens/BookingSuccessScreen';
 
-const HIDE_NAV     = ['/login', '/register', '/booking-success', '/forgot-password'];
-const HIDE_WAAPP   = ['/login', '/register', '/booking-success', '/forgot-password'];
+const HIDE_NAV     = ['/login', '/register', '/booking-success', '/forgot-password', '/edit-profile', '/book'];
+const HIDE_WAAPP   = ['/login', '/register', '/booking-success', '/forgot-password', '/edit-profile', '/book'];
 
 function AppShell() {
   const location = useLocation();
@@ -33,6 +37,10 @@ function AppShell() {
           <Route path="/bookings"        element={<BookingsScreen />} />
           <Route path="/profile"         element={<ProfileScreen />} />
           <Route path="/login"           element={<LoginScreen />} />
+          <Route path="/register"        element={<RegisterScreen />} />
+          <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+          <Route path="/edit-profile"    element={<EditProfileScreen />} />
+          <Route path="/coupons"         element={<CouponsScreen />} />
           <Route path="/booking-success" element={<BookingSuccessScreen />} />
         </Routes>
       </main>

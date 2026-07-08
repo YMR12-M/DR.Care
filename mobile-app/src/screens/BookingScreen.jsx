@@ -2,26 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api, secureFetch } from '../lib/api';
-
-/* ─── Fallback / constants ──────────────────────────────── */
-const FALLBACK_PACKAGES = [
-  { code: 'inside-out', name: 'غسيل داخلي وخارجي', price: 150 },
-  { code: 'outside',    name: 'غسيل خارجي فقط',    price: 100 },
-  { code: 'deep',       name: 'Deep Cleaning',       price: 250 },
-  { code: 'cover',      name: 'غسيل غطاء السيارة',  price: 50  },
-  { code: 'rims',       name: 'جنوط وكاوتش',         price: 100 },
-  { code: 'engine',     name: 'موتور السيارة',        price: 100 },
-  { code: 'chemical',   name: 'الغسيل الكيماوي',     price: 0   },
-  { code: 'carpet',     name: 'غسيل سجاد',           price: 0   },
-  { code: 'blanket',    name: 'غسيل بطاطين',         price: 80  },
-];
-
-const CAR_TYPES = [
-  { code: 'sedan',  name: 'سيدان',    icon: '🚗', extra: 0   },
-  { code: 'suv',    name: 'SUV',      icon: '🚙', extra: 60  },
-  { code: 'van',    name: 'فان',      icon: '🚐', extra: 90  },
-  { code: 'pickup', name: 'نقل خفيف', icon: '🛻', extra: 120 },
-];
+import {
+  FALLBACK_PACKAGES, FALLBACK_CAR_TYPES, FALLBACK_BRANCHES, FALLBACK_PAYMENT_METHODS,
+  PAYMENT_METHOD_ICONS, fetchConfig,
+} from '../lib/config';
 
 const DUR_MAP = {
   'inside-out': '~ ٤٥ دقيقة',
@@ -34,12 +18,6 @@ const DUR_MAP = {
   'carpet':     'حسب المساحة',
   'blanket':    '~ ٣٠ دقيقة',
 };
-
-const PAYMENT_METHODS = [
-  { code: 'Cash',          name: 'كاش',          icon: '💵' },
-  { code: 'Instapay',      name: 'Instapay',      icon: '📱' },
-  { code: 'Vodafone Cash', name: 'فودافون كاش',  icon: '📲' },
-];
 
 const RECOMMEND = {
   sedan:  { pkg: 'inside-out', msg: 'الغسيل الداخلي والخارجي مثالي لعربيتك' },
@@ -143,13 +121,13 @@ function StepBar({ current }) {
 }
 
 /* ─── Step 1: الخدمة ─────────────────────────────────── */
-function Step1({ packages, form, setForm, onNext }) {
+function Step1({ packages, carTypes, form, setForm, onNext }) {
   const [pkgError, setPkgError] = useState('');
   const selected = form.servicePackage;
   const selectedCar = form.carType;
   const rec = RECOMMEND[selectedCar];
   const pkg = packages.find(p => p.code === selected);
-  const car = CAR_TYPES.find(c => c.code === selectedCar);
+  const car = carTypes.find(c => c.code === selectedCar);
   const price = (pkg?.price || pkg?.base_price || 0) + (car?.extra || 0);
 
   const handleNext = () => {
@@ -201,7 +179,7 @@ function Step1({ packages, form, setForm, onNext }) {
       <div>
         <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>نوع العربية</p>
         <div className="grid grid-cols-2 gap-2.5">
-          {CAR_TYPES.map(c => (
+          {carTypes.map(c => (
             <button
               key={c.code}
               type="button"
@@ -279,20 +257,21 @@ function Step1({ packages, form, setForm, onNext }) {
 
 /* ─── Step 2: الميعاد ───────────────────────────────── */
 function Step2({ form, setForm, onNext, onBack }) {
-  const [slots, setSlots]     = useState([]);
-  const [loading, setLoading] = useState(false);
+  /* api/slots.php يرجع كل المواعيد المستقبلية مُجمَّعة حسب التاريخ في نداء واحد
+     (مثل { "2026-07-09": [{id,time,available}, ...] }) — نفس الشكل المستخدم فعلياً
+     في script.js (الموقع الرئيسي)، وليس مصفوفة مفلترة بتاريخ واحد. */
+  const [allSlots, setAllSlots] = useState({});
+  const [loading, setLoading]   = useState(true);
   const dateScrollRef = useRef(null);
   const availDates = getNextDays(10);
 
   useEffect(() => {
-    if (!form.apptDate) { setSlots([]); return; }
-    setLoading(true);
-    fetch(`../api/slots.php?date=${form.apptDate}`, { credentials: 'same-origin' })
+    fetch('../api/slots.php', { credentials: 'same-origin' })
       .then(r => r.json())
-      .then(d => setSlots(d.slots || []))
-      .catch(() => setSlots([]))
+      .then(d => setAllSlots(d.slots || {}))
+      .catch(() => setAllSlots({}))
       .finally(() => setLoading(false));
-  }, [form.apptDate]);
+  }, []);
 
   const pkg = form.servicePackage;
   const dur = DUR_MAP[pkg] || null;
@@ -301,7 +280,7 @@ function Step2({ form, setForm, onNext, onBack }) {
     onNext();
   };
 
-  const availSlots = slots.filter(s => s.available !== false);
+  const availSlots = (allSlots[form.apptDate] || []).filter(s => s.available > 0);
 
   return (
     <div className="flex flex-col gap-5 p-4 pb-24">
@@ -424,7 +403,7 @@ function Step2({ form, setForm, onNext, onBack }) {
 }
 
 /* ─── Step 3: بياناتك ────────────────────────────────── */
-function Step3({ packages, form, setForm, onBack, onSubmit, submitting, statusMsg }) {
+function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSubmit, submitting, statusMsg }) {
   const { user } = useAuth();
   const [errors, setErrors]         = useState({});
   const [touched, setTouched]       = useState({});
@@ -460,14 +439,14 @@ function Step3({ packages, form, setForm, onBack, onSubmit, submitting, statusMs
   const checkCoupon = async () => {
     if (!form.couponCode?.trim()) return;
     const pkg = packages.find(p => p.code === form.servicePackage);
-    const car = CAR_TYPES.find(c => c.code === form.carType);
+    const car = carTypes.find(c => c.code === form.carType);
     const subtotal = (pkg?.price || pkg?.base_price || 0) + (car?.extra || 0);
     try {
       const res = await api.post('coupons.php', {
         action: 'validate', code: form.couponCode.trim().toUpperCase(), subtotal,
       });
       const d = await res.json();
-      if (d.valid) {
+      if (d.ok) {
         setApplied(d);
         setCouponMsg({ ok: true, text: `✓ خصم ${d.discount} جنيه` });
       } else {
@@ -485,6 +464,7 @@ function Step3({ packages, form, setForm, onBack, onSubmit, submitting, statusMs
       const err = validateField(f, form[f] || '');
       if (err) newErrors[f] = err;
     });
+    if (!form.paymentMethod) newErrors.paymentMethod = 'اختار طريقة الدفع';
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setTouched({ name: true, phone: true, email: true });
@@ -503,7 +483,7 @@ function Step3({ packages, form, setForm, onBack, onSubmit, submitting, statusMs
   };
 
   const pkg = packages.find(p => p.code === form.servicePackage);
-  const car = CAR_TYPES.find(c => c.code === form.carType);
+  const car = carTypes.find(c => c.code === form.carType);
   const base = (pkg?.price || pkg?.base_price || 0) + (car?.extra || 0);
   const total = base - (appliedCoupon?.discount || 0);
   const dur = DUR_MAP[form.servicePackage] || null;
@@ -626,23 +606,24 @@ function Step3({ packages, form, setForm, onBack, onSubmit, submitting, statusMs
       >
         <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>طريقة الدفع</p>
         <div className="flex gap-2">
-          {PAYMENT_METHODS.map(m => (
+          {paymentMethods.map(m => (
             <button
-              key={m.code}
+              key={m}
               type="button"
-              onClick={() => setForm(f => ({ ...f, paymentMethod: m.code }))}
+              onClick={() => { setForm(f => ({ ...f, paymentMethod: m })); setErrors(e => ({ ...e, paymentMethod: '' })); }}
               className="flex-1 flex flex-col items-center gap-1 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform"
               style={{
-                background: form.paymentMethod === m.code ? 'var(--yellow-soft)' : 'var(--panel-3)',
-                border: `1px solid ${form.paymentMethod === m.code ? 'var(--yellow-line)' : 'var(--line-2)'}`,
-                color: form.paymentMethod === m.code ? 'var(--yellow)' : 'var(--muted)',
+                background: form.paymentMethod === m ? 'var(--yellow-soft)' : 'var(--panel-3)',
+                border: `1px solid ${form.paymentMethod === m ? 'var(--yellow-line)' : (errors.paymentMethod ? 'var(--error)' : 'var(--line-2)')}`,
+                color: form.paymentMethod === m ? 'var(--yellow)' : 'var(--muted)',
               }}
             >
-              <span className="text-lg">{m.icon}</span>
-              {m.name}
+              <span className="text-lg">{PAYMENT_METHOD_ICONS[m] || '💳'}</span>
+              {m}
             </button>
           ))}
         </div>
+        {errors.paymentMethod && <p className="text-xs mt-2 font-bold" style={{ color: 'var(--error)' }}>{errors.paymentMethod}</p>}
 
         {form.paymentMethod === 'Instapay' && (
           <div className="mt-4">
@@ -798,7 +779,10 @@ export default function BookingScreen() {
   const { user }  = useAuth();
 
   const [step, setStep]       = useState(0);
-  const [packages, setPackages] = useState(FALLBACK_PACKAGES);
+  const [config, setConfig]   = useState({
+    packages: FALLBACK_PACKAGES, carTypes: FALLBACK_CAR_TYPES,
+    branches: FALLBACK_BRANCHES, paymentMethods: FALLBACK_PAYMENT_METHODS,
+  });
   const [submitting, setSubmitting] = useState(false);
   const [statusMsg, setStatusMsg]   = useState(null);
 
@@ -810,7 +794,7 @@ export default function BookingScreen() {
     plateNumber:    '',
     servicePackage: location.state?.service  || '',
     carType:        location.state?.carType  || 'sedan',
-    paymentMethod:  'Cash',
+    paymentMethod:  '',
     apptDate:       '',
     apptTime:       '',
     couponCode:     '',
@@ -818,10 +802,7 @@ export default function BookingScreen() {
   });
 
   useEffect(() => {
-    api.get('packages.php')
-      .then(r => r.json())
-      .then(d => { if (d?.packages?.length) setPackages(d.packages); })
-      .catch(() => {});
+    fetchConfig().then(setConfig).catch(() => {});
   }, []);
 
   const submit = async (appliedCoupon) => {
@@ -836,7 +817,7 @@ export default function BookingScreen() {
         plateNumber:    form.plateNumber.trim() || null,
         servicePackage: form.servicePackage,
         carType:        form.carType,
-        branch:         'main',
+        branch:         config.branches[0],
         paymentMethod:  form.paymentMethod,
         appointment:    form.apptDate && form.apptTime
           ? `${form.apptDate}T${form.apptTime}`
@@ -898,7 +879,8 @@ export default function BookingScreen() {
       <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
         {step === 0 && (
           <Step1
-            packages={packages}
+            packages={config.packages}
+            carTypes={config.carTypes}
             form={form}
             setForm={setForm}
             onNext={() => setStep(1)}
@@ -914,7 +896,9 @@ export default function BookingScreen() {
         )}
         {step === 2 && (
           <Step3
-            packages={packages}
+            packages={config.packages}
+            carTypes={config.carTypes}
+            paymentMethods={config.paymentMethods}
             form={form}
             setForm={setForm}
             onBack={() => setStep(1)}

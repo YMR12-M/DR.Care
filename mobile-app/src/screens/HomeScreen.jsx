@@ -2,26 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import PromoBanner from '../components/PromoBanner';
+import { FALLBACK_PACKAGES, FALLBACK_CAR_TYPES, fetchConfig } from '../lib/config';
 
-/* ─── Fallback data ─────────────────────────────────────── */
-const FALLBACK_PACKAGES = [
-  { code: 'inside-out', name: 'غسيل داخلي وخارجي', price: 150 },
-  { code: 'outside',    name: 'غسيل خارجي فقط',    price: 100 },
-  { code: 'deep',       name: 'Deep Cleaning',       price: 250 },
-  { code: 'cover',      name: 'غسيل غطاء السيارة',  price: 50  },
-  { code: 'rims',       name: 'جنوط وكاوتش',         price: 100 },
-  { code: 'engine',     name: 'موتور السيارة',        price: 100 },
-  { code: 'chemical',   name: 'الغسيل الكيماوي',     price: 0   },
-  { code: 'carpet',     name: 'غسيل سجاد',           price: 0   },
-  { code: 'blanket',    name: 'غسيل بطاطين',         price: 80  },
-];
-
-const CAR_TYPES = [
-  { code: 'sedan',  name: 'سيدان',    icon: '🚗', extra: 0   },
-  { code: 'suv',    name: 'SUV',      icon: '🚙', extra: 60  },
-  { code: 'van',    name: 'فان',      icon: '🚐', extra: 90  },
-  { code: 'pickup', name: 'نقل خفيف', icon: '🛻', extra: 120 },
-];
+const CAR_TYPES = FALLBACK_CAR_TYPES;
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 function SectionLabel({ text }) {
@@ -232,9 +215,8 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    fetch('../api/packages.php', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
-      .then(r => r.json())
-      .then(d => { if (d?.packages?.length) setPackages(d.packages); })
+    fetchConfig()
+      .then(c => setPackages(c.packages))
       .catch(() => {});
   }, []);
 

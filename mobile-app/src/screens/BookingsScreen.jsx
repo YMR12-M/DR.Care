@@ -25,7 +25,7 @@ function BookingCard({ booking }) {
             {booking.package_name || booking.servicePackage}
           </p>
           <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-            {booking.car_type || booking.carType}
+            {booking.car_type_name}
           </p>
         </div>
         <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: s.bg, color: s.color }}>
