@@ -288,9 +288,13 @@ DR.Care/
 ├── assets/                      # صور ووسائط
 ├── icons/                       # أيقونات PWA (192/512)
 │
-├── CUSTOMER_SYSTEM.md           # توثيق نظام العملاء
-├── LOGIN_SYSTEM.md              # توثيق دخول الإدارة
-├── PROFILE_SYSTEM.md            # توثيق الملف الشخصي
+├── docs/                        # كل ملفات التوثيق (Markdown)
+│   ├── FEATURES.md              # دليل شامل لكل المميزات
+│   ├── BOOKING_WORKFLOW.md      # نظام Workflow الحجز + مخططات mermaid
+│   ├── ROADMAP.md               # خطة عمل الفجوات المكتشفة
+│   ├── CUSTOMER_SYSTEM.md       # توثيق نظام العملاء
+│   ├── LOGIN_SYSTEM.md          # توثيق دخول الإدارة
+│   └── PROFILE_SYSTEM.md        # توثيق الملف الشخصي
 └── README.md                    # هذا الملف
 ```
 
@@ -889,10 +893,12 @@ composer test:php
 
 | الملف | المحتوى |
 |-------|---------|
-| **[FEATURES.md](./FEATURES.md)** | **دليل شامل لكل المميزات والتفاصيل الدقيقة** |
-| [CUSTOMER_SYSTEM.md](./CUSTOMER_SYSTEM.md) | تفاصيل API العملاء والتحقق |
-| [LOGIN_SYSTEM.md](./LOGIN_SYSTEM.md) | نظام دخول الإدارة |
-| [PROFILE_SYSTEM.md](./PROFILE_SYSTEM.md) | الملف الشخصي وتدفقات UX |
+| **[FEATURES.md](./docs/FEATURES.md)** | **دليل شامل لكل المميزات والتفاصيل الدقيقة** |
+| [BOOKING_WORKFLOW.md](./docs/BOOKING_WORKFLOW.md) | نظام Workflow الحجز (State Machine) + مخططات mermaid |
+| [ROADMAP.md](./docs/ROADMAP.md) | خطة عمل الفجوات المكتشفة مرتبة بالأولوية |
+| [CUSTOMER_SYSTEM.md](./docs/CUSTOMER_SYSTEM.md) | تفاصيل API العملاء والتحقق |
+| [LOGIN_SYSTEM.md](./docs/LOGIN_SYSTEM.md) | نظام دخول الإدارة |
+| [PROFILE_SYSTEM.md](./docs/PROFILE_SYSTEM.md) | الملف الشخصي وتدفقات UX |
 
 ---
 
