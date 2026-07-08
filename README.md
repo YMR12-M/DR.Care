@@ -289,12 +289,17 @@ DR.Care/
 ├── icons/                       # أيقونات PWA (192/512)
 │
 ├── docs/                        # كل ملفات التوثيق (Markdown)
+│   ├── README.md                # فهرس كل ملفات التوثيق
 │   ├── FEATURES.md              # دليل شامل لكل المميزات
 │   ├── BOOKING_WORKFLOW.md      # نظام Workflow الحجز + مخططات mermaid
-│   ├── ROADMAP.md               # خطة عمل الفجوات المكتشفة
 │   ├── CUSTOMER_SYSTEM.md       # توثيق نظام العملاء
 │   ├── LOGIN_SYSTEM.md          # توثيق دخول الإدارة
-│   └── PROFILE_SYSTEM.md        # توثيق الملف الشخصي
+│   ├── PROFILE_SYSTEM.md        # توثيق الملف الشخصي
+│   ├── POS_SYSTEM.md            # توثيق نقطة البيع (الفرع)
+│   ├── PRICING_SYSTEM.md        # توثيق نظام التسعير
+│   ├── NOTIFICATIONS_SYSTEM.md  # توثيق البريد/واتساب/Push
+│   ├── LOYALTY_REFERRAL_SYSTEM.md # توثيق نقاط الولاء والإحالة
+│   └── ROADMAP.md               # خطة عمل الفجوات المكتشفة
 └── README.md                    # هذا الملف
 ```
 
@@ -891,14 +896,20 @@ composer test:php
 
 ## وثائق إضافية
 
+كل ملفات التوثيق مجمّعة في [docs/](./docs/) — ابدأ من [docs/README.md](./docs/README.md) كفهرس شامل.
+
 | الملف | المحتوى |
 |-------|---------|
 | **[FEATURES.md](./docs/FEATURES.md)** | **دليل شامل لكل المميزات والتفاصيل الدقيقة** |
 | [BOOKING_WORKFLOW.md](./docs/BOOKING_WORKFLOW.md) | نظام Workflow الحجز (State Machine) + مخططات mermaid |
-| [ROADMAP.md](./docs/ROADMAP.md) | خطة عمل الفجوات المكتشفة مرتبة بالأولوية |
 | [CUSTOMER_SYSTEM.md](./docs/CUSTOMER_SYSTEM.md) | تفاصيل API العملاء والتحقق |
 | [LOGIN_SYSTEM.md](./docs/LOGIN_SYSTEM.md) | نظام دخول الإدارة |
 | [PROFILE_SYSTEM.md](./docs/PROFILE_SYSTEM.md) | الملف الشخصي وتدفقات UX |
+| [POS_SYSTEM.md](./docs/POS_SYSTEM.md) | نقطة البيع (الفرع) |
+| [PRICING_SYSTEM.md](./docs/PRICING_SYSTEM.md) | مصدر الأسعار الفعلي وفجوة `pricing.php`/Java |
+| [NOTIFICATIONS_SYSTEM.md](./docs/NOTIFICATIONS_SYSTEM.md) | البريد، واتساب، Web Push |
+| [LOYALTY_REFERRAL_SYSTEM.md](./docs/LOYALTY_REFERRAL_SYSTEM.md) | نقاط الولاء والإحالة |
+| [ROADMAP.md](./docs/ROADMAP.md) | خطة عمل الفجوات المكتشفة مرتبة بالأولوية |
 
 ---
 

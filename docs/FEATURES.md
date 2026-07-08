@@ -481,10 +481,15 @@ GET /api/pos.php?action=today&token=...
 
 | code | name | price (ج.م) |
 |------|------|-------------|
-| quick | غسلة سريعة | 150 |
-| full | Full Care | 280 |
-| detail | دكتور العربية | 650 |
-| fleet | باقات الشركات | 0 (تعاقد) |
+| inside-out | غسيل داخلي وخارجي | 150 |
+| outside | غسيل خارجي فقط | 100 |
+| deep | غسيل متخصص (Deep Cleaning) | 250 |
+| cover | غسيل غطاء السيارة | 50 |
+| rims | غسيل وتنظيف جنوط السيارة | 100 |
+| engine | غسيل موتور السيارة | 100 |
+| chemical | الغسيل الكيماوي | 0 (تعاقد) |
+| carpet | غسيل سجاد | 0 (تعاقد) |
+| blanket | غسيل بطاطين | 80 |
 
 ### 9.3 إضافات نوع العربية
 
@@ -495,19 +500,21 @@ GET /api/pos.php?action=today&token=...
 | van | 90 |
 | pickup | 120 |
 
-### 9.4 `api/pricing.php`
+### 9.4 `api/pricing.php` — ⚠️ غير مستخدَم من أي واجهة أمامية حالياً، وغير متزامن مع 9.2
 
 ```http
-GET /api/pricing.php?package=full&car_type=suv
+GET /api/pricing.php?package=outside&car_type=suv
 ```
 
-1. يحاول Java: `java -cp java/src com.drcare.PricingCalculator full suv`
-2. عند الفشل → حساب PHP من config
+1. يحاول Java: `java -cp java/src com.drcare.PricingCalculator outside suv`
+2. عند الفشل (قيمة غير رقمية) → حساب PHP من config
 3. Response: `{ price, label, source: "java"|"php" }`
+
+**تحذير:** أكواد الباقات في الـ Java (`quick/full/detail/fleet`) لا تطابق الجدول في §9.2 إطلاقاً، وتعيد قيمة افتراضية (280) بدل خطأ لأي كود حقيقي — فيبدو الـ `source: "java"` ناجحاً بينما السعر خاطئ. التفاصيل الكاملة في `PRICING_SYSTEM.md`. تدفق الحجز الفعلي (`bookings.php`/`pos.php`) لا يستخدم هذا الـ endpoint إطلاقاً ويقرأ الأسعار من §9.1 مباشرة، فهو غير متأثر بهذه المشكلة.
 
 ### 9.5 Java `PricingCalculator`
 
-- نفس الأرقام مكررة في الكلاس (يجب مزامنتها مع config عند التعديل)
+- أرقام قديمة مكررة في الكلاس **بأكواد باقات مختلفة تماماً** عن config.php الحالي (راجع التحذير أعلاه) — غير متزامنة فعلياً وليس فقط "يجب مزامنتها".
 - CLI: `java com.drcare.PricingCalculator <package> <cartype>` → رقم فقط stdout
 
 ---

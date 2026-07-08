@@ -16,9 +16,12 @@
 - `customer-login.html` — واجهة تسجيل الدخول وإنشاء حساب العميل
 - `customer-bookings.html` — عرض الحجوزات الشخصية للعميل
 - `customer-profile.html` — شاشة الملف الشخصي وإدارة الحساب
-- `api/customer-login.php` — تسجيل/دخول العميل، فحص الجلسة، خروج
+- `verify-email.html` — تفعيل البريد الإلكتروني عبر رابط مُرسَل بالبريد
+- `forgot-password.html` / `reset-password.html` — طلب وتنفيذ إعادة تعيين كلمة المرور
+- `api/customer-login.php` — تسجيل/دخول العميل، فحص الجلسة، خروج، تفعيل البريد (`action=verify_email`/`resend_verification`)
 - `api/customer-bookings.php` — جلب الحجوزات الخاصة بالعميل
 - `api/customer-profile.php` — عرض وتحديث بيانات العميل
+- `api/password-reset.php` — طلب/تحقق/تنفيذ إعادة تعيين كلمة المرور (`action=request`/`verify`/`reset`)
 - `api/bootstrap.php` — تهيئة جداول `customer_users` و `bookings` وبدء الجلسات
 
 ## واجهات API
@@ -91,7 +94,13 @@ CREATE TABLE customer_users (
   password_hash TEXT NOT NULL,
   created_at TEXT,
   last_login TEXT,
-  is_active INTEGER DEFAULT 1
+  is_active INTEGER DEFAULT 1,
+  -- الأعمدة التالية أُضيفت لاحقاً عبر addMissingColumn() (تفعيل البريد + الإحالة):
+  email_verified INTEGER NOT NULL DEFAULT 0,
+  email_verify_token TEXT DEFAULT NULL,
+  email_verify_expires TEXT DEFAULT NULL,
+  referral_code TEXT DEFAULT NULL,
+  referred_by_id INTEGER DEFAULT NULL
 );
 ```
 
@@ -139,7 +148,7 @@ ALTER TABLE bookings ADD COLUMN customer_id INTEGER;
 
 - ربط الحجوزات يعتمد على البريد الإلكتروني للعميل.
 - الجدول `bookings` يدعم `customer_id` كتحسين لاحق.
-- يمكن إضافة تأكيد البريد أو استعادة كلمة المرور لاحقاً.
+- **تأكيد البريد واستعادة كلمة المرور موجودان بالفعل** (وليسا "لاحقاً" كما كان مذكوراً هنا سابقاً) — عبر `api/customer-login.php` (`action=verify_email`, `action=resend_verification`) و`api/password-reset.php` + `verify-email.html`/`forgot-password.html`/`reset-password.html`. راجع أيضاً نقاط الولاء والإحالة في `LOYALTY_REFERRAL_SYSTEM.md` (مرتبطة بتسجيل العميل عبر `referral_code`).
 - تحقق من سجلات الأخطاء: `error_log`
 - تحقق من قاعدة البيانات: `/data/drcare.db`
 - اختبر الاتصال: استخدم Postman لاختبار API
