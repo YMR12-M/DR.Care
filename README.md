@@ -295,10 +295,13 @@ DR.Care/
 │   ├── CUSTOMER_SYSTEM.md       # توثيق نظام العملاء
 │   ├── LOGIN_SYSTEM.md          # توثيق دخول الإدارة
 │   ├── PROFILE_SYSTEM.md        # توثيق الملف الشخصي
+│   ├── ADMIN_SYSTEM.md          # توثيق لوحة الإدارة الكاملة
 │   ├── POS_SYSTEM.md            # توثيق نقطة البيع (الفرع)
 │   ├── PRICING_SYSTEM.md        # توثيق نظام التسعير
 │   ├── NOTIFICATIONS_SYSTEM.md  # توثيق البريد/واتساب/Push
 │   ├── LOYALTY_REFERRAL_SYSTEM.md # توثيق نقاط الولاء والإحالة
+│   ├── MOBILE_APP.md            # توثيق تطبيق React الجديد (⚠️ حجز مكسور)
+│   ├── TESTING.md               # توثيق الاختبارات وCI
 │   └── ROADMAP.md               # خطة عمل الفجوات المكتشفة
 └── README.md                    # هذا الملف
 ```
@@ -905,10 +908,13 @@ composer test:php
 | [CUSTOMER_SYSTEM.md](./docs/CUSTOMER_SYSTEM.md) | تفاصيل API العملاء والتحقق |
 | [LOGIN_SYSTEM.md](./docs/LOGIN_SYSTEM.md) | نظام دخول الإدارة |
 | [PROFILE_SYSTEM.md](./docs/PROFILE_SYSTEM.md) | الملف الشخصي وتدفقات UX |
+| [ADMIN_SYSTEM.md](./docs/ADMIN_SYSTEM.md) | لوحة الإدارة الكاملة |
 | [POS_SYSTEM.md](./docs/POS_SYSTEM.md) | نقطة البيع (الفرع) |
 | [PRICING_SYSTEM.md](./docs/PRICING_SYSTEM.md) | مصدر الأسعار الفعلي وفجوة `pricing.php`/Java |
 | [NOTIFICATIONS_SYSTEM.md](./docs/NOTIFICATIONS_SYSTEM.md) | البريد، واتساب، Web Push |
 | [LOYALTY_REFERRAL_SYSTEM.md](./docs/LOYALTY_REFERRAL_SYSTEM.md) | نقاط الولاء والإحالة |
+| **[MOBILE_APP.md](./docs/MOBILE_APP.md)** | **تطبيق React الجديد — ⚠️ الحجز مكسور بالكامل فيه حالياً** |
+| [TESTING.md](./docs/TESTING.md) | الاختبارات وCI |
 | [ROADMAP.md](./docs/ROADMAP.md) | خطة عمل الفجوات المكتشفة مرتبة بالأولوية |
 
 ---
