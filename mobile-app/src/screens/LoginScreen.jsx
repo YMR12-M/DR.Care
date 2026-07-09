@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { secureFetch } from '../lib/api';
+import Button from '../components/ui/Button';
 
 export default function LoginScreen() {
   const navigate      = useNavigate();
@@ -42,28 +44,26 @@ export default function LoginScreen() {
       {/* Header */}
       <header
         className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
       >
         <button onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
           type="button">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ color: 'var(--muted)' }}>
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
+          <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>
         <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>تسجيل الدخول</h1>
       </header>
 
       <div className="flex-1 flex flex-col p-6">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8 mt-4">
+        <div className="flex flex-col items-center mb-8 mt-4 fade-in">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl mb-3"
-            style={{ background: 'var(--yellow)', color: '#0a0800' }}>DR</div>
+            style={{ background: 'linear-gradient(155deg, var(--yellow) 0%, var(--yellow-2) 100%)', color: '#0a0800', boxShadow: 'var(--shadow-yellow-glow)' }}>DR</div>
           <p className="text-sm" style={{ color: 'var(--muted)' }}>ادخل على حسابك في DR.Care</p>
         </div>
 
-        <form onSubmit={submit} className="flex flex-col gap-4">
+        <form onSubmit={submit} className="flex flex-col gap-4 fade-in fade-in-1">
           {[
             { label: 'البريد الإلكتروني', field: 'email',    type: 'email',    placeholder: 'your@gmail.com' },
             { label: 'كلمة المرور',       field: 'password', type: 'password', placeholder: '••••••••' },
@@ -83,12 +83,12 @@ export default function LoginScreen() {
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="w-full btn-yellow py-4 rounded-2xl text-base mt-2 disabled:opacity-50">
+          <Button type="submit" variant="primary" size="lg" disabled={loading} className="w-full mt-2">
             {loading ? 'جاري الدخول...' : 'دخول'}
-          </button>
+          </Button>
 
           <button type="button" onClick={() => navigate('/forgot-password')}
-            className="text-sm text-center font-bold" style={{ color: 'var(--yellow)' }}>
+            className="text-sm text-center font-bold active:opacity-70" style={{ color: 'var(--yellow)' }}>
             نسيت كلمة المرور؟
           </button>
 
@@ -98,11 +98,9 @@ export default function LoginScreen() {
             <div className="flex-1 h-px" style={{ background: 'var(--line)' }}/>
           </div>
 
-          <button type="button" onClick={() => navigate('/register')}
-            className="w-full py-4 rounded-2xl text-base font-black"
-            style={{ background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--white-2)' }}>
+          <Button type="button" variant="secondary" size="lg" onClick={() => navigate('/register')} className="w-full">
             إنشاء حساب جديد
-          </button>
+          </Button>
         </form>
       </div>
     </div>

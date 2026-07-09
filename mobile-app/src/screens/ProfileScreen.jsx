@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ClipboardList, UserRoundPen, Gift, Phone, LogOut, User as UserIcon, ChevronLeft, Star } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { secureFetch } from '../lib/api';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import IconBadge from '../components/ui/IconBadge';
 
-function MenuItem({ icon, label, onClick, danger }) {
+function MenuItem({ icon: Icon, label, onClick, danger, last }) {
   return (
     <button type="button" onClick={onClick}
-      className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-bold transition-colors"
-      style={{ color: danger ? 'var(--error)' : 'var(--white-2)', borderBottom: '1px solid var(--line)' }}
+      className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-bold transition-colors active:opacity-70"
+      style={{ color: danger ? 'var(--error)' : 'var(--white-2)', borderBottom: last ? 'none' : '1px solid var(--line)' }}
     >
-      <span className="text-xl w-6 text-center">{icon}</span>
+      <IconBadge icon={Icon} size="sm" tone={danger ? 'panel' : 'panel'} />
       <span className="flex-1 text-right">{label}</span>
-      <svg className="w-4 h-4 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-        style={{ color: 'var(--muted-2)' }}>
-        <path d="M9 18l6-6-6-6"/>
-      </svg>
+      <ChevronLeft size={16} style={{ color: 'var(--muted-2)' }} />
     </button>
   );
 }
@@ -51,18 +52,15 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: 'var(--black)' }}>
-        <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-4"
-          style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}>👤</div>
+        <IconBadge icon={UserIcon} size="lg" tone="yellow" className="mb-4" />
         <h2 className="text-lg font-black mb-2" style={{ color: 'var(--white)' }}>حسابك</h2>
         <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>سجل دخولك لمتابعة حجوزاتك وبياناتك</p>
-        <button onClick={() => navigate('/login')} className="w-full btn-yellow py-4 rounded-2xl text-base mb-3">
+        <Button variant="primary" size="lg" onClick={() => navigate('/login')} className="w-full mb-3">
           تسجيل الدخول
-        </button>
-        <button onClick={() => navigate('/register')}
-          className="w-full py-4 rounded-2xl text-base font-bold"
-          style={{ background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--white-2)' }}>
+        </Button>
+        <Button variant="secondary" size="lg" onClick={() => navigate('/register')} className="w-full">
           إنشاء حساب جديد
-        </button>
+        </Button>
       </div>
     );
   }
@@ -71,20 +69,22 @@ export default function ProfileScreen() {
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
         className="sticky top-0 z-40 px-4 py-4"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
       >
-        <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>حسابي</h1>
+        <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حسابي</h1>
       </header>
 
       {/* Profile Card */}
-      <div className="mx-4 mt-4 rounded-2xl p-5 relative overflow-hidden"
-        style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>
+      <Card className="mx-4 mt-4 p-5 relative overflow-hidden fade-in">
         {/* glow */}
         <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-10 pointer-events-none"
           style={{ background: 'var(--yellow)' }}/>
         <div className="relative flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black shrink-0"
-            style={{ background: 'var(--yellow)', color: '#0a0800' }}>
+            style={{
+              background: 'linear-gradient(155deg, var(--yellow) 0%, var(--yellow-2) 100%)', color: '#0a0800',
+              boxShadow: 'var(--shadow-yellow-glow)',
+            }}>
             {user.name?.[0] || 'أ'}
           </div>
           <div>
@@ -94,33 +94,38 @@ export default function ProfileScreen() {
           </div>
         </div>
         {loyaltyBalance > 0 && (
-          <div className="relative mt-4 rounded-xl p-3 flex items-center gap-2"
-            style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}>
-            <span className="text-xl">⭐</span>
-            <div>
+          <button
+            type="button"
+            onClick={() => navigate('/coupons')}
+            className="relative mt-4 w-full rounded-xl p-3 flex items-center gap-2 active:scale-[0.98] transition-transform"
+            style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}
+          >
+            <Star size={20} fill="var(--yellow)" stroke="var(--yellow)" />
+            <div className="text-right flex-1">
               <p className="text-xs" style={{ color: 'var(--muted)' }}>نقاط الولاء</p>
               <p className="font-black" style={{ color: 'var(--yellow)' }}>{loyaltyBalance} نقطة</p>
             </div>
-          </div>
+            <ChevronLeft size={16} style={{ color: 'var(--yellow)' }} />
+          </button>
         )}
-      </div>
+      </Card>
 
       {/* Menu */}
-      <div className="mx-4 mt-4 rounded-2xl overflow-hidden" style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>
-        <MenuItem icon="📋" label="حجوزاتي"       onClick={() => navigate('/bookings')} />
-        <MenuItem icon="👤" label="تعديل البيانات" onClick={() => navigate('/edit-profile')} />
-        <MenuItem icon="🎁" label="كوبونات الخصم"  onClick={() => navigate('/coupons')} />
-        <MenuItem icon="📞" label="تواصل معنا"     onClick={() => window.open('tel:+201037957593')} />
-      </div>
+      <Card className="mx-4 mt-4 overflow-hidden fade-in fade-in-1">
+        <MenuItem icon={ClipboardList} label="حجوزاتي"       onClick={() => navigate('/bookings')} />
+        <MenuItem icon={UserRoundPen}  label="تعديل البيانات" onClick={() => navigate('/edit-profile')} />
+        <MenuItem icon={Gift}          label="كوبونات الخصم"  onClick={() => navigate('/coupons')} />
+        <MenuItem icon={Phone}         label="تواصل معنا"     onClick={() => window.open('tel:+201037957593')} last />
+      </Card>
 
-      <div className="mx-4 mt-3 rounded-2xl overflow-hidden" style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>
+      <Card className="mx-4 mt-3 overflow-hidden fade-in fade-in-2">
         <button type="button" onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-bold"
+          className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-bold active:opacity-70"
           style={{ color: 'var(--error)' }}>
-          <span className="text-xl w-6 text-center">🚪</span>
+          <IconBadge icon={LogOut} size="sm" tone="panel" />
           <span className="flex-1 text-right">{loggingOut ? 'جاري الخروج...' : 'تسجيل الخروج'}</span>
         </button>
-      </div>
+      </Card>
 
       <p className="text-center text-xs mt-6 mb-2" style={{ color: 'var(--muted-2)' }}>
         DR.Care v2.0 — مغسلة عربيات مصرية

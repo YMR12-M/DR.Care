@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, CheckCircle2 } from 'lucide-react';
 import { secureFetch } from '../lib/api';
+import Button from '../components/ui/Button';
 
 export default function RegisterScreen() {
   const navigate = useNavigate();
@@ -53,41 +55,41 @@ export default function RegisterScreen() {
     <div className="h-full overflow-y-auto scroll-hide flex flex-col" style={{ background: 'var(--black)' }}>
       <header
         className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
       >
         <button onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
           type="button">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ color: 'var(--muted)' }}>
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
+          <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>
         <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>إنشاء حساب جديد</h1>
       </header>
 
       <div className="flex-1 flex flex-col p-6">
         {done ? (
-          <div className="flex flex-col items-center text-center mt-10">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-4"
-              style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}>✅</div>
+          <div className="flex flex-col items-center text-center mt-10 fade-in">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+              style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}>
+              <CheckCircle2 size={30} style={{ color: 'var(--yellow)' }} />
+            </div>
             <h2 className="text-lg font-black mb-2" style={{ color: 'var(--white)' }}>تم إنشاء الحساب بنجاح!</h2>
             <p className="text-sm mb-8" style={{ color: 'var(--muted)' }}>
               تحقق من بريدك الإلكتروني لتفعيل حسابك، ثم سجّل دخولك
             </p>
-            <button onClick={() => navigate('/login')} className="w-full btn-yellow py-4 rounded-2xl text-base">
+            <Button variant="primary" size="lg" onClick={() => navigate('/login')} className="w-full">
               تسجيل الدخول
-            </button>
+            </Button>
           </div>
         ) : (
           <>
-            <div className="flex flex-col items-center mb-8 mt-4">
+            <div className="flex flex-col items-center mb-8 mt-4 fade-in">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl mb-3"
-                style={{ background: 'var(--yellow)', color: '#0a0800' }}>DR</div>
+                style={{ background: 'linear-gradient(155deg, var(--yellow) 0%, var(--yellow-2) 100%)', color: '#0a0800', boxShadow: 'var(--shadow-yellow-glow)' }}>DR</div>
               <p className="text-sm" style={{ color: 'var(--muted)' }}>انضم لعائلة DR.Care</p>
             </div>
 
-            <form onSubmit={submit} className="flex flex-col gap-4">
+            <form onSubmit={submit} className="flex flex-col gap-4 fade-in fade-in-1">
               {[
                 { label: 'الاسم الكامل',      field: 'name',     type: 'text',     placeholder: 'أحمد محمد', dir: 'rtl' },
                 { label: 'البريد الإلكتروني', field: 'email',    type: 'email',    placeholder: 'your@gmail.com' },
@@ -110,12 +112,12 @@ export default function RegisterScreen() {
                 </div>
               )}
 
-              <button type="submit" disabled={loading} className="w-full btn-yellow py-4 rounded-2xl text-base mt-2 disabled:opacity-50">
+              <Button type="submit" variant="primary" size="lg" disabled={loading} className="w-full mt-2">
                 {loading ? 'جاري الإنشاء...' : 'إنشاء الحساب'}
-              </button>
+              </Button>
 
               <button type="button" onClick={() => navigate('/login')}
-                className="text-sm text-center font-bold" style={{ color: 'var(--yellow)' }}>
+                className="text-sm text-center font-bold active:opacity-70" style={{ color: 'var(--yellow)' }}>
                 عندك حساب بالفعل؟ سجّل دخولك
               </button>
             </form>

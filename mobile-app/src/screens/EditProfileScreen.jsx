@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { secureFetch } from '../lib/api';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 
 export default function EditProfileScreen() {
   const navigate = useNavigate();
@@ -70,71 +73,65 @@ export default function EditProfileScreen() {
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
         className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
       >
         <button onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
           type="button">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ color: 'var(--muted)' }}>
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
+          <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>
         <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>تعديل البيانات</h1>
       </header>
 
       <div className="p-6 flex flex-col gap-6">
         {/* Personal info */}
-        <form onSubmit={saveInfo} className="flex flex-col gap-4">
+        <Card as="form" onSubmit={saveInfo} className="p-4 flex flex-col gap-4 fade-in">
           <p className="text-sm font-black" style={{ color: 'var(--white)' }}>البيانات الشخصية</p>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>الاسم الكامل</label>
             <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-2)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
           </div>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>رقم الموبايل</label>
             <input type="tel" dir="ltr" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
               className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-2)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
           </div>
           {infoMsg && (
             <p className="text-xs font-bold text-center" style={{ color: infoMsg.ok ? 'var(--success)' : 'var(--error)' }}>{infoMsg.text}</p>
           )}
-          <button type="submit" disabled={savingInfo} className="w-full btn-yellow py-3.5 rounded-2xl text-sm disabled:opacity-50">
+          <Button type="submit" variant="primary" size="md" disabled={savingInfo} className="w-full">
             {savingInfo ? 'جاري الحفظ...' : 'حفظ البيانات'}
-          </button>
-        </form>
-
-        <div className="h-px" style={{ background: 'var(--line)' }} />
+          </Button>
+        </Card>
 
         {/* Password */}
-        <form onSubmit={savePassword} className="flex flex-col gap-4">
+        <Card as="form" onSubmit={savePassword} className="p-4 flex flex-col gap-4 fade-in fade-in-1">
           <p className="text-sm font-black" style={{ color: 'var(--white)' }}>تغيير كلمة المرور</p>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>كلمة المرور الحالية</label>
             <input type="password" dir="ltr" value={pwForm.current_password}
               onChange={e => setPwForm(f => ({ ...f, current_password: e.target.value }))}
               className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-2)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
           </div>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>كلمة المرور الجديدة</label>
             <input type="password" dir="ltr" value={pwForm.new_password}
               onChange={e => setPwForm(f => ({ ...f, new_password: e.target.value }))}
               className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-2)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
           </div>
           {pwMsg && (
             <p className="text-xs font-bold text-center" style={{ color: pwMsg.ok ? 'var(--success)' : 'var(--error)' }}>{pwMsg.text}</p>
           )}
-          <button type="submit" disabled={savingPw}
-            className="w-full py-3.5 rounded-2xl text-sm font-black disabled:opacity-50"
-            style={{ background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--white-2)' }}>
+          <Button type="submit" variant="secondary" size="md" disabled={savingPw} className="w-full">
             {savingPw ? 'جاري التحديث...' : 'تحديث كلمة المرور'}
-          </button>
-        </form>
+          </Button>
+        </Card>
       </div>
     </div>
   );

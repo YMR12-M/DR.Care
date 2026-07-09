@@ -1,11 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import {
+  Check, ChevronRight, ChevronLeft, Lightbulb, Zap, Paperclip, Loader2, Clock, Car, CarFront, Bus, Truck,
+  Wallet, Smartphone, CreditCard,
+} from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { api, secureFetch } from '../lib/api';
+import Button from '../components/ui/Button';
 import {
   FALLBACK_PACKAGES, FALLBACK_CAR_TYPES, FALLBACK_BRANCHES, FALLBACK_PAYMENT_METHODS,
-  PAYMENT_METHOD_ICONS, fetchConfig,
+  fetchConfig,
 } from '../lib/config';
+
+const CAR_TYPE_ICON = { sedan: Car, suv: CarFront, van: Bus, pickup: Truck };
+const PAYMENT_ICON = { 'كاش': Wallet, 'Instapay': Smartphone };
 
 const DUR_MAP = {
   'inside-out': '~ ٤٥ دقيقة',
@@ -54,26 +62,6 @@ function getNextDays(n = 7) {
 }
 
 /* ─── Small UI pieces ──────────────────────────────────── */
-function DarkInput({ error, label, ...props }) {
-  return (
-    <div>
-      {label && (
-        <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>{label}</label>
-      )}
-      <input
-        className="w-full rounded-xl px-4 py-3.5 text-sm placeholder-[#6e6860] focus:outline-none"
-        style={{
-          background: 'var(--panel-3)',
-          border: `1px solid ${error ? 'var(--error)' : 'var(--line-2)'}`,
-          color: 'var(--white)',
-        }}
-        {...props}
-      />
-      {error && <p className="text-xs mt-1 font-bold" style={{ color: 'var(--error)' }}>{error}</p>}
-    </div>
-  );
-}
-
 function FieldHint({ valid, error, msg }) {
   if (!msg && !error) return null;
   return (
@@ -108,7 +96,7 @@ function StepBar({ current }) {
                 color: done ? '#0a0800' : active ? 'var(--yellow)' : 'var(--muted-2)',
               }}
             >
-              {done ? '✓' : i + 1}
+              {done ? <Check size={14} strokeWidth={3} /> : i + 1}
             </div>
             <span className="text-[10px] font-bold" style={{ color: active ? 'var(--yellow)' : 'var(--muted-2)' }}>
               {label}
@@ -140,7 +128,7 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
   return (
     <div className="flex flex-col gap-5 p-4 pb-24">
       {/* Packages */}
-      <div>
+      <div className="fade-in fade-in-1">
         <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>اختار الباقة</p>
         <div className="grid grid-cols-2 gap-2.5">
           {packages.map(p => (
@@ -154,7 +142,8 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
               className="rounded-2xl p-4 text-right active:scale-95 transition-transform"
               style={{
                 background: selected === p.code ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                border: `1px solid ${selected === p.code ? 'var(--yellow-line)' : 'var(--line)'}`,
+                border: selected === p.code ? '1px solid var(--yellow-line)' : 'none',
+                boxShadow: selected === p.code ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
               }}
             >
               <p
@@ -167,7 +156,9 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
                 {p.price > 0 ? `${p.price} ج` : 'حسب الشغل'}
               </p>
               {DUR_MAP[p.code] && (
-                <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>⏱ {DUR_MAP[p.code]}</p>
+                <p className="inline-flex items-center gap-1 text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>
+                  <Clock size={10} /> {DUR_MAP[p.code]}
+                </p>
               )}
             </button>
           ))}
@@ -176,10 +167,12 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
       </div>
 
       {/* Car types */}
-      <div>
+      <div className="fade-in fade-in-2">
         <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>نوع العربية</p>
         <div className="grid grid-cols-2 gap-2.5">
-          {carTypes.map(c => (
+          {carTypes.map(c => {
+            const CarIcon = CAR_TYPE_ICON[c.code] || Car;
+            return (
             <button
               key={c.code}
               type="button"
@@ -187,10 +180,11 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
               className="flex items-center gap-3 rounded-2xl p-4 active:scale-95 transition-transform"
               style={{
                 background: selectedCar === c.code ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                border: `1px solid ${selectedCar === c.code ? 'var(--yellow-line)' : 'var(--line)'}`,
+                border: selectedCar === c.code ? '1px solid var(--yellow-line)' : 'none',
+                boxShadow: selectedCar === c.code ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
               }}
             >
-              <span className="text-2xl">{c.icon}</span>
+              <CarIcon size={22} strokeWidth={2.2} style={{ color: selectedCar === c.code ? 'var(--yellow)' : 'var(--muted)' }} />
               <div className="text-right">
                 <p className="text-sm font-black" style={{ color: selectedCar === c.code ? 'var(--yellow)' : 'var(--white)' }}>
                   {c.name}
@@ -200,18 +194,20 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
                 )}
               </div>
             </button>
-          ))}
+          );})}
         </div>
       </div>
 
       {/* Smart recommendation */}
       {selectedCar && rec && (
         <div
-          className="rounded-2xl p-4 flex items-center justify-between gap-3"
-          style={{ background: 'var(--panel-2)', border: '1px solid var(--yellow-line)' }}
+          className="rounded-2xl p-4 flex items-center justify-between gap-3 fade-in"
+          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-yellow-glow)', border: '1px solid var(--yellow-line)' }}
         >
           <div>
-            <p className="text-xs font-bold" style={{ color: 'var(--yellow)' }}>💡 اقتراح ذكي</p>
+            <p className="inline-flex items-center gap-1.5 text-xs font-bold" style={{ color: 'var(--yellow)' }}>
+              <Lightbulb size={13} fill="var(--yellow)" fillOpacity={0.25} /> اقتراح ذكي
+            </p>
             <p className="text-sm font-black mt-0.5" style={{ color: 'var(--white)' }}>{rec.msg}</p>
           </div>
           <button
@@ -228,13 +224,15 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
       {/* Price estimate */}
       {selected && (
         <div
-          className="rounded-2xl p-4 flex items-center justify-between"
-          style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}
+          className="rounded-2xl p-4 flex items-center justify-between fade-in"
+          style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}
         >
           <div>
             <p className="text-xs font-bold" style={{ color: 'var(--muted)' }}>السعر المتوقع</p>
             {DUR_MAP[selected] && (
-              <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>⏱ {DUR_MAP[selected]}</p>
+              <p className="inline-flex items-center gap-1 text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>
+                <Clock size={10} /> {DUR_MAP[selected]}
+              </p>
             )}
           </div>
           <p className="text-2xl font-black" style={{ color: 'var(--yellow)' }}>
@@ -244,13 +242,9 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
       )}
 
       {/* Next button */}
-      <button
-        type="button"
-        onClick={handleNext}
-        className="w-full btn-yellow py-4 rounded-2xl text-base font-black active:scale-95 transition-transform"
-      >
-        التالي ←
-      </button>
+      <Button variant="primary" size="lg" onClick={handleNext} className="w-full">
+        <span className="inline-flex items-center gap-1.5">التالي <ChevronRight size={16} className="rotate-180" /></span>
+      </Button>
     </div>
   );
 }
@@ -286,11 +280,11 @@ function Step2({ form, setForm, onNext, onBack }) {
     <div className="flex flex-col gap-5 p-4 pb-24">
 
       {/* Date chips */}
-      <div>
+      <div className="fade-in fade-in-1">
         <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>اختار اليوم</p>
         <div
           ref={dateScrollRef}
-          className="flex gap-2 overflow-x-auto pb-2"
+          className="flex gap-2 overflow-x-auto pb-2 scroll-fade-x"
           style={{ scrollbarWidth: 'none' }}
         >
           {availDates.map(d => {
@@ -304,7 +298,8 @@ function Step2({ form, setForm, onNext, onBack }) {
                 className="flex-shrink-0 flex flex-col items-center rounded-2xl px-4 py-3 active:scale-95 transition-transform"
                 style={{
                   background: sel ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                  border: `1px solid ${sel ? 'var(--yellow)' : 'var(--line)'}`,
+                  border: sel ? '1px solid var(--yellow)' : 'none',
+                  boxShadow: sel ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
                   minWidth: '72px',
                 }}
               >
@@ -319,12 +314,12 @@ function Step2({ form, setForm, onNext, onBack }) {
 
       {/* Time slots */}
       {form.apptDate && (
-        <div>
+        <div className="fade-in">
           <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>اختار الوقت</p>
           {loading ? (
             <div className="flex flex-wrap gap-2">
               {[1,2,3,4,5,6].map(i => (
-                <div key={i} className="h-10 w-24 rounded-xl animate-pulse" style={{ background: 'var(--panel-3)' }} />
+                <div key={i} className="h-10 w-24 rounded-xl skeleton" />
               ))}
             </div>
           ) : availSlots.length > 0 ? (
@@ -339,7 +334,8 @@ function Step2({ form, setForm, onNext, onBack }) {
                     className="px-4 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-transform"
                     style={{
                       background: sel ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                      border: `1px solid ${sel ? 'var(--yellow)' : 'var(--line)'}`,
+                      border: sel ? '1px solid var(--yellow)' : 'none',
+                      boxShadow: sel ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
                       color: sel ? 'var(--yellow)' : 'var(--muted)',
                     }}
                   >
@@ -366,10 +362,10 @@ function Step2({ form, setForm, onNext, onBack }) {
       {/* Duration hint */}
       {dur && (
         <div
-          className="rounded-xl px-4 py-3 flex items-center gap-2"
-          style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
+          className="rounded-xl px-4 py-3 flex items-center gap-2 fade-in"
+          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
         >
-          <span style={{ color: 'var(--yellow)' }}>⏱</span>
+          <Clock size={15} style={{ color: 'var(--yellow)' }} />
           <span className="text-sm font-bold" style={{ color: 'var(--muted)' }}>
             المدة المتوقعة: {dur}
           </span>
@@ -382,21 +378,12 @@ function Step2({ form, setForm, onNext, onBack }) {
       </p>
 
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex-1 py-4 rounded-2xl text-base font-black active:scale-95 transition-transform"
-          style={{ background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--white-2)' }}
-        >
-          → رجوع
-        </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          className="flex-1 btn-yellow py-4 rounded-2xl text-base font-black active:scale-95 transition-transform"
-        >
-          التالي ←
-        </button>
+        <Button variant="secondary" size="lg" onClick={onBack} className="flex-1">
+          <span className="inline-flex items-center gap-1.5"><ChevronRight size={16} /> رجوع</span>
+        </Button>
+        <Button variant="primary" size="lg" onClick={handleNext} className="flex-1">
+          <span className="inline-flex items-center gap-1.5">التالي <ChevronRight size={16} className="rotate-180" /></span>
+        </Button>
       </div>
     </div>
   );
@@ -496,21 +483,21 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
         <button
           type="button"
           onClick={autoFill}
-          className="flex items-center justify-between rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform"
-          style={{ background: 'var(--panel-2)', border: '1px solid var(--yellow-line)' }}
+          className="flex items-center justify-between rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform fade-in"
+          style={{ background: 'var(--panel-2)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}
         >
           <div className="text-right">
             <p className="text-sm font-black" style={{ color: 'var(--yellow)' }}>ملأ بياناتك من آخر حجز</p>
             <p className="text-xs" style={{ color: 'var(--muted)' }}>اضغط لملء الاسم والموبايل والبريد</p>
           </div>
-          <span className="text-xl">⚡</span>
+          <Zap size={20} style={{ color: 'var(--yellow)' }} fill="var(--yellow)" fillOpacity={0.25} />
         </button>
       )}
 
       {/* Personal info */}
       <div
-        className="rounded-2xl p-4 flex flex-col gap-3"
-        style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
+        className="rounded-2xl p-4 flex flex-col gap-3 fade-in fade-in-1"
+        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
       >
         <p className="text-sm font-black" style={{ color: 'var(--white)' }}>بياناتك الشخصية</p>
 
@@ -601,12 +588,14 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Payment method */}
       <div
-        className="rounded-2xl p-4"
-        style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
+        className="rounded-2xl p-4 fade-in fade-in-2"
+        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
       >
         <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>طريقة الدفع</p>
         <div className="flex gap-2">
-          {paymentMethods.map(m => (
+          {paymentMethods.map(m => {
+            const PIcon = PAYMENT_ICON[m] || CreditCard;
+            return (
             <button
               key={m}
               type="button"
@@ -618,10 +607,10 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
                 color: form.paymentMethod === m ? 'var(--yellow)' : 'var(--muted)',
               }}
             >
-              <span className="text-lg">{PAYMENT_METHOD_ICONS[m] || '💳'}</span>
+              <PIcon size={18} strokeWidth={2.2} />
               {m}
             </button>
-          ))}
+          );})}
         </div>
         {errors.paymentMethod && <p className="text-xs mt-2 font-bold" style={{ color: 'var(--error)' }}>{errors.paymentMethod}</p>}
 
@@ -638,7 +627,7 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
                 <img src={imgPreview} alt="preview" className="max-h-32 rounded-lg object-contain" />
               ) : (
                 <>
-                  <span className="text-2xl mb-1">📎</span>
+                  <Paperclip size={22} className="mb-1" style={{ color: 'var(--muted)' }} />
                   <span className="text-xs font-bold" style={{ color: 'var(--muted)' }}>اضغط لاختيار الصورة</span>
                 </>
               )}
@@ -650,8 +639,8 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Coupon */}
       <div
-        className="rounded-2xl p-4"
-        style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}
+        className="rounded-2xl p-4 fade-in fade-in-3"
+        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
       >
         <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>كود خصم</p>
         <div className="flex gap-2">
@@ -664,13 +653,9 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
             className="flex-1 rounded-xl px-4 py-3 text-sm placeholder-[#6e6860] focus:outline-none"
             style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}
           />
-          <button
-            type="button"
-            onClick={checkCoupon}
-            className="btn-yellow px-4 rounded-xl text-sm font-black flex-shrink-0 active:scale-95 transition-transform"
-          >
+          <Button variant="primary" size="md" onClick={checkCoupon} className="flex-shrink-0" style={{ padding: '0.75rem 1.1rem' }}>
             تطبيق
-          </button>
+          </Button>
         </div>
         {couponMsg && (
           <p className="text-xs mt-2 font-bold" style={{ color: couponMsg.ok ? 'var(--success)' : 'var(--error)' }}>
@@ -681,8 +666,8 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Summary box */}
       <div
-        className="rounded-2xl p-4"
-        style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}
+        className="rounded-2xl p-4 fade-in fade-in-4"
+        style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}
       >
         <p className="text-xs font-black mb-3" style={{ color: 'var(--yellow)' }}>ملخص الحجز</p>
         <div className="flex flex-col gap-2">
@@ -693,9 +678,11 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
             </div>
           )}
           {car && (
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between items-center text-sm">
               <span style={{ color: 'var(--muted)' }}>نوع العربية</span>
-              <span className="font-bold" style={{ color: 'var(--white)' }}>{car.icon} {car.name}</span>
+              <span className="inline-flex items-center gap-1.5 font-bold" style={{ color: 'var(--white)' }}>
+                {(() => { const CarIcon = CAR_TYPE_ICON[car.code] || Car; return <CarIcon size={14} />; })()} {car.name}
+              </span>
             </div>
           )}
           {form.apptDate && (
@@ -743,30 +730,19 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Buttons */}
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex-1 py-4 rounded-2xl text-base font-black active:scale-95 transition-transform"
-          style={{ background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--white-2)' }}
-        >
-          → رجوع
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="flex-1 btn-yellow py-4 rounded-2xl text-base font-black disabled:opacity-50 active:scale-95 transition-transform"
-        >
+        <Button variant="secondary" size="lg" onClick={onBack} className="flex-1">
+          <span className="inline-flex items-center gap-1.5"><ChevronRight size={16} /> رجوع</span>
+        </Button>
+        <Button variant="primary" size="lg" onClick={handleSubmit} disabled={submitting} className="flex-1">
           {submitting ? (
             <span className="flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-              </svg>
+              <Loader2 size={16} className="animate-spin" />
               جاري الحجز...
             </span>
-          ) : 'تأكيد الحجز ←'}
-        </button>
+          ) : (
+            <span className="inline-flex items-center gap-1.5">تأكيد الحجز <ChevronRight size={16} className="rotate-180" /></span>
+          )}
+        </Button>
       </div>
     </div>
   );
@@ -851,18 +827,15 @@ export default function BookingScreen() {
         style={{
           background: 'rgba(2,2,2,0.92)',
           backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid var(--line)',
         }}
       >
         <button
           type="button"
           onClick={() => (step > 0 ? setStep(s => s - 1) : navigate(-1))}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
         >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ color: 'var(--muted)' }}>
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
+          <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>
         <div>
           <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>حجز موعد</h1>
@@ -871,7 +844,7 @@ export default function BookingScreen() {
       </header>
 
       {/* Step indicator */}
-      <div className="flex-shrink-0" style={{ borderBottom: '1px solid var(--line)' }}>
+      <div className="flex-shrink-0" style={{ boxShadow: 'var(--shadow-card)' }}>
         <StepBar current={step} />
       </div>
 

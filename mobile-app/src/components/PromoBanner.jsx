@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Zap, X } from 'lucide-react';
 
 function getSecsUntilMidnight() {
   const now = new Date();
@@ -37,31 +38,31 @@ export default function PromoBanner() {
     <div
       className="relative flex items-center justify-between gap-2 px-4 py-2.5 text-xs font-bold"
       style={{
-        background: 'var(--yellow)',
+        background: 'linear-gradient(90deg, var(--yellow) 0%, var(--yellow-2) 100%)',
         color: '#0a0800',
       }}
     >
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <span className="text-base flex-shrink-0">🚗</span>
+        <Zap size={15} fill="#0a0800" strokeWidth={0} className="flex-shrink-0" />
         <span className="truncate leading-tight">
           احجز اليوم — أول 5 حجوزات يومياً لهم أسبقية التنفيذ الفوري
         </span>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <span
-          className="font-black tabular-nums text-[11px] rounded px-1.5 py-0.5"
+          className="font-black tabular-nums text-[11px] rounded-md px-1.5 py-0.5"
           style={{ background: 'rgba(0,0,0,0.15)', letterSpacing: '0.04em' }}
         >
           {formatCountdown(secs)}
         </span>
         <button
           onClick={close}
-          className="w-5 h-5 flex items-center justify-center rounded-full font-black text-sm leading-none flex-shrink-0 active:scale-90 transition-transform"
+          className="w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 active:scale-90 transition-transform"
           style={{ background: 'rgba(0,0,0,0.15)', color: '#0a0800' }}
           type="button"
           aria-label="إغلاق"
         >
-          ✕
+          <X size={12} strokeWidth={3} />
         </button>
       </div>
     </div>
