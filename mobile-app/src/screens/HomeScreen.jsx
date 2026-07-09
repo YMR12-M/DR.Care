@@ -75,8 +75,8 @@ function PackageCard({ pkg, navigate }) {
     <button
       type="button"
       onClick={() => navigate('/book', { state: { service: pkg.code } })}
-      className="flex-shrink-0 w-36 text-right rounded-2xl p-4 active:scale-95 transition-transform"
-      style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
+      className="flex-shrink-0 w-40 text-right rounded-2xl p-5 active:scale-95 transition-transform"
+      style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
     >
       <IconBadge icon={Icon} size="md" tone="yellow" className="mb-3" />
       <p className="text-xs font-black mb-1 leading-tight" style={{ color: 'var(--white)' }}>{pkg.name}</p>
@@ -199,7 +199,7 @@ export default function HomeScreen() {
       <PromoBanner />
 
       {/* Compact app bar — greeting instead of marketing headline */}
-      <header className="flex items-center justify-between px-4 pt-4 pb-3 fade-in">
+      <header className="flex items-center justify-between px-5 pt-5 pb-3 fade-in">
         <div>
           <p className="text-xl font-black leading-none tracking-tight" style={{ color: 'var(--white)' }}>
             {user ? `أهلاً يا ${firstName} 👋` : 'أهلاً بيك 👋'}
@@ -227,7 +227,7 @@ export default function HomeScreen() {
         </button>
       </header>
 
-      <div className="px-4 flex flex-col gap-4 pb-6">
+      <div className="px-5 flex flex-col gap-5 pb-6">
 
         {/* Active booking status (app-native: surfaces the user's current state) */}
         {user && <div className="fade-in fade-in-1"><ActiveBookingCard navigate={navigate} /></div>}
@@ -264,8 +264,8 @@ export default function HomeScreen() {
           <button
             type="button"
             onClick={() => navigate('/coupons')}
-            className="w-full flex items-center gap-3 rounded-2xl p-3.5 text-right active:scale-[0.98] transition-transform fade-in fade-in-3"
-            style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
+            className="w-full flex items-center gap-3 rounded-2xl p-4 text-right active:scale-[0.98] transition-transform fade-in fade-in-3"
+            style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
           >
             <IconBadge icon={Gift} size="sm" tone="yellow" />
             <p className="flex-1 text-xs font-bold" style={{ color: 'var(--white-2)' }}>

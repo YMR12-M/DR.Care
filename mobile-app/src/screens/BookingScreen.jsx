@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { api, secureFetch } from '../lib/api';
 import Button from '../components/ui/Button';
+import IconBadge from '../components/ui/IconBadge';
 import {
   FALLBACK_PACKAGES, FALLBACK_CAR_TYPES, FALLBACK_BRANCHES, FALLBACK_PAYMENT_METHODS,
   fetchConfig,
@@ -126,11 +127,11 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
   };
 
   return (
-    <div className="flex flex-col gap-5 p-4 pb-24">
+    <div className="flex flex-col gap-7 p-5 pb-24">
       {/* Packages */}
       <div className="fade-in fade-in-1">
-        <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>اختار الباقة</p>
-        <div className="grid grid-cols-2 gap-2.5">
+        <p className="text-xs font-black mb-3.5" style={{ color: 'var(--muted)' }}>اختار الباقة</p>
+        <div className="grid grid-cols-2 gap-3">
           {packages.map(p => (
             <button
               key={p.code}
@@ -139,24 +140,25 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
                 setForm(f => ({ ...f, servicePackage: p.code }));
                 setPkgError('');
               }}
-              className="rounded-2xl p-4 text-right active:scale-95 transition-transform"
+              className="rounded-2xl p-5 text-right active:scale-95 transition-transform flex flex-col gap-1.5"
               style={{
                 background: selected === p.code ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                border: selected === p.code ? '1px solid var(--yellow-line)' : 'none',
+                border: selected === p.code ? '1.5px solid var(--yellow-line)' : '1px solid var(--line-2)',
                 boxShadow: selected === p.code ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
+                minHeight: '108px',
               }}
             >
               <p
-                className="text-sm font-black mb-0.5"
+                className="text-sm font-black leading-snug"
                 style={{ color: selected === p.code ? 'var(--yellow)' : 'var(--white)' }}
               >
                 {p.name}
               </p>
-              <p className="text-xs" style={{ color: 'var(--muted)' }}>
+              <p className="text-sm font-bold" style={{ color: selected === p.code ? 'var(--yellow-2)' : 'var(--muted)' }}>
                 {p.price > 0 ? `${p.price} ج` : 'حسب الشغل'}
               </p>
               {DUR_MAP[p.code] && (
-                <p className="inline-flex items-center gap-1 text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>
+                <p className="inline-flex items-center gap-1 text-[10px] mt-auto pt-1" style={{ color: 'var(--muted-2)' }}>
                   <Clock size={10} /> {DUR_MAP[p.code]}
                 </p>
               )}
@@ -168,8 +170,8 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
 
       {/* Car types */}
       <div className="fade-in fade-in-2">
-        <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>نوع العربية</p>
-        <div className="grid grid-cols-2 gap-2.5">
+        <p className="text-xs font-black mb-3.5" style={{ color: 'var(--muted)' }}>نوع العربية</p>
+        <div className="grid grid-cols-2 gap-3">
           {carTypes.map(c => {
             const CarIcon = CAR_TYPE_ICON[c.code] || Car;
             return (
@@ -177,20 +179,20 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
               key={c.code}
               type="button"
               onClick={() => setForm(f => ({ ...f, carType: c.code }))}
-              className="flex items-center gap-3 rounded-2xl p-4 active:scale-95 transition-transform"
+              className="flex items-center gap-3.5 rounded-2xl p-5 active:scale-95 transition-transform"
               style={{
                 background: selectedCar === c.code ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                border: selectedCar === c.code ? '1px solid var(--yellow-line)' : 'none',
+                border: selectedCar === c.code ? '1.5px solid var(--yellow-line)' : '1px solid var(--line-2)',
                 boxShadow: selectedCar === c.code ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
               }}
             >
-              <CarIcon size={22} strokeWidth={2.2} style={{ color: selectedCar === c.code ? 'var(--yellow)' : 'var(--muted)' }} />
+              <IconBadge icon={CarIcon} size="sm" tone={selectedCar === c.code ? 'yellow' : 'panel'} />
               <div className="text-right">
                 <p className="text-sm font-black" style={{ color: selectedCar === c.code ? 'var(--yellow)' : 'var(--white)' }}>
                   {c.name}
                 </p>
                 {c.extra > 0 && (
-                  <p className="text-[10px]" style={{ color: 'var(--muted-2)' }}>+{c.extra} ج</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: 'var(--muted-2)' }}>+{c.extra} ج</p>
                 )}
               </div>
             </button>
@@ -277,7 +279,7 @@ function Step2({ form, setForm, onNext, onBack }) {
   const availSlots = (allSlots[form.apptDate] || []).filter(s => s.available > 0);
 
   return (
-    <div className="flex flex-col gap-5 p-4 pb-24">
+    <div className="flex flex-col gap-7 p-5 pb-24">
 
       {/* Date chips */}
       <div className="fade-in fade-in-1">
@@ -295,12 +297,12 @@ function Step2({ form, setForm, onNext, onBack }) {
                 key={d}
                 type="button"
                 onClick={() => setForm(f => ({ ...f, apptDate: d, apptTime: '' }))}
-                className="flex-shrink-0 flex flex-col items-center rounded-2xl px-4 py-3 active:scale-95 transition-transform"
+                className="flex-shrink-0 flex flex-col items-center gap-0.5 rounded-2xl px-5 py-3.5 active:scale-95 transition-transform"
                 style={{
                   background: sel ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                  border: sel ? '1px solid var(--yellow)' : 'none',
+                  border: sel ? '1.5px solid var(--yellow)' : '1px solid var(--line-2)',
                   boxShadow: sel ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
-                  minWidth: '72px',
+                  minWidth: '76px',
                 }}
               >
                 <span className="text-[10px] font-bold" style={{ color: sel ? 'var(--yellow)' : 'var(--muted)' }}>{day}</span>
@@ -331,10 +333,10 @@ function Step2({ form, setForm, onNext, onBack }) {
                     key={s.time}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, apptTime: s.time }))}
-                    className="px-4 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-transform"
+                    className="px-5 py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform"
                     style={{
                       background: sel ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                      border: sel ? '1px solid var(--yellow)' : 'none',
+                      border: sel ? '1.5px solid var(--yellow)' : '1px solid var(--line-2)',
                       boxShadow: sel ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
                       color: sel ? 'var(--yellow)' : 'var(--muted)',
                     }}
@@ -363,7 +365,7 @@ function Step2({ form, setForm, onNext, onBack }) {
       {dur && (
         <div
           className="rounded-xl px-4 py-3 flex items-center gap-2 fade-in"
-          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
+          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
         >
           <Clock size={15} style={{ color: 'var(--yellow)' }} />
           <span className="text-sm font-bold" style={{ color: 'var(--muted)' }}>
@@ -476,7 +478,7 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
   const dur = DUR_MAP[form.servicePackage] || null;
 
   return (
-    <div className="flex flex-col gap-4 p-4 pb-28">
+    <div className="flex flex-col gap-5 p-5 pb-28">
 
       {/* Auto-fill from profile */}
       {user && (
@@ -496,8 +498,8 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Personal info */}
       <div
-        className="rounded-2xl p-4 flex flex-col gap-3 fade-in fade-in-1"
-        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
+        className="rounded-2xl p-5 flex flex-col gap-4 fade-in fade-in-1"
+        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
       >
         <p className="text-sm font-black" style={{ color: 'var(--white)' }}>بياناتك الشخصية</p>
 
@@ -588,8 +590,8 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Payment method */}
       <div
-        className="rounded-2xl p-4 fade-in fade-in-2"
-        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
+        className="rounded-2xl p-5 fade-in fade-in-2"
+        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
       >
         <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>طريقة الدفع</p>
         <div className="flex gap-2">
@@ -639,8 +641,8 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
       {/* Coupon */}
       <div
-        className="rounded-2xl p-4 fade-in fade-in-3"
-        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}
+        className="rounded-2xl p-5 fade-in fade-in-3"
+        style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
       >
         <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>كود خصم</p>
         <div className="flex gap-2">
@@ -823,17 +825,18 @@ export default function BookingScreen() {
 
       {/* Header */}
       <header
-        className="flex-shrink-0 flex items-center gap-3 px-4 py-3"
+        className="flex-shrink-0 flex items-center gap-3 px-5 py-3.5"
         style={{
           background: 'rgba(2,2,2,0.92)',
           backdropFilter: 'blur(16px)',
+          borderBottom: '1px solid var(--line)',
         }}
       >
         <button
           type="button"
           onClick={() => (step > 0 ? setStep(s => s - 1) : navigate(-1))}
           className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
-          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
         >
           <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>
@@ -844,7 +847,7 @@ export default function BookingScreen() {
       </header>
 
       {/* Step indicator */}
-      <div className="flex-shrink-0" style={{ boxShadow: 'var(--shadow-card)' }}>
+      <div className="flex-shrink-0" style={{ borderBottom: '1px solid var(--line)' }}>
         <StepBar current={step} />
       </div>
 

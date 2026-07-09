@@ -27,8 +27,8 @@ export default function BookingSuccessScreen() {
       </p>
 
       {booking.id && (
-        <div className="rounded-2xl p-4 w-full mb-6 text-right relative fade-in fade-in-3"
-          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="rounded-2xl p-5 w-full mb-6 text-right relative fade-in fade-in-3"
+          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}>
           <p className="text-xs mb-1" style={{ color: 'var(--muted)' }}>رقم الحجز</p>
           <p className="text-xl font-black" style={{ color: 'var(--yellow)' }}>#{booking.id}</p>
         </div>

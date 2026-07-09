@@ -69,20 +69,20 @@ export default function CouponsScreen() {
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
-        className="sticky top-0 z-40 px-4 py-4"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
+        className="sticky top-0 z-40 px-5 py-4"
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
         <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>كوبونات الخصم</h1>
       </header>
 
       {loading ? (
-        <div className="p-4 flex flex-col gap-3">
+        <div className="p-5 flex flex-col gap-4">
           {[1,2,3].map(i => (
-            <div key={i} className="h-20 rounded-2xl skeleton"/>
+            <div key={i} className="h-20 rounded-2xl skeleton" style={{ border: '1px solid var(--line-2)' }}/>
           ))}
         </div>
       ) : (
-        <div className="p-4 flex flex-col gap-4">
+        <div className="p-5 flex flex-col gap-5">
           {/* Balance */}
           <Card variant="yellow" className="p-5 text-center fade-in">
             <p className="text-xs font-bold mb-1" style={{ color: 'var(--muted)' }}>رصيدك الحالي</p>
@@ -115,9 +115,9 @@ export default function CouponsScreen() {
           {/* Rewards */}
           <div className="fade-in fade-in-1">
             <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>المكافآت المتاحة</p>
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-3">
               {(data?.rewards || []).map(r => (
-                <Card key={r.id} className="p-4 flex items-center justify-between">
+                <Card key={r.id} className="p-5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <IconBadge icon={Gift} size="sm" tone={r.available ? 'yellow' : 'panel'} />
                     <div>
@@ -143,9 +143,9 @@ export default function CouponsScreen() {
           {data?.history?.length > 0 && (
             <div className="fade-in fade-in-2">
               <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>سجل النقاط</p>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 {data.history.map((h, i) => (
-                  <Card key={i} className="p-3 flex items-center justify-between">
+                  <Card key={i} className="p-4 flex items-center justify-between">
                     <div>
                       <p className="text-xs font-bold" style={{ color: 'var(--white-2)' }}>{h.note || h.package_name || h.source}</p>
                       <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>{h.created_at}</p>

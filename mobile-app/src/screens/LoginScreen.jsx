@@ -43,12 +43,12 @@ export default function LoginScreen() {
     <div className="h-full overflow-y-auto scroll-hide flex flex-col" style={{ background: 'var(--black)' }}>
       {/* Header */}
       <header
-        className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
+        className="sticky top-0 z-40 flex items-center gap-3 px-5 py-3.5"
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
         <button onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
-          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
           type="button">
           <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>

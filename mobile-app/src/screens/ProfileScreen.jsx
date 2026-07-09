@@ -68,14 +68,14 @@ export default function ProfileScreen() {
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
-        className="sticky top-0 z-40 px-4 py-4"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
+        className="sticky top-0 z-40 px-5 py-4"
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
         <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حسابي</h1>
       </header>
 
       {/* Profile Card */}
-      <Card className="mx-4 mt-4 p-5 relative overflow-hidden fade-in">
+      <Card className="mx-5 mt-5 p-5 relative overflow-hidden fade-in">
         {/* glow */}
         <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-10 pointer-events-none"
           style={{ background: 'var(--yellow)' }}/>
@@ -111,14 +111,14 @@ export default function ProfileScreen() {
       </Card>
 
       {/* Menu */}
-      <Card className="mx-4 mt-4 overflow-hidden fade-in fade-in-1">
+      <Card className="mx-5 mt-4 overflow-hidden fade-in fade-in-1">
         <MenuItem icon={ClipboardList} label="حجوزاتي"       onClick={() => navigate('/bookings')} />
         <MenuItem icon={UserRoundPen}  label="تعديل البيانات" onClick={() => navigate('/edit-profile')} />
         <MenuItem icon={Gift}          label="كوبونات الخصم"  onClick={() => navigate('/coupons')} />
         <MenuItem icon={Phone}         label="تواصل معنا"     onClick={() => window.open('tel:+201037957593')} last />
       </Card>
 
-      <Card className="mx-4 mt-3 overflow-hidden fade-in fade-in-2">
+      <Card className="mx-5 mt-4 overflow-hidden fade-in fade-in-2">
         <button type="button" onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-bold active:opacity-70"
           style={{ color: 'var(--error)' }}>

@@ -22,7 +22,7 @@ function BookingCard({ booking, index }) {
     : new Date(booking.created_at).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
 
   return (
-    <Card className={`p-4 fade-in fade-in-${Math.min(index + 1, 7)}`}>
+    <Card className={`p-5 fade-in fade-in-${Math.min(index + 1, 7)}`}>
       <div className="flex items-start gap-3 mb-3">
         <IconBadge icon={Car} size="sm" tone="panel" />
         <div className="flex-1 min-w-0">
@@ -53,7 +53,7 @@ function BookingCard({ booking, index }) {
 
 function Skeleton() {
   return (
-    <div className="rounded-2xl p-4" style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)' }}>
+    <div className="rounded-2xl p-5" style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}>
       <div className="flex justify-between mb-3">
         <div>
           <div className="h-4 rounded w-32 mb-1.5 skeleton" />
@@ -98,8 +98,8 @@ export default function BookingsScreen() {
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
-        className="sticky top-0 z-40 px-4 py-4"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
+        className="sticky top-0 z-40 px-5 py-4"
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
         <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حجوزاتي</h1>
         {!loading && (
@@ -107,7 +107,7 @@ export default function BookingsScreen() {
         )}
       </header>
 
-      <div className="p-4 flex flex-col gap-3">
+      <div className="p-5 flex flex-col gap-4">
         {loading ? (
           [1,2,3].map(i => <Skeleton key={i}/>)
         ) : bookings.length === 0 ? (

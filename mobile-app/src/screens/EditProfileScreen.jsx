@@ -72,12 +72,12 @@ export default function EditProfileScreen() {
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
-        className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)' }}
+        className="sticky top-0 z-40 flex items-center gap-3 px-5 py-3.5"
+        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
         <button onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
-          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)' }}
+          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
           type="button">
           <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
         </button>
@@ -86,7 +86,7 @@ export default function EditProfileScreen() {
 
       <div className="p-6 flex flex-col gap-6">
         {/* Personal info */}
-        <Card as="form" onSubmit={saveInfo} className="p-4 flex flex-col gap-4 fade-in">
+        <Card as="form" onSubmit={saveInfo} className="p-5 flex flex-col gap-4 fade-in">
           <p className="text-sm font-black" style={{ color: 'var(--white)' }}>البيانات الشخصية</p>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>الاسم الكامل</label>
@@ -109,7 +109,7 @@ export default function EditProfileScreen() {
         </Card>
 
         {/* Password */}
-        <Card as="form" onSubmit={savePassword} className="p-4 flex flex-col gap-4 fade-in fade-in-1">
+        <Card as="form" onSubmit={savePassword} className="p-5 flex flex-col gap-4 fade-in fade-in-1">
           <p className="text-sm font-black" style={{ color: 'var(--white)' }}>تغيير كلمة المرور</p>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>كلمة المرور الحالية</label>
