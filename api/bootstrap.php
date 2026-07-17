@@ -423,6 +423,11 @@ try {
   addMissingColumn($pdo, 'customer_users', 'email_verify_expires','TEXT DEFAULT NULL');
   addMissingColumn($pdo, 'customer_users', 'referral_code',       'TEXT DEFAULT NULL');
   addMissingColumn($pdo, 'customer_users', 'referred_by_id',      'INTEGER DEFAULT NULL');
+  addMissingColumn($pdo, 'customer_users', 'notes',     'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'customer_users', 'car_type',  'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'customer_users', 'car_color', 'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'customer_users', 'car_plate', 'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'customer_users', 'source',    "TEXT DEFAULT 'web'");
 
   /* ── Referrals ── */
   $pdo->exec("CREATE TABLE IF NOT EXISTS referrals (
@@ -456,6 +461,35 @@ try {
     created_at  TEXT NOT NULL
   )");
   $pdo->exec("CREATE INDEX IF NOT EXISTS idx_pr_token ON password_resets(token_hash)");
+
+  /* ── Expenses ledger ── */
+  $pdo->exec("CREATE TABLE IF NOT EXISTS expenses (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    category     TEXT NOT NULL,
+    amount       REAL NOT NULL,
+    expense_date TEXT NOT NULL,
+    note         TEXT,
+    created_by   INTEGER,
+    created_at   TEXT NOT NULL
+  )");
+  $pdo->exec("CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(expense_date)");
+
+  /* ── Manual daily revenue log (walk-in/cash, separate from online bookings) ── */
+  $pdo->exec("CREATE TABLE IF NOT EXISTS revenue_logs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    log_date        TEXT NOT NULL,
+    cars_count      INTEGER NOT NULL DEFAULT 0,
+    cars_amount     REAL NOT NULL DEFAULT 0,
+    carpets_count   INTEGER NOT NULL DEFAULT 0,
+    carpets_amount  REAL NOT NULL DEFAULT 0,
+    blankets_count  INTEGER NOT NULL DEFAULT 0,
+    blankets_amount REAL NOT NULL DEFAULT 0,
+    total_amount    REAL NOT NULL DEFAULT 0,
+    note            TEXT,
+    created_by      INTEGER,
+    created_at      TEXT NOT NULL
+  )");
+  $pdo->exec("CREATE INDEX IF NOT EXISTS idx_revenue_logs_date ON revenue_logs(log_date)");
 
   /* ── Audit log ── */
   $pdo->exec("CREATE TABLE IF NOT EXISTS audit_log (

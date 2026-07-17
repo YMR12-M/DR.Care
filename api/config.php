@@ -18,6 +18,14 @@ return [
     ['code' => 'van',    'name' => 'فان',      'extra' => 90],
     ['code' => 'pickup', 'name' => 'نقل خفيف','extra' => 120]
   ],
+  'expenseCategories' => [
+    ['code' => 'salaries',    'name' => 'مرتبات العمالة'],
+    ['code' => 'maids',       'name' => 'الخادمات'],
+    ['code' => 'maintenance', 'name' => 'الصيانة'],
+    ['code' => 'electricity', 'name' => 'الكهرباء'],
+    ['code' => 'rent',        'name' => 'الإيجار'],
+    ['code' => 'other',       'name' => 'أخرى']
+  ],
   'branches' => ['قليوب — شارع العروبة'],
   'paymentMethods'  => ['كاش', 'Instapay'],
   'instapayNumber'  => '01037957593'

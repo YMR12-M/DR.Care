@@ -666,6 +666,14 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span class="item-label">العملاء</span>
           </button>
+          <button class="sidebar-nav-item" type="button" id="toggleRevenueBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <span class="item-label">الإيرادات</span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="toggleExpensesBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+            <span class="item-label">المصروفات</span>
+          </button>
           <button class="sidebar-nav-item" type="button" id="toggleReviewsBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span class="item-label">التقييمات</span>
@@ -895,7 +903,42 @@
               <div class="spacer"></div>
               <input type="search" id="customerSearch" class="search-input" placeholder="بحث باسم أو إيميل..." style="width:min(220px,100%)">
               <span class="results-badge" id="customerCount"></span>
+              <button class="btn-primary" type="button" id="showCustomerFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ عميل جديد</button>
             </div>
+
+            <!-- Create customer form -->
+            <div id="customerCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+              <p style="font-weight:800;margin-bottom:16px">تسجيل عميل جديد</p>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الاسم *
+                  <input id="cu_name" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="اسم العميل">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الموبايل *
+                  <input id="cu_phone" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="01xxxxxxxxx">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الإيميل (اختياري)
+                  <input id="cu_email" type="email" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="example@mail.com">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">نوع/موديل السيارة
+                  <input id="cu_car_type" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="تويوتا كورولا">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">لون السيارة
+                  <input id="cu_car_color" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="أبيض">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">رقم اللوحة
+                  <input id="cu_car_plate" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="أ ب ج 123">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">ملاحظات / عنوان
+                  <textarea id="cu_notes" class="search-input" rows="2" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit"></textarea>
+                </label>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="button" id="createCustomerBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">تسجيل العميل</button>
+                <button type="button" id="cancelCustomerFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+              </div>
+              <p id="customerFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+            </div>
+
             <div class="table-wrap">
               <table class="bookings-table" id="customersTable">
                 <thead>
@@ -903,6 +946,7 @@
                     <th>العميل</th>
                     <th>الإيميل</th>
                     <th>الموبايل</th>
+                    <th>السيارة</th>
                     <th>الحجوزات</th>
                     <th>إجمالي المصروف</th>
                     <th>تاريخ الانضمام</th>
@@ -910,7 +954,165 @@
                   </tr>
                 </thead>
                 <tbody id="customersBody">
-                  <tr><td colspan="7"><div class="table-empty"><span>👥</span><p>جاري التحميل...</p></div></td></tr>
+                  <tr><td colspan="8"><div class="table-empty"><span>👥</span><p>جاري التحميل...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── REVENUE PANEL ── -->
+          <div id="revenuePanel" style="display:none;margin-bottom:24px">
+            <div class="stats-row" id="revenueStatsRow" style="margin-bottom:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+              <div class="stat-card stat-card--yellow stat-card--primary">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                </div>
+                <p class="stat-card__kicker">إجمالي إيراد الشهر</p>
+                <div class="stat-card__value" id="revenueMonthTotal">—</div>
+                <p class="stat-card__label">سجل يدوي منفصل عن الحجوزات</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">🚗</div>
+                <p class="stat-card__kicker">سيارات</p>
+                <div class="stat-card__value" id="revenueCarsCount">—</div>
+                <p class="stat-card__label" id="revenueCarsAmount">—</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">🧵</div>
+                <p class="stat-card__kicker">سجاد</p>
+                <div class="stat-card__value" id="revenueCarpetsCount">—</div>
+                <p class="stat-card__label" id="revenueCarpetsAmount">—</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">🛏️</div>
+                <p class="stat-card__kicker">بطاطين</p>
+                <div class="stat-card__value" id="revenueBlanketsCount">—</div>
+                <p class="stat-card__label" id="revenueBlanketsAmount">—</p>
+              </div>
+            </div>
+
+            <div class="filter-bar" style="margin-bottom:12px">
+              <strong style="font-size:.9rem">📈 سجل الإيرادات اليدوي</strong>
+              <div class="spacer"></div>
+              <input type="month" id="revenueMonthFilter" class="search-input">
+              <button class="btn-primary" type="button" id="showRevenueFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ سجل جديد</button>
+            </div>
+
+            <div id="revenueCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+              <p style="font-weight:800;margin-bottom:16px" id="revenueFormTitle">تسجيل إيراد يومي</p>
+              <input type="hidden" id="rv_id" value="">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">التاريخ *
+                  <input id="rv_date" type="date" class="search-input" style="width:100%;height:40px;margin-top:6px">
+                </label>
+                <div></div><div></div>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">🚗 عدد السيارات
+                  <input id="rv_cars_count" type="number" min="0" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:span 2">🚗 قيمة السيارات (ج)
+                  <input id="rv_cars_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">🧵 عدد السجاد
+                  <input id="rv_carpets_count" type="number" min="0" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:span 2">🧵 قيمة السجاد (ج)
+                  <input id="rv_carpets_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">🛏️ عدد البطاطين
+                  <input id="rv_blankets_count" type="number" min="0" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:span 2">🛏️ قيمة البطاطين (ج)
+                  <input id="rv_blankets_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">ملاحظات
+                  <textarea id="rv_note" class="search-input" rows="2" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit"></textarea>
+                </label>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="button" id="saveRevenueBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">حفظ السجل</button>
+                <button type="button" id="cancelRevenueFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+              </div>
+              <p id="revenueFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="bookings-table" id="revenueTable">
+                <thead>
+                  <tr>
+                    <th>التاريخ</th>
+                    <th>🚗 سيارات</th>
+                    <th>🧵 سجاد</th>
+                    <th>🛏️ بطاطين</th>
+                    <th>الإجمالي</th>
+                    <th>ملاحظات</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="revenueBody">
+                  <tr><td colspan="7"><div class="table-empty"><span>📈</span><p>جاري التحميل...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── EXPENSES PANEL ── -->
+          <div id="expensesPanel" style="display:none;margin-bottom:24px">
+            <div class="stats-row" id="expensesStatsRow" style="margin-bottom:12px;grid-template-columns:1fr">
+              <div class="stat-card stat-card--orange stat-card--primary">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+                </div>
+                <p class="stat-card__kicker">إجمالي مصروفات الشهر</p>
+                <div class="stat-card__value" id="expensesMonthTotal">—</div>
+                <p class="stat-card__label" id="expensesMonthCount">—</p>
+              </div>
+            </div>
+            <div class="stats-row" id="expensesCategoryRow" style="margin-bottom:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
+
+            <div class="filter-bar" style="margin-bottom:12px">
+              <strong style="font-size:.9rem">💸 سجل المصروفات</strong>
+              <div class="spacer"></div>
+              <input type="month" id="expensesMonthFilter" class="search-input">
+              <button class="btn-primary" type="button" id="showExpenseFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ مصروف جديد</button>
+            </div>
+
+            <div id="expenseCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+              <p style="font-weight:800;margin-bottom:16px" id="expenseFormTitle">تسجيل مصروف جديد</p>
+              <input type="hidden" id="ex_id" value="">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الفئة *
+                  <select id="ex_category" class="search-input" style="width:100%;height:40px;margin-top:6px"></select>
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">المبلغ (ج) *
+                  <input id="ex_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">التاريخ *
+                  <input id="ex_date" type="date" class="search-input" style="width:100%;height:40px;margin-top:6px">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">ملاحظات
+                  <textarea id="ex_note" class="search-input" rows="2" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit"></textarea>
+                </label>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="button" id="saveExpenseBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">حفظ المصروف</button>
+                <button type="button" id="cancelExpenseFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+              </div>
+              <p id="expenseFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="bookings-table" id="expensesTable">
+                <thead>
+                  <tr>
+                    <th>التاريخ</th>
+                    <th>الفئة</th>
+                    <th>المبلغ</th>
+                    <th>ملاحظات</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="expensesBody">
+                  <tr><td colspan="5"><div class="table-empty"><span>💸</span><p>جاري التحميل...</p></div></td></tr>
                 </tbody>
               </table>
             </div>

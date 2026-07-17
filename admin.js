@@ -105,6 +105,16 @@ const STATUS_TRANSITIONS = {
 const PAYMENT_LABELS = { pending: 'انتظار', paid: 'مدفوع', waived: 'معفو' };
 const PAYMENT_COLORS = { pending: '#e67e22', paid: '#27ae60', waived: '#7f8c8d' };
 
+// يطابق 'expenseCategories' في api/config.php — تحديث هنا لو الـ backend اتغير
+const EXPENSE_CATEGORIES = [
+  { code: 'salaries',    name: 'مرتبات العمالة' },
+  { code: 'maids',       name: 'الخادمات' },
+  { code: 'maintenance', name: 'الصيانة' },
+  { code: 'electricity', name: 'الكهرباء' },
+  { code: 'rent',        name: 'الإيجار' },
+  { code: 'other',       name: 'أخرى' },
+];
+
 // ─── State ─────────────────────────────────────────
 let allBookings          = [];
 let currentFilter        = 'all';
@@ -1166,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (countEl) countEl.textContent = `${list.length} عميل`;
     if (!tbody) return;
     if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="7"><div class="table-empty"><span>👥</span><p>لا يوجد عملاء</p></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8"><div class="table-empty"><span>👥</span><p>لا يوجد عملاء</p></div></td></tr>';
       return;
     }
     tbody.innerHTML = list.map(c => {
@@ -1174,14 +1184,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const waPhone  = (c.phone || '').replace(/[^0-9]/g, '');
       const waLink   = waPhone ? `https://wa.me/2${waPhone}` : null;
       const joined   = c.created_at ? new Date(c.created_at).toLocaleDateString('ar-EG', { year:'numeric', month:'short' }) : '—';
+      const isManual = c.source === 'admin';
+      const isPlaceholderEmail = isManual && (c.email || '').endsWith('@drcare.local');
+      const emailDisplay = isPlaceholderEmail
+        ? '—' : `<a href="mailto:${escapeHtml(c.email)}" style="color:var(--muted)">${escapeHtml(c.email)}</a>`;
+      const carBits = [c.car_type, c.car_color, c.car_plate].filter(Boolean).map(escapeHtml);
+      const carDisplay = carBits.length ? carBits.join(' · ') : '—';
       return `
         <tr>
           <td style="display:flex;align-items:center;gap:10px">
             <div style="width:34px;height:34px;border-radius:50%;background:var(--yellow);color:#0a0800;font-weight:900;display:grid;place-items:center;font-size:.85rem;flex-shrink:0">${escapeHtml(initials)}</div>
-            <strong>${escapeHtml(c.name || '—')}</strong>
+            <div>
+              <strong>${escapeHtml(c.name || '—')}</strong>
+              ${isManual ? '<span class="bk-badge bk-badge--new" style="margin-right:6px">يدوي</span>' : ''}
+              ${c.notes ? `<span class="booking-sub" title="${escapeHtml(c.notes)}">${escapeHtml(c.notes)}</span>` : ''}
+            </div>
           </td>
-          <td><a href="mailto:${escapeHtml(c.email)}" style="color:var(--muted)">${escapeHtml(c.email)}</a></td>
+          <td>${emailDisplay}</td>
           <td>${escapeHtml(c.phone || '—')}</td>
+          <td style="color:var(--muted);font-size:.82rem">${carDisplay}</td>
           <td style="font-weight:800;color:var(--yellow)">${c.booking_count || 0}</td>
           <td style="font-weight:700">${formatPrice(c.total_spent || 0)}</td>
           <td style="color:var(--muted)">${joined}</td>
@@ -1206,6 +1227,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCustomersTable(q ? allCustomers.filter(c =>
       (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q) || (c.phone || '').includes(q)
     ) : allCustomers);
+  });
+
+  /* ── Manual customer registration ── */
+  const customerCreateForm  = document.getElementById('customerCreateForm');
+  const customerFormMsg     = document.getElementById('customerFormMsg');
+
+  document.getElementById('showCustomerFormBtn')?.addEventListener('click', () => {
+    if (customerCreateForm) customerCreateForm.style.display = '';
+  });
+  document.getElementById('cancelCustomerFormBtn')?.addEventListener('click', () => {
+    if (customerCreateForm) customerCreateForm.style.display = 'none';
+  });
+
+  document.getElementById('createCustomerBtn')?.addEventListener('click', async () => {
+    const body = {
+      name:      document.getElementById('cu_name')?.value.trim(),
+      phone:     document.getElementById('cu_phone')?.value.trim(),
+      email:     document.getElementById('cu_email')?.value.trim(),
+      notes:     document.getElementById('cu_notes')?.value.trim(),
+      car_type:  document.getElementById('cu_car_type')?.value.trim(),
+      car_color: document.getElementById('cu_car_color')?.value.trim(),
+      car_plate: document.getElementById('cu_car_plate')?.value.trim(),
+    };
+    const btn = document.getElementById('createCustomerBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/customers.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (customerFormMsg) { customerFormMsg.textContent = data.message || (data.ok ? '✓ تم تسجيل العميل' : ''); customerFormMsg.style.color = data.ok ? 'var(--success)' : 'var(--error)'; }
+      if (data.ok) {
+        ['cu_name','cu_phone','cu_email','cu_notes','cu_car_type','cu_car_color','cu_car_plate'].forEach(id => {
+          const el = document.getElementById(id); if (el) el.value = '';
+        });
+        if (customerCreateForm) customerCreateForm.style.display = 'none';
+        showToast('✓ تم تسجيل العميل بنجاح', 'success');
+        fetchCustomers();
+      }
+    } catch { if (customerFormMsg) { customerFormMsg.textContent = 'خطأ في الاتصال'; customerFormMsg.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.textContent = 'تسجيل العميل'; }
   });
 
   /* ── Coupons ── */
@@ -1385,6 +1448,288 @@ document.addEventListener('DOMContentLoaded', async () => {
       const id = deleteBtn.dataset.deleteCoupon;
       await fetch('api/coupons.php', { method: 'DELETE', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id) }) });
       fetchCoupons();
+    }
+  });
+
+  /* ══════════════════════════════════════════
+     REVENUE PANEL (manual daily log — cars/carpets/blankets)
+  ══════════════════════════════════════════ */
+  const revenuePanel     = document.getElementById('revenuePanel');
+  const toggleRevenueBtn = document.getElementById('toggleRevenueBtn');
+  const revenueCreateForm= document.getElementById('revenueCreateForm');
+  const revenueFormMsg   = document.getElementById('revenueFormMsg');
+  const revenueMonthFilter = document.getElementById('revenueMonthFilter');
+  let allRevenueLogs = [];
+
+  const curMonth = () => new Date().toISOString().slice(0, 7);
+  if (revenueMonthFilter) revenueMonthFilter.value = curMonth();
+
+  const renderRevenueSummary = (list) => {
+    const sum = (k) => list.reduce((s, r) => s + Number(r[k] || 0), 0);
+    const totalAmount = sum('total_amount');
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('revenueMonthTotal',   formatPrice(totalAmount));
+    set('revenueCarsCount',    sum('cars_count').toLocaleString('ar-EG'));
+    set('revenueCarsAmount',   formatPrice(sum('cars_amount')));
+    set('revenueCarpetsCount', sum('carpets_count').toLocaleString('ar-EG'));
+    set('revenueCarpetsAmount',formatPrice(sum('carpets_amount')));
+    set('revenueBlanketsCount',sum('blankets_count').toLocaleString('ar-EG'));
+    set('revenueBlanketsAmount',formatPrice(sum('blankets_amount')));
+  };
+
+  const renderRevenueTable = (list) => {
+    const tbody = document.getElementById('revenueBody');
+    if (!tbody) return;
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="table-empty"><span>📈</span><p>لا توجد سجلات لهذا الشهر</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(r => `
+      <tr>
+        <td style="color:var(--muted)">${new Date(r.log_date + 'T00:00:00').toLocaleDateString('ar-EG')}</td>
+        <td>${r.cars_count || 0}<span style="color:var(--muted-2)"> · ${formatPrice(r.cars_amount || 0)}</span></td>
+        <td>${r.carpets_count || 0}<span style="color:var(--muted-2)"> · ${formatPrice(r.carpets_amount || 0)}</span></td>
+        <td>${r.blankets_count || 0}<span style="color:var(--muted-2)"> · ${formatPrice(r.blankets_amount || 0)}</span></td>
+        <td class="price-val">${formatPrice(r.total_amount || 0)}</td>
+        <td style="color:var(--muted);font-size:.8rem">${escapeHtml(r.note || '—')}</td>
+        <td style="display:flex;gap:6px">
+          <button class="details-btn" data-edit-revenue="${r.id}">تعديل</button>
+          <button class="details-btn" data-delete-revenue="${r.id}" style="color:var(--error)">حذف</button>
+        </td>
+      </tr>`).join('');
+  };
+
+  const fetchRevenueLogs = async () => {
+    const month = revenueMonthFilter?.value || curMonth();
+    const res   = await adminFetch(`api/revenue-log.php?month=${encodeURIComponent(month)}`);
+    const data  = await res.json().catch(() => ({}));
+    allRevenueLogs = data.logs || [];
+    renderRevenueSummary(allRevenueLogs);
+    renderRevenueTable(allRevenueLogs);
+  };
+
+  toggleRevenueBtn?.addEventListener('click', () => activateSection('revenue'));
+  revenueMonthFilter?.addEventListener('change', fetchRevenueLogs);
+
+  const resetRevenueForm = () => {
+    document.getElementById('rv_id').value = '';
+    document.getElementById('rv_date').value = new Date().toISOString().slice(0, 10);
+    ['rv_cars_count','rv_cars_amount','rv_carpets_count','rv_carpets_amount','rv_blankets_count','rv_blankets_amount'].forEach(id => {
+      document.getElementById(id).value = 0;
+    });
+    document.getElementById('rv_note').value = '';
+    document.getElementById('revenueFormTitle').textContent = 'تسجيل إيراد يومي';
+    if (revenueFormMsg) revenueFormMsg.textContent = '';
+  };
+
+  document.getElementById('showRevenueFormBtn')?.addEventListener('click', () => {
+    resetRevenueForm();
+    if (revenueCreateForm) revenueCreateForm.style.display = '';
+  });
+  document.getElementById('cancelRevenueFormBtn')?.addEventListener('click', () => {
+    if (revenueCreateForm) revenueCreateForm.style.display = 'none';
+  });
+
+  document.getElementById('saveRevenueBtn')?.addEventListener('click', async () => {
+    const id = document.getElementById('rv_id').value;
+    const body = {
+      log_date:        document.getElementById('rv_date')?.value,
+      cars_count:      document.getElementById('rv_cars_count')?.value,
+      cars_amount:     document.getElementById('rv_cars_amount')?.value,
+      carpets_count:   document.getElementById('rv_carpets_count')?.value,
+      carpets_amount:  document.getElementById('rv_carpets_amount')?.value,
+      blankets_count:  document.getElementById('rv_blankets_count')?.value,
+      blankets_amount: document.getElementById('rv_blankets_amount')?.value,
+      note:            document.getElementById('rv_note')?.value,
+    };
+    if (id) body.id = Number(id);
+    const btn = document.getElementById('saveRevenueBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/revenue-log.php', {
+        method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast('✓ تم حفظ السجل', 'success');
+        if (revenueCreateForm) revenueCreateForm.style.display = 'none';
+        fetchRevenueLogs();
+      } else if (revenueFormMsg) {
+        revenueFormMsg.textContent = data.message || 'فشل الحفظ'; revenueFormMsg.style.color = 'var(--error)';
+      }
+    } catch { if (revenueFormMsg) { revenueFormMsg.textContent = 'خطأ في الاتصال'; revenueFormMsg.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.textContent = 'حفظ السجل'; }
+  });
+
+  document.getElementById('revenueTable')?.addEventListener('click', async (e) => {
+    const editBtn   = e.target.closest('[data-edit-revenue]');
+    const deleteBtn = e.target.closest('[data-delete-revenue]');
+
+    if (editBtn) {
+      const row = allRevenueLogs.find(r => String(r.id) === editBtn.dataset.editRevenue);
+      if (!row) return;
+      document.getElementById('rv_id').value = row.id;
+      document.getElementById('rv_date').value = row.log_date;
+      document.getElementById('rv_cars_count').value = row.cars_count;
+      document.getElementById('rv_cars_amount').value = row.cars_amount;
+      document.getElementById('rv_carpets_count').value = row.carpets_count;
+      document.getElementById('rv_carpets_amount').value = row.carpets_amount;
+      document.getElementById('rv_blankets_count').value = row.blankets_count;
+      document.getElementById('rv_blankets_amount').value = row.blankets_amount;
+      document.getElementById('rv_note').value = row.note || '';
+      document.getElementById('revenueFormTitle').textContent = 'تعديل سجل الإيراد';
+      if (revenueFormMsg) revenueFormMsg.textContent = '';
+      if (revenueCreateForm) revenueCreateForm.style.display = '';
+    }
+    if (deleteBtn && confirm('حذف هذا السجل؟')) {
+      const id = deleteBtn.dataset.deleteRevenue;
+      await fetchAdminCsrf();
+      await adminFetch('api/revenue-log.php', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id) })
+      });
+      fetchRevenueLogs();
+    }
+  });
+
+  /* ══════════════════════════════════════════
+     EXPENSES PANEL
+  ══════════════════════════════════════════ */
+  const expensesPanel     = document.getElementById('expensesPanel');
+  const toggleExpensesBtn = document.getElementById('toggleExpensesBtn');
+  const expenseCreateForm = document.getElementById('expenseCreateForm');
+  const expenseFormMsg    = document.getElementById('expenseFormMsg');
+  const expensesMonthFilter = document.getElementById('expensesMonthFilter');
+  let allExpenses = [];
+
+  if (expensesMonthFilter) expensesMonthFilter.value = curMonth();
+
+  const exCategorySelect = document.getElementById('ex_category');
+  if (exCategorySelect) {
+    exCategorySelect.innerHTML = EXPENSE_CATEGORIES.map(c => `<option value="${c.code}">${escapeHtml(c.name)}</option>`).join('');
+  }
+  const categoryName = (code) => EXPENSE_CATEGORIES.find(c => c.code === code)?.name || code;
+
+  const renderExpensesSummary = (list) => {
+    const total = list.reduce((s, e) => s + Number(e.amount || 0), 0);
+    const totalEl = document.getElementById('expensesMonthTotal');
+    const countEl = document.getElementById('expensesMonthCount');
+    if (totalEl) totalEl.textContent = formatPrice(total);
+    if (countEl) countEl.textContent = `${list.length} عملية هذا الشهر`;
+
+    const rowEl = document.getElementById('expensesCategoryRow');
+    if (!rowEl) return;
+    rowEl.innerHTML = EXPENSE_CATEGORIES.map(cat => {
+      const catTotal = list.filter(e => e.category === cat.code).reduce((s, e) => s + Number(e.amount || 0), 0);
+      return `
+        <div class="stat-card">
+          <p class="stat-card__kicker">${escapeHtml(cat.name)}</p>
+          <div class="stat-card__value" style="font-size:1.3rem">${formatPrice(catTotal)}</div>
+        </div>`;
+    }).join('');
+  };
+
+  const renderExpensesTable = (list) => {
+    const tbody = document.getElementById('expensesBody');
+    if (!tbody) return;
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="table-empty"><span>💸</span><p>لا توجد مصروفات لهذا الشهر</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(e => `
+      <tr>
+        <td style="color:var(--muted)">${new Date(e.expense_date + 'T00:00:00').toLocaleDateString('ar-EG')}</td>
+        <td><span class="status-badge new">${escapeHtml(categoryName(e.category))}</span></td>
+        <td class="price-val">${formatPrice(e.amount)}</td>
+        <td style="color:var(--muted);font-size:.8rem">${escapeHtml(e.note || '—')}</td>
+        <td style="display:flex;gap:6px">
+          <button class="details-btn" data-edit-expense="${e.id}">تعديل</button>
+          <button class="details-btn" data-delete-expense="${e.id}" style="color:var(--error)">حذف</button>
+        </td>
+      </tr>`).join('');
+  };
+
+  const fetchExpenses = async () => {
+    const month = expensesMonthFilter?.value || curMonth();
+    const res   = await adminFetch(`api/expenses.php?month=${encodeURIComponent(month)}`);
+    const data  = await res.json().catch(() => ({}));
+    allExpenses = data.expenses || [];
+    renderExpensesSummary(allExpenses);
+    renderExpensesTable(allExpenses);
+  };
+
+  toggleExpensesBtn?.addEventListener('click', () => activateSection('expenses'));
+  expensesMonthFilter?.addEventListener('change', fetchExpenses);
+
+  const resetExpenseForm = () => {
+    document.getElementById('ex_id').value = '';
+    document.getElementById('ex_category').value = EXPENSE_CATEGORIES[0].code;
+    document.getElementById('ex_amount').value = '';
+    document.getElementById('ex_date').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('ex_note').value = '';
+    document.getElementById('expenseFormTitle').textContent = 'تسجيل مصروف جديد';
+    if (expenseFormMsg) expenseFormMsg.textContent = '';
+  };
+
+  document.getElementById('showExpenseFormBtn')?.addEventListener('click', () => {
+    resetExpenseForm();
+    if (expenseCreateForm) expenseCreateForm.style.display = '';
+  });
+  document.getElementById('cancelExpenseFormBtn')?.addEventListener('click', () => {
+    if (expenseCreateForm) expenseCreateForm.style.display = 'none';
+  });
+
+  document.getElementById('saveExpenseBtn')?.addEventListener('click', async () => {
+    const id = document.getElementById('ex_id').value;
+    const body = {
+      category:     document.getElementById('ex_category')?.value,
+      amount:       document.getElementById('ex_amount')?.value,
+      expense_date: document.getElementById('ex_date')?.value,
+      note:         document.getElementById('ex_note')?.value,
+    };
+    if (id) body.id = Number(id);
+    const btn = document.getElementById('saveExpenseBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/expenses.php', {
+        method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast('✓ تم حفظ المصروف', 'success');
+        if (expenseCreateForm) expenseCreateForm.style.display = 'none';
+        fetchExpenses();
+      } else if (expenseFormMsg) {
+        expenseFormMsg.textContent = data.message || 'فشل الحفظ'; expenseFormMsg.style.color = 'var(--error)';
+      }
+    } catch { if (expenseFormMsg) { expenseFormMsg.textContent = 'خطأ في الاتصال'; expenseFormMsg.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.textContent = 'حفظ المصروف'; }
+  });
+
+  document.getElementById('expensesTable')?.addEventListener('click', async (e) => {
+    const editBtn   = e.target.closest('[data-edit-expense]');
+    const deleteBtn = e.target.closest('[data-delete-expense]');
+
+    if (editBtn) {
+      const row = allExpenses.find(x => String(x.id) === editBtn.dataset.editExpense);
+      if (!row) return;
+      document.getElementById('ex_id').value = row.id;
+      document.getElementById('ex_category').value = row.category;
+      document.getElementById('ex_amount').value = row.amount;
+      document.getElementById('ex_date').value = row.expense_date;
+      document.getElementById('ex_note').value = row.note || '';
+      document.getElementById('expenseFormTitle').textContent = 'تعديل المصروف';
+      if (expenseFormMsg) expenseFormMsg.textContent = '';
+      if (expenseCreateForm) expenseCreateForm.style.display = '';
+    }
+    if (deleteBtn && confirm('حذف هذا المصروف؟')) {
+      const id = deleteBtn.dataset.deleteExpense;
+      await fetchAdminCsrf();
+      await adminFetch('api/expenses.php', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id) })
+      });
+      fetchExpenses();
     }
   });
 
@@ -1695,6 +2040,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     dashboard: { panel: null,          btn: navDashboardBtn },
     charts:    { panel: chartsPanel,    btn: toggleChartsBtn },
     customers: { panel: customersPanel, btn: toggleCustomersBtn },
+    revenue:   { panel: revenuePanel,   btn: toggleRevenueBtn },
+    expenses:  { panel: expensesPanel,  btn: toggleExpensesBtn },
     reviews:   { panel: reviewsPanel,   btn: toggleReviewsBtn },
     coupons:   { panel: couponsPanel,   btn: toggleCouponsBtn },
     slots:     { panel: slotsPanel,     btn: toggleSlotsBtn },
@@ -1723,6 +2070,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (key === 'charts') renderCharts(allBookings);
     else if (key === 'customers') fetchCustomers();
+    else if (key === 'revenue') fetchRevenueLogs();
+    else if (key === 'expenses') fetchExpenses();
     else if (key === 'coupons') fetchCoupons();
     else if (key === 'reviews' && !reviewsLoaded) fetchReviews();
     else if (key === 'slots') fetchSlots();
