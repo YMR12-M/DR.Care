@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Check, ChevronRight, ChevronLeft, Lightbulb, Zap, Paperclip, Loader2, Clock, CalendarDays, Car, CarFront, Bus, Truck,
+  Check, ChevronRight, ChevronLeft, Zap, Paperclip, Loader2, Clock, CalendarDays, Car, CarFront, Bus, Truck,
   Wallet, Smartphone, CreditCard, User, Phone as PhoneIcon, Mail, Hash, Ticket,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -28,13 +28,6 @@ const DUR_MAP = {
   'chemical':   'حسب الشغل',
   'carpet':     'حسب المساحة',
   'blanket':    '~ ٣٠ دقيقة',
-};
-
-const RECOMMEND = {
-  sedan:  { pkg: 'inside-out', msg: 'الغسيل الداخلي والخارجي مثالي لعربيتك' },
-  suv:    { pkg: 'inside-out', msg: 'الغسيل الشامل مع تركيز على الجنوط' },
-  van:    { pkg: 'deep',       msg: 'Deep Cleaning الأنسب للمساحات الداخلية' },
-  pickup: { pkg: 'outside',    msg: 'الغسيل الخارجي يكفي' },
 };
 
 /* ─── Arabic date / time formatting ───────────────────── */
@@ -106,7 +99,6 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
   const [pkgError, setPkgError] = useState('');
   const selected = form.servicePackage;
   const selectedCar = form.carType;
-  const rec = RECOMMEND[selectedCar];
   const pkg = packages.find(p => p.code === selected);
   const car = carTypes.find(c => c.code === selectedCar);
   const price = (pkg?.price || pkg?.base_price || 0) + (car?.extra || 0);
@@ -224,29 +216,6 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
           );})}
         </div>
       </div>
-
-      {/* Smart recommendation */}
-      {selectedCar && rec && (
-        <div
-          className="rounded-2xl p-4 flex items-center justify-between gap-3 fade-in"
-          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-yellow-glow)', border: '1px solid var(--yellow-line)' }}
-        >
-          <div>
-            <p className="inline-flex items-center gap-1.5 text-xs font-bold" style={{ color: 'var(--yellow)' }}>
-              <Lightbulb size={13} fill="var(--yellow)" fillOpacity={0.25} /> اقتراح ذكي
-            </p>
-            <p className="text-sm font-black mt-0.5" style={{ color: 'var(--white)' }}>{rec.msg}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setForm(f => ({ ...f, servicePackage: rec.pkg }))}
-            className="text-xs font-black px-3 py-2 rounded-xl flex-shrink-0 active:scale-90 transition-transform"
-            style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}
-          >
-            اختار
-          </button>
-        </div>
-      )}
 
       {/* Next button */}
       <Button variant="primary" size="lg" onClick={handleNext} className="w-full">
