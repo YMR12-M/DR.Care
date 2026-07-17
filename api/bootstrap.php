@@ -474,23 +474,6 @@ try {
   )");
   $pdo->exec("CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(expense_date)");
 
-  /* ── Manual daily revenue log (walk-in/cash, separate from online bookings) ── */
-  $pdo->exec("CREATE TABLE IF NOT EXISTS revenue_logs (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    log_date        TEXT NOT NULL,
-    cars_count      INTEGER NOT NULL DEFAULT 0,
-    cars_amount     REAL NOT NULL DEFAULT 0,
-    carpets_count   INTEGER NOT NULL DEFAULT 0,
-    carpets_amount  REAL NOT NULL DEFAULT 0,
-    blankets_count  INTEGER NOT NULL DEFAULT 0,
-    blankets_amount REAL NOT NULL DEFAULT 0,
-    total_amount    REAL NOT NULL DEFAULT 0,
-    note            TEXT,
-    created_by      INTEGER,
-    created_at      TEXT NOT NULL
-  )");
-  $pdo->exec("CREATE INDEX IF NOT EXISTS idx_revenue_logs_date ON revenue_logs(log_date)");
-
   /* ── Audit log ── */
   $pdo->exec("CREATE TABLE IF NOT EXISTS audit_log (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,

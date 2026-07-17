@@ -1452,149 +1452,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   /* ══════════════════════════════════════════
-     REVENUE PANEL (manual daily log — cars/carpets/blankets)
+     REVENUE PANEL — fully automatic, derived from bookings
+     (the "الإيراد الإجمالي/الشهر/اليوم" cards live here now,
+     populated by renderStats()/renderReports() as before —
+     only their DOM location moved, not their computation)
   ══════════════════════════════════════════ */
   const revenuePanel     = document.getElementById('revenuePanel');
   const toggleRevenueBtn = document.getElementById('toggleRevenueBtn');
-  const revenueCreateForm= document.getElementById('revenueCreateForm');
-  const revenueFormMsg   = document.getElementById('revenueFormMsg');
-  const revenueMonthFilter = document.getElementById('revenueMonthFilter');
-  let allRevenueLogs = [];
 
-  const curMonth = () => new Date().toISOString().slice(0, 7);
-  if (revenueMonthFilter) revenueMonthFilter.value = curMonth();
+  const renderRevenueBreakdown = (bookings) => {
+    const active   = bookings.filter(b => b.status !== 'cancelled');
+    const carpets  = active.filter(b => b.package_code === 'carpet');
+    const blankets = active.filter(b => b.package_code === 'blanket');
+    const cars     = active.filter(b => b.package_code !== 'carpet' && b.package_code !== 'blanket');
+    const sum      = (list) => list.reduce((s, b) => s + Number(b.total_price || 0), 0);
+    const set      = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-  const renderRevenueSummary = (list) => {
-    const sum = (k) => list.reduce((s, r) => s + Number(r[k] || 0), 0);
-    const totalAmount = sum('total_amount');
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    set('revenueMonthTotal',   formatPrice(totalAmount));
-    set('revenueCarsCount',    sum('cars_count').toLocaleString('ar-EG'));
-    set('revenueCarsAmount',   formatPrice(sum('cars_amount')));
-    set('revenueCarpetsCount', sum('carpets_count').toLocaleString('ar-EG'));
-    set('revenueCarpetsAmount',formatPrice(sum('carpets_amount')));
-    set('revenueBlanketsCount',sum('blankets_count').toLocaleString('ar-EG'));
-    set('revenueBlanketsAmount',formatPrice(sum('blankets_amount')));
-  };
-
-  const renderRevenueTable = (list) => {
-    const tbody = document.getElementById('revenueBody');
-    if (!tbody) return;
-    if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="7"><div class="table-empty"><span>📈</span><p>لا توجد سجلات لهذا الشهر</p></div></td></tr>';
-      return;
-    }
-    tbody.innerHTML = list.map(r => `
-      <tr>
-        <td style="color:var(--muted)">${new Date(r.log_date + 'T00:00:00').toLocaleDateString('ar-EG')}</td>
-        <td>${r.cars_count || 0}<span style="color:var(--muted-2)"> · ${formatPrice(r.cars_amount || 0)}</span></td>
-        <td>${r.carpets_count || 0}<span style="color:var(--muted-2)"> · ${formatPrice(r.carpets_amount || 0)}</span></td>
-        <td>${r.blankets_count || 0}<span style="color:var(--muted-2)"> · ${formatPrice(r.blankets_amount || 0)}</span></td>
-        <td class="price-val">${formatPrice(r.total_amount || 0)}</td>
-        <td style="color:var(--muted);font-size:.8rem">${escapeHtml(r.note || '—')}</td>
-        <td style="display:flex;gap:6px">
-          <button class="details-btn" data-edit-revenue="${r.id}">تعديل</button>
-          <button class="details-btn" data-delete-revenue="${r.id}" style="color:var(--error)">حذف</button>
-        </td>
-      </tr>`).join('');
-  };
-
-  const fetchRevenueLogs = async () => {
-    const month = revenueMonthFilter?.value || curMonth();
-    const res   = await adminFetch(`api/revenue-log.php?month=${encodeURIComponent(month)}`);
-    const data  = await res.json().catch(() => ({}));
-    allRevenueLogs = data.logs || [];
-    renderRevenueSummary(allRevenueLogs);
-    renderRevenueTable(allRevenueLogs);
+    set('revenueCarsCount',      cars.length.toLocaleString('ar-EG'));
+    set('revenueCarsAmount',     formatPrice(sum(cars)));
+    set('revenueCarpetsCount',   carpets.length.toLocaleString('ar-EG'));
+    set('revenueCarpetsAmount',  formatPrice(sum(carpets)));
+    set('revenueBlanketsCount',  blankets.length.toLocaleString('ar-EG'));
+    set('revenueBlanketsAmount', formatPrice(sum(blankets)));
   };
 
   toggleRevenueBtn?.addEventListener('click', () => activateSection('revenue'));
-  revenueMonthFilter?.addEventListener('change', fetchRevenueLogs);
-
-  const resetRevenueForm = () => {
-    document.getElementById('rv_id').value = '';
-    document.getElementById('rv_date').value = new Date().toISOString().slice(0, 10);
-    ['rv_cars_count','rv_cars_amount','rv_carpets_count','rv_carpets_amount','rv_blankets_count','rv_blankets_amount'].forEach(id => {
-      document.getElementById(id).value = 0;
-    });
-    document.getElementById('rv_note').value = '';
-    document.getElementById('revenueFormTitle').textContent = 'تسجيل إيراد يومي';
-    if (revenueFormMsg) revenueFormMsg.textContent = '';
-  };
-
-  document.getElementById('showRevenueFormBtn')?.addEventListener('click', () => {
-    resetRevenueForm();
-    if (revenueCreateForm) revenueCreateForm.style.display = '';
-  });
-  document.getElementById('cancelRevenueFormBtn')?.addEventListener('click', () => {
-    if (revenueCreateForm) revenueCreateForm.style.display = 'none';
-  });
-
-  document.getElementById('saveRevenueBtn')?.addEventListener('click', async () => {
-    const id = document.getElementById('rv_id').value;
-    const body = {
-      log_date:        document.getElementById('rv_date')?.value,
-      cars_count:      document.getElementById('rv_cars_count')?.value,
-      cars_amount:     document.getElementById('rv_cars_amount')?.value,
-      carpets_count:   document.getElementById('rv_carpets_count')?.value,
-      carpets_amount:  document.getElementById('rv_carpets_amount')?.value,
-      blankets_count:  document.getElementById('rv_blankets_count')?.value,
-      blankets_amount: document.getElementById('rv_blankets_amount')?.value,
-      note:            document.getElementById('rv_note')?.value,
-    };
-    if (id) body.id = Number(id);
-    const btn = document.getElementById('saveRevenueBtn');
-    btn.disabled = true; btn.textContent = '...';
-    try {
-      await fetchAdminCsrf();
-      const res  = await adminFetch('api/revenue-log.php', {
-        method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-      });
-      const data = await res.json().catch(() => ({}));
-      if (data.ok) {
-        showToast('✓ تم حفظ السجل', 'success');
-        if (revenueCreateForm) revenueCreateForm.style.display = 'none';
-        fetchRevenueLogs();
-      } else if (revenueFormMsg) {
-        revenueFormMsg.textContent = data.message || 'فشل الحفظ'; revenueFormMsg.style.color = 'var(--error)';
-      }
-    } catch { if (revenueFormMsg) { revenueFormMsg.textContent = 'خطأ في الاتصال'; revenueFormMsg.style.color = 'var(--error)'; } }
-    finally { btn.disabled = false; btn.textContent = 'حفظ السجل'; }
-  });
-
-  document.getElementById('revenueTable')?.addEventListener('click', async (e) => {
-    const editBtn   = e.target.closest('[data-edit-revenue]');
-    const deleteBtn = e.target.closest('[data-delete-revenue]');
-
-    if (editBtn) {
-      const row = allRevenueLogs.find(r => String(r.id) === editBtn.dataset.editRevenue);
-      if (!row) return;
-      document.getElementById('rv_id').value = row.id;
-      document.getElementById('rv_date').value = row.log_date;
-      document.getElementById('rv_cars_count').value = row.cars_count;
-      document.getElementById('rv_cars_amount').value = row.cars_amount;
-      document.getElementById('rv_carpets_count').value = row.carpets_count;
-      document.getElementById('rv_carpets_amount').value = row.carpets_amount;
-      document.getElementById('rv_blankets_count').value = row.blankets_count;
-      document.getElementById('rv_blankets_amount').value = row.blankets_amount;
-      document.getElementById('rv_note').value = row.note || '';
-      document.getElementById('revenueFormTitle').textContent = 'تعديل سجل الإيراد';
-      if (revenueFormMsg) revenueFormMsg.textContent = '';
-      if (revenueCreateForm) revenueCreateForm.style.display = '';
-    }
-    if (deleteBtn && confirm('حذف هذا السجل؟')) {
-      const id = deleteBtn.dataset.deleteRevenue;
-      await fetchAdminCsrf();
-      await adminFetch('api/revenue-log.php', {
-        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id) })
-      });
-      fetchRevenueLogs();
-    }
-  });
 
   /* ══════════════════════════════════════════
      EXPENSES PANEL
   ══════════════════════════════════════════ */
+  const curMonth = () => new Date().toISOString().slice(0, 7);
   const expensesPanel     = document.getElementById('expensesPanel');
   const toggleExpensesBtn = document.getElementById('toggleExpensesBtn');
   const expenseCreateForm = document.getElementById('expenseCreateForm');
@@ -2070,7 +1957,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (key === 'charts') renderCharts(allBookings);
     else if (key === 'customers') fetchCustomers();
-    else if (key === 'revenue') fetchRevenueLogs();
+    else if (key === 'revenue') renderRevenueBreakdown(allBookings);
     else if (key === 'expenses') fetchExpenses();
     else if (key === 'coupons') fetchCoupons();
     else if (key === 'reviews' && !reviewsLoaded) fetchReviews();

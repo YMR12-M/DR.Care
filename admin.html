@@ -753,41 +753,6 @@
           <!-- ── STATS ── -->
           <div id="statsGrid" aria-label="ملخص الأداء" style="display:contents">
 
-            <!-- Revenue Row -->
-            <p class="stats-section-label">الإيراد</p>
-            <div class="stats-row stats-row-primary">
-
-              <div class="stat-card stat-card--yellow stat-card--primary">
-                <div class="stat-card__icon-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                </div>
-                <p class="stat-card__kicker">الإيراد الإجمالي</p>
-                <div class="stat-card__value" id="expectedRevenue">—</div>
-                <p class="stat-card__label">إجمالي كل الطلبات المكتملة</p>
-              </div>
-
-              <div class="stat-card stat-card--yellow">
-                <div class="stat-card__icon-wrap">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </div>
-                <p class="stat-card__kicker">إيراد الشهر</p>
-                <div class="stat-card__value" id="monthRevenue">—</div>
-                <span class="stat-trend" id="monthRevenueTrend" style="display:none"></span>
-                <p class="stat-card__label">هذا الشهر</p>
-              </div>
-
-              <div class="stat-card stat-card--yellow">
-                <div class="stat-card__icon-wrap">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                </div>
-                <p class="stat-card__kicker">إيراد اليوم</p>
-                <div class="stat-card__value" id="todayRevenue">—</div>
-                <span class="stat-trend" id="todayRevenueTrend" style="display:none"></span>
-                <p class="stat-card__label">اليوم فقط</p>
-              </div>
-
-            </div>
-
             <!-- Activity Row -->
             <p class="stats-section-label">النشاط</p>
             <div class="stats-row stats-row-secondary">
@@ -962,15 +927,41 @@
 
           <!-- ── REVENUE PANEL ── -->
           <div id="revenuePanel" style="display:none;margin-bottom:24px">
-            <div class="stats-row" id="revenueStatsRow" style="margin-bottom:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+
+            <p class="stats-section-label">الإيراد</p>
+            <div class="stats-row stats-row-primary" style="margin-bottom:20px">
               <div class="stat-card stat-card--yellow stat-card--primary">
                 <div class="stat-card__icon-wrap">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
-                <p class="stat-card__kicker">إجمالي إيراد الشهر</p>
-                <div class="stat-card__value" id="revenueMonthTotal">—</div>
-                <p class="stat-card__label">سجل يدوي منفصل عن الحجوزات</p>
+                <p class="stat-card__kicker">الإيراد الإجمالي</p>
+                <div class="stat-card__value" id="expectedRevenue">—</div>
+                <p class="stat-card__label">إجمالي كل الطلبات المكتملة</p>
               </div>
+
+              <div class="stat-card stat-card--yellow">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <p class="stat-card__kicker">إيراد الشهر</p>
+                <div class="stat-card__value" id="monthRevenue">—</div>
+                <span class="stat-trend" id="monthRevenueTrend" style="display:none"></span>
+                <p class="stat-card__label">هذا الشهر</p>
+              </div>
+
+              <div class="stat-card stat-card--yellow">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <p class="stat-card__kicker">إيراد اليوم</p>
+                <div class="stat-card__value" id="todayRevenue">—</div>
+                <span class="stat-trend" id="todayRevenueTrend" style="display:none"></span>
+                <p class="stat-card__label">اليوم فقط</p>
+              </div>
+            </div>
+
+            <p class="stats-section-label">توزيع الإيراد حسب الخدمة — من واقع باقة كل حجز</p>
+            <div class="stats-row" id="revenueStatsRow" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
               <div class="stat-card">
                 <div class="stat-card__icon-wrap">🚗</div>
                 <p class="stat-card__kicker">سيارات</p>
@@ -991,68 +982,6 @@
               </div>
             </div>
 
-            <div class="filter-bar" style="margin-bottom:12px">
-              <strong style="font-size:.9rem">📈 سجل الإيرادات اليدوي</strong>
-              <div class="spacer"></div>
-              <input type="month" id="revenueMonthFilter" class="search-input">
-              <button class="btn-primary" type="button" id="showRevenueFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ سجل جديد</button>
-            </div>
-
-            <div id="revenueCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
-              <p style="font-weight:800;margin-bottom:16px" id="revenueFormTitle">تسجيل إيراد يومي</p>
-              <input type="hidden" id="rv_id" value="">
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">التاريخ *
-                  <input id="rv_date" type="date" class="search-input" style="width:100%;height:40px;margin-top:6px">
-                </label>
-                <div></div><div></div>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">🚗 عدد السيارات
-                  <input id="rv_cars_count" type="number" min="0" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
-                </label>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:span 2">🚗 قيمة السيارات (ج)
-                  <input id="rv_cars_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
-                </label>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">🧵 عدد السجاد
-                  <input id="rv_carpets_count" type="number" min="0" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
-                </label>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:span 2">🧵 قيمة السجاد (ج)
-                  <input id="rv_carpets_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
-                </label>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">🛏️ عدد البطاطين
-                  <input id="rv_blankets_count" type="number" min="0" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
-                </label>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:span 2">🛏️ قيمة البطاطين (ج)
-                  <input id="rv_blankets_amount" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" value="0">
-                </label>
-                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">ملاحظات
-                  <textarea id="rv_note" class="search-input" rows="2" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit"></textarea>
-                </label>
-              </div>
-              <div style="display:flex;gap:10px">
-                <button type="button" id="saveRevenueBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">حفظ السجل</button>
-                <button type="button" id="cancelRevenueFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
-              </div>
-              <p id="revenueFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
-            </div>
-
-            <div class="table-wrap">
-              <table class="bookings-table" id="revenueTable">
-                <thead>
-                  <tr>
-                    <th>التاريخ</th>
-                    <th>🚗 سيارات</th>
-                    <th>🧵 سجاد</th>
-                    <th>🛏️ بطاطين</th>
-                    <th>الإجمالي</th>
-                    <th>ملاحظات</th>
-                    <th>إجراء</th>
-                  </tr>
-                </thead>
-                <tbody id="revenueBody">
-                  <tr><td colspan="7"><div class="table-empty"><span>📈</span><p>جاري التحميل...</p></div></td></tr>
-                </tbody>
-              </table>
-            </div>
           </div>
 
           <!-- ── EXPENSES PANEL ── -->
