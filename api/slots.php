@@ -85,9 +85,17 @@ if ($method === 'POST') {
     jsonResponse(['ok' => true, 'added' => $added]);
 }
 
-/* ── DELETE: admin only — remove a slot ── */
+/* ── DELETE: admin only — remove a slot, or ?all=1 to wipe every slot ── */
 if ($method === 'DELETE') {
     requireAdmin();
+
+    if (isset($_GET['all'])) {
+        $count = (int)$pdo->query("SELECT COUNT(*) FROM appointment_slots")->fetchColumn();
+        $pdo->exec("DELETE FROM appointment_slots");
+        logAudit($pdo, 'admin', $_SESSION['admin_id'] ?? null, 'slots.deleted_all', 'appointment_slots', null, ['count' => $count]);
+        jsonResponse(['ok' => true, 'deleted' => $count]);
+    }
+
     $id = (int)($_GET['id'] ?? 0);
     if (!$id) jsonResponse(['ok' => false, 'message' => 'id required'], 400);
     $pdo->prepare("DELETE FROM appointment_slots WHERE id = :id")->execute([':id' => $id]);

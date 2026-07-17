@@ -2083,6 +2083,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchSlots();
   });
 
+  document.getElementById('deleteAllSlotsBtn')?.addEventListener('click', async () => {
+    if (!confirm('هتحذف كل المواعيد المتاحة نهائياً — الإجراء ده مش قابل للتراجع. متأكد؟')) return;
+    const btn = document.getElementById('deleteAllSlotsBtn');
+    btn.disabled = true;
+    try {
+      const res  = await adminFetch('api/slots.php?all=1', { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast(`تم حذف ${data.deleted} موعد`, 'success');
+        fetchSlots();
+      } else {
+        showToast(data.message || 'خطأ', 'error');
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   /* ═══════════════════════════════════════════════
      CSV Export
   ═══════════════════════════════════════════════ */
