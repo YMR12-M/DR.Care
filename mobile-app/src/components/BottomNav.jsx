@@ -22,7 +22,9 @@ export default function BottomNav() {
         style={{ boxShadow: 'var(--shadow-premium)' }}
       >
         {tabs.map(({ path, label, Icon }) => {
-          const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+          const isActive = path === '/'
+            ? location.pathname === '/'
+            : location.pathname === path || location.pathname.startsWith(path + '/');
 
           return (
             <button
