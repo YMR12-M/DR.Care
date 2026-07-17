@@ -91,8 +91,10 @@ if ($method === 'POST') {
     jsonResponse(['ok' => false, 'message' => 'رقم اللوحة غير صالح'], 400);
   }
 
-  // find package and car type
-  $pkg = array_values(array_filter($config['packages'], fn($p) => $p['code'] === $packageCode))[0] ?? null;
+  // find package (DB-backed, admin-editable prices) and car type (static config)
+  $pkgStmt = $pdo->prepare('SELECT * FROM packages WHERE code = :code AND is_active = 1 LIMIT 1');
+  $pkgStmt->execute([':code' => $packageCode]);
+  $pkg = $pkgStmt->fetch(PDO::FETCH_ASSOC) ?: null;
   $car = array_values(array_filter($config['carTypes'], fn($c) => $c['code'] === $carTypeCode))[0] ?? null;
 
   if (!$pkg || !$car) {

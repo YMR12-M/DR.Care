@@ -7,11 +7,12 @@ $input  = json_decode(file_get_contents('php://input'), true) ?? [];
 $config = require __DIR__ . '/config.php';
 $validCategories = array_column($config['expenseCategories'], 'code');
 
-function validateExpenseInput(array $input, array $validCategories): array {
+function validateExpenseInput(PDO $pdo, array $input, array $validCategories): array {
   $category = trim($input['category'] ?? '');
   $amount   = (float)($input['amount'] ?? 0);
   $date     = trim($input['expense_date'] ?? '');
   $note     = trim($input['note'] ?? '');
+  $staffId  = isset($input['staff_id']) && $input['staff_id'] !== '' ? (int)$input['staff_id'] : null;
 
   if (!in_array($category, $validCategories, true)) {
     jsonResponse(['ok' => false, 'message' => 'فئة المصروف غير صالحة'], 400);
@@ -25,8 +26,15 @@ function validateExpenseInput(array $input, array $validCategories): array {
   if ($note && mb_strlen($note) > 300) {
     jsonResponse(['ok' => false, 'message' => 'الملاحظة طويلة جداً'], 400);
   }
+  if ($staffId) {
+    $exists = $pdo->prepare('SELECT 1 FROM staff WHERE id = :id LIMIT 1');
+    $exists->execute([':id' => $staffId]);
+    if (!$exists->fetchColumn()) {
+      jsonResponse(['ok' => false, 'message' => 'الموظف غير موجود'], 400);
+    }
+  }
 
-  return [$category, $amount, $date, $note ?: null];
+  return [$category, $amount, $date, $note ?: null, $staffId];
 }
 
 /* ══════════════════════════════════════
@@ -56,17 +64,17 @@ if ($method === 'POST') {
   requireAdmin();
   validateCsrfToken();
 
-  [$category, $amount, $date, $note] = validateExpenseInput($input, $validCategories);
+  [$category, $amount, $date, $note, $staffId] = validateExpenseInput($pdo, $input, $validCategories);
   $adminId = $_SESSION['admin_id'] ?? null;
   $now     = date('c');
 
   $stmt = $pdo->prepare('
-    INSERT INTO expenses (category, amount, expense_date, note, created_by, created_at)
-    VALUES (:category, :amount, :date, :note, :by, :now)
+    INSERT INTO expenses (category, amount, expense_date, note, staff_id, created_by, created_at)
+    VALUES (:category, :amount, :date, :note, :staff, :by, :now)
   ');
   $stmt->execute([
     ':category' => $category, ':amount' => $amount, ':date' => $date,
-    ':note' => $note, ':by' => $adminId, ':now' => $now,
+    ':note' => $note, ':staff' => $staffId, ':by' => $adminId, ':now' => $now,
   ]);
   $id = (int)$pdo->lastInsertId();
 
@@ -87,15 +95,15 @@ if ($method === 'PATCH') {
   $id = (int)($input['id'] ?? 0);
   if (!$id) jsonResponse(['ok' => false, 'message' => 'ID مطلوب'], 400);
 
-  [$category, $amount, $date, $note] = validateExpenseInput($input, $validCategories);
+  [$category, $amount, $date, $note, $staffId] = validateExpenseInput($pdo, $input, $validCategories);
   $adminId = $_SESSION['admin_id'] ?? null;
 
   $pdo->prepare('
-    UPDATE expenses SET category = :category, amount = :amount, expense_date = :date, note = :note
+    UPDATE expenses SET category = :category, amount = :amount, expense_date = :date, note = :note, staff_id = :staff
     WHERE id = :id
   ')->execute([
     ':category' => $category, ':amount' => $amount, ':date' => $date,
-    ':note' => $note, ':id' => $id,
+    ':note' => $note, ':staff' => $staffId, ':id' => $id,
   ]);
 
   logAudit($pdo, 'admin', $adminId, 'expense.updated', 'expense', $id, [

@@ -240,7 +240,9 @@ if ($method === 'POST') {
   if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL))
     jsonResponse(['ok' => false, 'message' => 'البريد الإلكتروني غير صالح'], 400);
 
-  $pkg = array_values(array_filter($config['packages'], fn($p) => $p['code'] === $packageCode))[0] ?? null;
+  $pkgStmt = $pdo->prepare('SELECT * FROM packages WHERE code = :code AND is_active = 1 LIMIT 1');
+  $pkgStmt->execute([':code' => $packageCode]);
+  $pkg = $pkgStmt->fetch(PDO::FETCH_ASSOC) ?: null;
   $car = array_values(array_filter($config['carTypes'], fn($c) => $c['code'] === $carTypeCode))[0] ?? null;
 
   if (!$pkg) jsonResponse(['ok' => false, 'message' => 'اختار الباقة'], 400);

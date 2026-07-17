@@ -33,7 +33,9 @@ if ($output !== null && is_numeric(trim($output))) {
 
 /* ── PHP fallback ── */
 if ($price === null) {
-  $pkgData = array_values(array_filter($config['packages'], fn($p) => $p['code'] === $pkg))[0] ?? null;
+  $pkgStmt = $pdo->prepare('SELECT * FROM packages WHERE code = :code AND is_active = 1 LIMIT 1');
+  $pkgStmt->execute([':code' => $pkg]);
+  $pkgData = $pkgStmt->fetch(PDO::FETCH_ASSOC) ?: null;
   $carData = array_values(array_filter($config['carTypes'], fn($c) => $c['code'] === $carType))[0] ?? null;
 
   if (!$pkgData || !$carData) {

@@ -683,6 +683,18 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
             <span class="item-label">المصروفات</span>
           </button>
+          <button class="sidebar-nav-item" type="button" id="toggleProfitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span class="item-label">الأرباح</span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="togglePackagesBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span class="item-label">الباقات والأسعار</span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="toggleStaffBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="item-label">الموظفين</span>
+          </button>
           <button class="sidebar-nav-item" type="button" id="toggleReviewsBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span class="item-label">التقييمات</span>
@@ -1027,6 +1039,10 @@
                 <label style="font-size:.8rem;font-weight:700;color:var(--muted)">التاريخ *
                   <input id="ex_date" type="date" class="search-input" style="width:100%;height:40px;margin-top:6px">
                 </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الموظف (اختياري)
+                  <select id="ex_staff" class="search-input" style="width:100%;height:40px;margin-top:6px"><option value="">— بدون —</option></select>
+                </label>
+                <div></div><div></div>
                 <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">ملاحظات
                   <textarea id="ex_note" class="search-input" rows="2" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit"></textarea>
                 </label>
@@ -1045,12 +1061,145 @@
                     <th>التاريخ</th>
                     <th>الفئة</th>
                     <th>المبلغ</th>
+                    <th>الموظف</th>
                     <th>ملاحظات</th>
                     <th>إجراء</th>
                   </tr>
                 </thead>
                 <tbody id="expensesBody">
-                  <tr><td colspan="5"><div class="table-empty"><span>💸</span><p>جاري التحميل...</p></div></td></tr>
+                  <tr><td colspan="6"><div class="table-empty"><span>💸</span><p>جاري التحميل...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── PROFIT PANEL (P&L) ── -->
+          <div id="profitPanel" style="display:none;margin-bottom:24px">
+            <p class="stats-section-label">صافي الربح</p>
+            <div class="stats-row stats-row-primary" style="margin-bottom:20px">
+              <div class="stat-card stat-card--yellow stat-card--primary">
+                <div class="stat-card__icon-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <p class="stat-card__kicker">صافي ربح الشهر الحالي</p>
+                <div class="stat-card__value" id="profitMonthNet">—</div>
+                <p class="stat-card__label">إيراد الشهر − مصروفات الشهر</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">📈</div>
+                <p class="stat-card__kicker">إجمالي الإيراد</p>
+                <div class="stat-card__value" id="profitTotalRevenue">—</div>
+                <p class="stat-card__label">كل الوقت</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">📉</div>
+                <p class="stat-card__kicker">إجمالي المصروفات</p>
+                <div class="stat-card__value" id="profitTotalExpenses">—</div>
+                <p class="stat-card__label">كل الوقت</p>
+              </div>
+            </div>
+            <div class="stats-row" style="margin-bottom:20px;grid-template-columns:1fr">
+              <div class="stat-card stat-card--blue">
+                <p class="stat-card__kicker">صافي الربح الإجمالي (كل الوقت)</p>
+                <div class="stat-card__value" id="profitTotalNet">—</div>
+              </div>
+            </div>
+            <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+              <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الإيراد مقابل المصروفات — آخر 6 شهور</p>
+              <canvas id="chartProfit" height="180"></canvas>
+            </div>
+          </div>
+
+          <!-- ── PACKAGES PANEL ── -->
+          <div id="packagesPanel" style="display:none;margin-bottom:24px">
+            <div class="filter-bar" style="margin-bottom:12px">
+              <strong style="font-size:.9rem">🧾 الباقات والأسعار</strong>
+              <div class="spacer"></div>
+              <button class="btn-primary" type="button" id="showPackageFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ باقة جديدة</button>
+            </div>
+
+            <div id="packageCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+              <p style="font-weight:800;margin-bottom:16px" id="packageFormTitle">إضافة باقة جديدة</p>
+              <input type="hidden" id="pkg_id" value="">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)" id="pkg_code_wrap">كود الباقة *
+                  <input id="pkg_code" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="new-service">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الاسم *
+                  <input id="pkg_name" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="اسم الباقة">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">السعر (ج) *
+                  <input id="pkg_price" type="number" min="0" step="0.01" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="0">
+                </label>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="button" id="savePackageBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">حفظ الباقة</button>
+                <button type="button" id="cancelPackageFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+              </div>
+              <p id="packageFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="bookings-table" id="packagesTable">
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>الكود</th>
+                    <th>السعر</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="packagesBody">
+                  <tr><td colspan="5"><div class="table-empty"><span>🧾</span><p>جاري التحميل...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── STAFF PANEL ── -->
+          <div id="staffPanel" style="display:none;margin-bottom:24px">
+            <div class="filter-bar" style="margin-bottom:12px">
+              <strong style="font-size:.9rem">👷 الموظفين</strong>
+              <div class="spacer"></div>
+              <button class="btn-primary" type="button" id="showStaffFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ موظف جديد</button>
+            </div>
+
+            <div id="staffCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+              <p style="font-weight:800;margin-bottom:16px" id="staffFormTitle">تسجيل موظف جديد</p>
+              <input type="hidden" id="st_id" value="">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الاسم *
+                  <input id="st_name" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="اسم الموظف">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الموبايل
+                  <input id="st_phone" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="01xxxxxxxxx">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الوظيفة
+                  <input id="st_role" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="غسال / كاشير...">
+                </label>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="button" id="saveStaffBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">حفظ الموظف</button>
+                <button type="button" id="cancelStaffFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+              </div>
+              <p id="staffFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="bookings-table" id="staffTable">
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>الوظيفة</th>
+                    <th>الموبايل</th>
+                    <th>إجمالي المرتبات المسجلة</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="staffBody">
+                  <tr><td colspan="6"><div class="table-empty"><span>👷</span><p>جاري التحميل...</p></div></td></tr>
                 </tbody>
               </table>
             </div>

@@ -1521,7 +1521,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tbody = document.getElementById('expensesBody');
     if (!tbody) return;
     if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="5"><div class="table-empty"><span>💸</span><p>لا توجد مصروفات لهذا الشهر</p></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6"><div class="table-empty"><span>💸</span><p>لا توجد مصروفات لهذا الشهر</p></div></td></tr>';
       return;
     }
     tbody.innerHTML = list.map(e => `
@@ -1529,6 +1529,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td style="color:var(--muted)">${new Date(e.expense_date + 'T00:00:00').toLocaleDateString('ar-EG')}</td>
         <td><span class="status-badge new">${escapeHtml(categoryName(e.category))}</span></td>
         <td class="price-val">${formatPrice(e.amount)}</td>
+        <td style="color:var(--muted)">${escapeHtml(staffName(e.staff_id))}</td>
         <td style="color:var(--muted);font-size:.8rem">${escapeHtml(e.note || '—')}</td>
         <td style="display:flex;gap:6px">
           <button class="details-btn" data-edit-expense="${e.id}">تعديل</button>
@@ -1554,6 +1555,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('ex_category').value = EXPENSE_CATEGORIES[0].code;
     document.getElementById('ex_amount').value = '';
     document.getElementById('ex_date').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('ex_staff').value = '';
     document.getElementById('ex_note').value = '';
     document.getElementById('expenseFormTitle').textContent = 'تسجيل مصروف جديد';
     if (expenseFormMsg) expenseFormMsg.textContent = '';
@@ -1561,6 +1563,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('showExpenseFormBtn')?.addEventListener('click', () => {
     resetExpenseForm();
+    fetchStaff();
     if (expenseCreateForm) expenseCreateForm.style.display = '';
   });
   document.getElementById('cancelExpenseFormBtn')?.addEventListener('click', () => {
@@ -1573,6 +1576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       category:     document.getElementById('ex_category')?.value,
       amount:       document.getElementById('ex_amount')?.value,
       expense_date: document.getElementById('ex_date')?.value,
+      staff_id:     document.getElementById('ex_staff')?.value || null,
       note:         document.getElementById('ex_note')?.value,
     };
     if (id) body.id = Number(id);
@@ -1610,6 +1614,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('expenseFormTitle').textContent = 'تعديل المصروف';
       if (expenseFormMsg) expenseFormMsg.textContent = '';
       if (expenseCreateForm) expenseCreateForm.style.display = '';
+      fetchStaff().then(() => { document.getElementById('ex_staff').value = row.staff_id || ''; });
     }
     if (deleteBtn && confirm('حذف هذا المصروف؟')) {
       const id = deleteBtn.dataset.deleteExpense;
@@ -1618,6 +1623,321 @@ document.addEventListener('DOMContentLoaded', async () => {
         method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id) })
       });
       fetchExpenses();
+    }
+  });
+
+  /* ══════════════════════════════════════════
+     PROFIT PANEL (P&L) — reuses bookings + expenses data already loaded, no new endpoint
+  ══════════════════════════════════════════ */
+  const profitPanel     = document.getElementById('profitPanel');
+  const toggleProfitBtn = document.getElementById('toggleProfitBtn');
+
+  const renderProfitSection = async (bookings) => {
+    const active = bookings.filter((b) => b.status !== 'cancelled');
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const sumRevSince = (from) => active.reduce((s, b) => {
+      const d = new Date(b.created_at);
+      return (Number.isFinite(d.getTime()) && d >= from) ? s + Number(b.total_price || 0) : s;
+    }, 0);
+    const monthRevenueValue = sumRevSince(startOfMonth);
+    const totalRevenueValue = active.reduce((s, b) => s + Number(b.total_price || 0), 0);
+
+    const [monthExpRes, allExpRes] = await Promise.all([
+      adminFetch(`api/expenses.php?month=${encodeURIComponent(curMonth())}`),
+      adminFetch('api/expenses.php?month=all'),
+    ]);
+    const monthExpData = await monthExpRes.json().catch(() => ({}));
+    const allExpData   = await allExpRes.json().catch(() => ({}));
+    const monthExpensesTotal = (monthExpData.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0);
+    const totalExpensesValue = (allExpData.expenses   || []).reduce((s, e) => s + Number(e.amount || 0), 0);
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('profitMonthNet',     formatPrice(monthRevenueValue - monthExpensesTotal));
+    set('profitTotalRevenue', formatPrice(totalRevenueValue));
+    set('profitTotalExpenses',formatPrice(totalExpensesValue));
+    set('profitTotalNet',     formatPrice(totalRevenueValue - totalExpensesValue));
+
+    /* Last 6 months: revenue (from allBookings, already loaded) vs expenses (per-month fetch) */
+    const months = [];
+    for (let i = 5; i >= 0; i--) months.push(new Date(now.getFullYear(), now.getMonth() - i, 1));
+    const monthLabels = months.map((d) => d.toLocaleDateString('ar-EG', { month: 'short', year: '2-digit' }));
+
+    const revenueByMonth = months.map((d) => {
+      const start = new Date(d.getFullYear(), d.getMonth(), 1);
+      const end   = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      return active.reduce((s, b) => {
+        const bd = new Date(b.created_at);
+        return (Number.isFinite(bd.getTime()) && bd >= start && bd < end) ? s + Number(b.total_price || 0) : s;
+      }, 0);
+    });
+
+    const monthExpenseResults = await Promise.all(months.map((d) => {
+      const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return adminFetch(`api/expenses.php?month=${ym}`).then((r) => r.json()).catch(() => ({ expenses: [] }));
+    }));
+    const expensesByMonth = monthExpenseResults.map((d) => (d.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0));
+
+    makeChart('chartProfit', {
+      type: 'bar',
+      data: {
+        labels: monthLabels,
+        datasets: [
+          { label: 'الإيراد', data: revenueByMonth, backgroundColor: '#ffd21f', borderRadius: 4 },
+          { label: 'المصروفات', data: expensesByMonth, backgroundColor: '#f0533e', borderRadius: 4 },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#9e9689' } } },
+        scales: {
+          x: { ticks: { color: '#9e9689' }, grid: { color: 'rgba(255,255,255,.06)' } },
+          y: { ticks: { color: '#9e9689' }, grid: { color: 'rgba(255,255,255,.06)' } },
+        },
+      },
+    });
+  };
+
+  toggleProfitBtn?.addEventListener('click', () => activateSection('profit'));
+
+  /* ══════════════════════════════════════════
+     PACKAGES PANEL — admin-editable prices, code is immutable once created
+  ══════════════════════════════════════════ */
+  const packagesPanel      = document.getElementById('packagesPanel');
+  const togglePackagesBtn  = document.getElementById('togglePackagesBtn');
+  const packageCreateForm  = document.getElementById('packageCreateForm');
+  const packageFormMsg     = document.getElementById('packageFormMsg');
+  let allPackages = [];
+
+  const renderPackagesTable = (list) => {
+    const tbody = document.getElementById('packagesBody');
+    if (!tbody) return;
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="table-empty"><span>🧾</span><p>لا توجد باقات</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((p) => `
+      <tr>
+        <td><strong>${escapeHtml(p.name)}</strong></td>
+        <td style="font-family:var(--font-en);color:var(--muted-2)">${escapeHtml(p.code)}</td>
+        <td class="price-val">${formatPrice(p.price)}</td>
+        <td>${p.is_active ? '<span style="color:var(--success);font-weight:700">نشطة</span>' : '<span style="color:var(--error)">معطّلة</span>'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="details-btn" data-edit-package="${p.id}">تعديل</button>
+          <button class="details-btn" data-toggle-package="${p.id}" data-active="${p.is_active}">${p.is_active ? 'تعطيل' : 'تفعيل'}</button>
+        </td>
+      </tr>`).join('');
+  };
+
+  const fetchPackages = async () => {
+    const res  = await adminFetch('api/packages.php?admin=1');
+    const data = await res.json().catch(() => ({}));
+    allPackages = data.packages || [];
+    renderPackagesTable(allPackages);
+  };
+
+  togglePackagesBtn?.addEventListener('click', () => activateSection('packages'));
+
+  const resetPackageForm = (forNew) => {
+    document.getElementById('pkg_id').value = '';
+    document.getElementById('pkg_code').value = '';
+    document.getElementById('pkg_name').value = '';
+    document.getElementById('pkg_price').value = '';
+    document.getElementById('pkg_code').disabled = !forNew;
+    document.getElementById('pkg_code_wrap').style.opacity = forNew ? '1' : '.5';
+    document.getElementById('packageFormTitle').textContent = forNew ? 'إضافة باقة جديدة' : 'تعديل الباقة (الكود ثابت ومربوط بمنطق الموقع)';
+    if (packageFormMsg) packageFormMsg.textContent = '';
+  };
+
+  document.getElementById('showPackageFormBtn')?.addEventListener('click', () => {
+    resetPackageForm(true);
+    if (packageCreateForm) packageCreateForm.style.display = '';
+  });
+  document.getElementById('cancelPackageFormBtn')?.addEventListener('click', () => {
+    if (packageCreateForm) packageCreateForm.style.display = 'none';
+  });
+
+  document.getElementById('savePackageBtn')?.addEventListener('click', async () => {
+    const id = document.getElementById('pkg_id').value;
+    const body = {
+      name:  document.getElementById('pkg_name')?.value,
+      price: document.getElementById('pkg_price')?.value,
+    };
+    if (id) body.id = Number(id);
+    else body.code = document.getElementById('pkg_code')?.value;
+
+    const btn = document.getElementById('savePackageBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/packages.php', {
+        method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast('✓ تم حفظ الباقة', 'success');
+        if (packageCreateForm) packageCreateForm.style.display = 'none';
+        fetchPackages();
+      } else if (packageFormMsg) {
+        packageFormMsg.textContent = data.message || 'فشل الحفظ'; packageFormMsg.style.color = 'var(--error)';
+      }
+    } catch { if (packageFormMsg) { packageFormMsg.textContent = 'خطأ في الاتصال'; packageFormMsg.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.textContent = 'حفظ الباقة'; }
+  });
+
+  document.getElementById('packagesTable')?.addEventListener('click', async (e) => {
+    const editBtn   = e.target.closest('[data-edit-package]');
+    const toggleBtn = e.target.closest('[data-toggle-package]');
+
+    if (editBtn) {
+      const row = allPackages.find((p) => String(p.id) === editBtn.dataset.editPackage);
+      if (!row) return;
+      resetPackageForm(false);
+      document.getElementById('pkg_id').value = row.id;
+      document.getElementById('pkg_code').value = row.code;
+      document.getElementById('pkg_name').value = row.name;
+      document.getElementById('pkg_price').value = row.price;
+      if (packageCreateForm) packageCreateForm.style.display = '';
+    }
+    if (toggleBtn) {
+      const id     = toggleBtn.dataset.togglePackage;
+      const active = toggleBtn.dataset.active === '1' ? 0 : 1;
+      await fetchAdminCsrf();
+      await adminFetch('api/packages.php', {
+        method: active ? 'PATCH' : 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(active ? { id: Number(id), is_active: 1 } : { id: Number(id) }),
+      });
+      fetchPackages();
+    }
+  });
+
+  /* ══════════════════════════════════════════
+     STAFF PANEL
+  ══════════════════════════════════════════ */
+  const staffPanel      = document.getElementById('staffPanel');
+  const toggleStaffBtn  = document.getElementById('toggleStaffBtn');
+  const staffCreateForm = document.getElementById('staffCreateForm');
+  const staffFormMsg    = document.getElementById('staffFormMsg');
+  let allStaff = [];
+
+  const staffName = (id) => {
+    if (!id) return '—';
+    const s = allStaff.find((x) => String(x.id) === String(id));
+    return s ? s.name : '—';
+  };
+
+  const populateStaffSelect = () => {
+    const sel = document.getElementById('ex_staff');
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— بدون —</option>' +
+      allStaff.filter((s) => s.is_active).map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+    sel.value = current;
+  };
+
+  const renderStaffTable = (list) => {
+    const tbody = document.getElementById('staffBody');
+    if (!tbody) return;
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="table-empty"><span>👷</span><p>لا يوجد موظفين</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((s) => `
+      <tr>
+        <td><strong>${escapeHtml(s.name)}</strong></td>
+        <td style="color:var(--muted)">${escapeHtml(s.role || '—')}</td>
+        <td style="color:var(--muted)">${escapeHtml(s.phone || '—')}</td>
+        <td class="price-val">${formatPrice(s.total_expenses || 0)}</td>
+        <td>${s.is_active ? '<span style="color:var(--success);font-weight:700">نشط</span>' : '<span style="color:var(--error)">معطّل</span>'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="details-btn" data-edit-staff="${s.id}">تعديل</button>
+          <button class="details-btn" data-toggle-staff="${s.id}" data-active="${s.is_active}">${s.is_active ? 'تعطيل' : 'تفعيل'}</button>
+        </td>
+      </tr>`).join('');
+  };
+
+  const fetchStaff = async () => {
+    const res  = await adminFetch('api/staff.php');
+    const data = await res.json().catch(() => ({}));
+    allStaff = data.staff || [];
+    renderStaffTable(allStaff);
+    populateStaffSelect();
+  };
+
+  toggleStaffBtn?.addEventListener('click', () => activateSection('staff'));
+
+  const resetStaffForm = () => {
+    document.getElementById('st_id').value = '';
+    document.getElementById('st_name').value = '';
+    document.getElementById('st_phone').value = '';
+    document.getElementById('st_role').value = '';
+    document.getElementById('staffFormTitle').textContent = 'تسجيل موظف جديد';
+    if (staffFormMsg) staffFormMsg.textContent = '';
+  };
+
+  document.getElementById('showStaffFormBtn')?.addEventListener('click', () => {
+    resetStaffForm();
+    if (staffCreateForm) staffCreateForm.style.display = '';
+  });
+  document.getElementById('cancelStaffFormBtn')?.addEventListener('click', () => {
+    if (staffCreateForm) staffCreateForm.style.display = 'none';
+  });
+
+  document.getElementById('saveStaffBtn')?.addEventListener('click', async () => {
+    const id = document.getElementById('st_id').value;
+    const body = {
+      name:  document.getElementById('st_name')?.value,
+      phone: document.getElementById('st_phone')?.value,
+      role:  document.getElementById('st_role')?.value,
+    };
+    if (id) body.id = Number(id);
+
+    const btn = document.getElementById('saveStaffBtn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/staff.php', {
+        method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast('✓ تم حفظ بيانات الموظف', 'success');
+        if (staffCreateForm) staffCreateForm.style.display = 'none';
+        fetchStaff();
+      } else if (staffFormMsg) {
+        staffFormMsg.textContent = data.message || 'فشل الحفظ'; staffFormMsg.style.color = 'var(--error)';
+      }
+    } catch { if (staffFormMsg) { staffFormMsg.textContent = 'خطأ في الاتصال'; staffFormMsg.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; btn.textContent = 'حفظ الموظف'; }
+  });
+
+  document.getElementById('staffTable')?.addEventListener('click', async (e) => {
+    const editBtn   = e.target.closest('[data-edit-staff]');
+    const toggleBtn = e.target.closest('[data-toggle-staff]');
+
+    if (editBtn) {
+      const row = allStaff.find((s) => String(s.id) === editBtn.dataset.editStaff);
+      if (!row) return;
+      document.getElementById('st_id').value = row.id;
+      document.getElementById('st_name').value = row.name;
+      document.getElementById('st_phone').value = row.phone || '';
+      document.getElementById('st_role').value = row.role || '';
+      document.getElementById('staffFormTitle').textContent = 'تعديل بيانات الموظف';
+      if (staffFormMsg) staffFormMsg.textContent = '';
+      if (staffCreateForm) staffCreateForm.style.display = '';
+    }
+    if (toggleBtn) {
+      const id     = toggleBtn.dataset.toggleStaff;
+      const active = toggleBtn.dataset.active === '1' ? 0 : 1;
+      await fetchAdminCsrf();
+      await adminFetch('api/staff.php', {
+        method: active ? 'PATCH' : 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(active ? { id: Number(id), is_active: 1 } : { id: Number(id) }),
+      });
+      fetchStaff();
     }
   });
 
@@ -1930,6 +2250,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     customers: { panel: customersPanel, btn: toggleCustomersBtn },
     revenue:   { panel: revenuePanel,   btn: toggleRevenueBtn },
     expenses:  { panel: expensesPanel,  btn: toggleExpensesBtn },
+    profit:    { panel: profitPanel,    btn: toggleProfitBtn },
+    packages:  { panel: packagesPanel,  btn: togglePackagesBtn },
+    staff:     { panel: staffPanel,     btn: toggleStaffBtn },
     reviews:   { panel: reviewsPanel,   btn: toggleReviewsBtn },
     coupons:   { panel: couponsPanel,   btn: toggleCouponsBtn },
     slots:     { panel: slotsPanel,     btn: toggleSlotsBtn },
@@ -1960,6 +2283,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     else if (key === 'customers') fetchCustomers();
     else if (key === 'revenue') renderRevenueBreakdown(allBookings);
     else if (key === 'expenses') fetchExpenses();
+    else if (key === 'profit') renderProfitSection(allBookings);
+    else if (key === 'packages') fetchPackages();
+    else if (key === 'staff') fetchStaff();
     else if (key === 'coupons') fetchCoupons();
     else if (key === 'reviews' && !reviewsLoaded) fetchReviews();
     else if (key === 'slots') fetchSlots();

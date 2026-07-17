@@ -473,6 +473,29 @@ try {
     created_at   TEXT NOT NULL
   )");
   $pdo->exec("CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(expense_date)");
+  addMissingColumn($pdo, 'expenses', 'staff_id', 'INTEGER DEFAULT NULL');
+
+  /* ── Packages (editable prices via admin) ── */
+  $pdo->exec("CREATE TABLE IF NOT EXISTS packages (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    code       TEXT UNIQUE NOT NULL,
+    name       TEXT NOT NULL,
+    price      REAL NOT NULL DEFAULT 0,
+    is_active  INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  )");
+  seedPackagesIfEmpty($pdo);
+
+  /* ── Staff ── */
+  $pdo->exec("CREATE TABLE IF NOT EXISTS staff (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL,
+    phone      TEXT,
+    role       TEXT,
+    is_active  INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+  )");
 
   /* ── Audit log ── */
   $pdo->exec("CREATE TABLE IF NOT EXISTS audit_log (
@@ -522,6 +545,26 @@ function createDefaultAdminIfMissing(PDO $pdo): void {
     ':hash' => $passwordHash,
     ':now' => date('c')
   ]);
+}
+
+function seedPackagesIfEmpty(PDO $pdo): void {
+  $count = (int) $pdo->query('SELECT COUNT(*) FROM packages')->fetchColumn();
+  if ($count > 0) {
+    return;
+  }
+
+  $config = require __DIR__ . '/config.php';
+  $now    = date('c');
+  $insert = $pdo->prepare('INSERT INTO packages (code, name, price, is_active, sort_order, created_at) VALUES (:code, :name, :price, 1, :sort, :now)');
+  foreach ($config['packages'] as $i => $p) {
+    $insert->execute([
+      ':code'  => $p['code'],
+      ':name'  => $p['name'],
+      ':price' => $p['price'],
+      ':sort'  => $i,
+      ':now'   => $now,
+    ]);
+  }
 }
 
 function logAudit(PDO $pdo, string $actorType, ?int $actorId, string $action, string $targetType, ?int $targetId, array $detail = []): void {
