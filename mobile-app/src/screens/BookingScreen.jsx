@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Check, ChevronRight, ChevronLeft, Zap, Paperclip, Loader2, Clock, CalendarDays, Car, CarFront, Bus, Truck,
+  Check, ChevronRight, Zap, Paperclip, Loader2, Clock, CalendarDays, Car, CarFront, Bus, Truck,
   Wallet, Smartphone, CreditCard, User, Phone as PhoneIcon, Mail, Hash, Ticket,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -804,29 +804,6 @@ export default function BookingScreen() {
 
   return (
     <div className="h-full flex flex-col" style={{ background: 'var(--black)' }}>
-
-      {/* Header */}
-      <header
-        className="flex-shrink-0 flex items-center gap-3 px-5 py-3.5"
-        style={{
-          background: 'rgba(2,2,2,0.92)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid var(--line)',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => (step > 0 ? setStep(s => s - 1) : navigate(-1))}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
-          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
-        >
-          <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
-        </button>
-        <div>
-          <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>حجز موعد</h1>
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>خطوة {step + 1} من 3</p>
-        </div>
-      </header>
 
       {/* Step indicator */}
       <div className="flex-shrink-0" style={{ borderBottom: '1px solid var(--line)' }}>
