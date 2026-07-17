@@ -650,7 +650,7 @@
 
         <div class="sidebar-group">
           <p class="sidebar-group__label">نظرة عامة</p>
-          <a href="#bookingsSection" class="sidebar-nav-item panel-active" id="navDashboardBtn">
+          <a href="#" class="sidebar-nav-item panel-active" id="navDashboardBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
             <span class="item-label">الحجوزات</span>
           </a>
@@ -1002,7 +1002,7 @@
           </div>
 
           <!-- ── FILTER BAR ── -->
-          <div class="filter-bar" role="toolbar" aria-label="أدوات الفلترة">
+          <div class="filter-bar" id="bookingsFilterBar" role="toolbar" aria-label="أدوات الفلترة">
             <span class="filter-bar__label">الحالة</span>
             <div class="filter-bar__group" id="filterButtons" role="group" aria-label="فلترة بالحالة">
               <button class="filter-btn filter-btn--all active" type="button" data-filter="all">الكل</button>
@@ -1211,12 +1211,6 @@
       /* close the drawer after tapping a nav item on mobile */
       sidebar?.querySelectorAll('.sidebar-nav-item').forEach((item) => {
         item.addEventListener('click', () => { if (window.innerWidth <= 1100) closeSidebar(); });
-      });
-
-      document.getElementById('navDashboardBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('bookingsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (window.innerWidth <= 1100) closeSidebar();
       });
     })();
   </script>

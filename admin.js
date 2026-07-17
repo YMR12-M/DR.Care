@@ -1151,20 +1151,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   /* ── Charts panel ── */
   const chartsPanel   = document.getElementById('chartsPanel');
   const toggleChartsBtn = document.getElementById('toggleChartsBtn');
-  let chartsVisible   = false;
   const panelIn = (el) => { el.classList.remove('panel-animate'); void el.offsetWidth; el.classList.add('panel-animate'); };
 
-  toggleChartsBtn?.addEventListener('click', () => {
-    chartsVisible = !chartsVisible;
-    if (chartsPanel) { chartsPanel.style.display = chartsVisible ? '' : 'none'; if (chartsVisible) panelIn(chartsPanel); }
-    if (chartsVisible) renderCharts(allBookings);
-    toggleChartsBtn.classList.toggle('panel-active', chartsVisible);
-  });
+  toggleChartsBtn?.addEventListener('click', () => activateSection('charts'));
 
   /* ── Customers panel ── */
   const customersPanel    = document.getElementById('customersPanel');
   const toggleCustomersBtn= document.getElementById('toggleCustomersBtn');
-  let customersVisible    = false;
   let allCustomers        = [];
 
   const renderCustomersTable = (list) => {
@@ -1206,12 +1199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCustomersTable(allCustomers);
   };
 
-  toggleCustomersBtn?.addEventListener('click', () => {
-    customersVisible = !customersVisible;
-    if (customersPanel) { customersPanel.style.display = customersVisible ? '' : 'none'; if (customersVisible) panelIn(customersPanel); }
-    toggleCustomersBtn.classList.toggle('panel-active', customersVisible);
-    if (customersVisible) fetchCustomers();
-  });
+  toggleCustomersBtn?.addEventListener('click', () => activateSection('customers'));
 
   document.getElementById('customerSearch')?.addEventListener('input', (e) => {
     const q = e.target.value.trim().toLowerCase();
@@ -1222,15 +1210,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   /* ── Coupons ── */
   const couponsPanel     = document.getElementById('couponsPanel');
-  const bookingsTable    = document.querySelector('.table-wrap');
   const toggleCouponsBtn = document.getElementById('toggleCouponsBtn');
   const couponCreateForm = document.getElementById('couponCreateForm');
   const showCouponFormBtn= document.getElementById('showCouponFormBtn');
   const cancelCouponFormBtn = document.getElementById('cancelCouponFormBtn');
   const createCouponBtn  = document.getElementById('createCouponBtn');
   const couponFormMsg    = document.getElementById('couponFormMsg');
-
-  let couponsVisible = false;
 
   const fetchCoupons = async () => {
     const res  = await fetch('api/coupons.php', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
@@ -1264,21 +1249,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }).join('');
   };
 
-  toggleCouponsBtn?.addEventListener('click', () => {
-    couponsVisible = !couponsVisible;
-    if (couponsPanel)    { couponsPanel.style.display  = couponsVisible ? '' : 'none'; if (couponsVisible) panelIn(couponsPanel); }
-    if (bookingsTable)   bookingsTable.style.display   = couponsVisible ? 'none' : '';
-    const filterBar = document.querySelector('.filter-bar');
-    if (filterBar)       filterBar.style.display       = couponsVisible ? 'none' : '';
-    toggleCouponsBtn.classList.toggle('panel-active', couponsVisible);
-    if (couponsVisible) fetchCoupons();
-  });
+  toggleCouponsBtn?.addEventListener('click', () => activateSection('coupons'));
 
   /* ── Reviews ── */
   const reviewsPanel     = document.getElementById('reviewsPanel');
   const toggleReviewsBtn = document.getElementById('toggleReviewsBtn');
   const reviewsBadge     = document.getElementById('reviewsBadge');
-  let reviewsVisible     = false;
   let reviewsLoaded      = false;
 
   const renderStars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
@@ -1335,12 +1311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  toggleReviewsBtn?.addEventListener('click', () => {
-    reviewsVisible = !reviewsVisible;
-    if (reviewsPanel) { reviewsPanel.style.display = reviewsVisible ? '' : 'none'; if (reviewsVisible) panelIn(reviewsPanel); }
-    toggleReviewsBtn.classList.toggle('panel-active', reviewsVisible);
-    if (reviewsVisible && !reviewsLoaded) fetchReviews();
-  });
+  toggleReviewsBtn?.addEventListener('click', () => activateSection('reviews'));
 
   /* Save reply (delegated) */
   document.getElementById('reviewsList')?.addEventListener('click', async (e) => {
@@ -1422,7 +1393,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   ══════════════════════════════════════════ */
   const slotsPanel     = document.getElementById('slotsPanel');
   const toggleSlotsBtn = document.getElementById('toggleSlotsBtn');
-  let slotsVisible     = false;
 
   const SLOT_TIMES = [
     '08:00','09:00','10:00','11:00','12:00',
@@ -1517,12 +1487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (_) {}
   };
 
-  toggleSlotsBtn?.addEventListener('click', () => {
-    slotsVisible = !slotsVisible;
-    if (slotsPanel) { slotsPanel.style.display = slotsVisible ? '' : 'none'; if (slotsVisible) panelIn(slotsPanel); }
-    toggleSlotsBtn.classList.toggle('panel-active', slotsVisible);
-    if (slotsVisible) fetchSlots();
-  });
+  toggleSlotsBtn?.addEventListener('click', () => activateSection('slots'));
 
   document.getElementById('addSlotBtn')?.addEventListener('click', async () => {
     const dateVal = document.getElementById('slotDateInput')?.value;
@@ -1575,12 +1540,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   ═══════════════════════════════════════════════ */
   const pushPanel      = document.getElementById('pushPanel');
   const togglePushBtn  = document.getElementById('togglePushBtn');
-  let pushVisible      = false;
-  togglePushBtn?.addEventListener('click', () => {
-    pushVisible = !pushVisible;
-    if (pushPanel) { pushPanel.style.display = pushVisible ? '' : 'none'; if (pushVisible) panelIn(pushPanel); }
-    togglePushBtn.classList.toggle('panel-active', pushVisible);
-  });
+  togglePushBtn?.addEventListener('click', () => activateSection('push'));
 
   document.getElementById('sendPushBtn')?.addEventListener('click', async () => {
     const title = document.getElementById('pushTitle')?.value.trim();
@@ -1715,4 +1675,54 @@ document.addEventListener('DOMContentLoaded', async () => {
       await fetchBookings();
     } finally { btn.disabled = false; btn.textContent = 'تطبيق'; }
   });
+
+  /* ══════════════════════════════════════════
+     SECTION SWITCHER — the sidebar shows exactly
+     one section at a time (dashboard / charts /
+     customers / reviews / coupons / slots / push)
+  ══════════════════════════════════════════ */
+  const bookingsFilterBar = document.getElementById('bookingsFilterBar');
+  const bookingsSectionEl = document.getElementById('bookingsSection');
+  const statsGridEl       = document.getElementById('statsGrid');
+  const navDashboardBtn   = document.getElementById('navDashboardBtn');
+  const dashboardOnlyEls  = [statsGridEl, bookingsFilterBar, bookingsSectionEl].filter(Boolean);
+
+  const SECTIONS = {
+    dashboard: { panel: null,          btn: navDashboardBtn },
+    charts:    { panel: chartsPanel,    btn: toggleChartsBtn },
+    customers: { panel: customersPanel, btn: toggleCustomersBtn },
+    reviews:   { panel: reviewsPanel,   btn: toggleReviewsBtn },
+    coupons:   { panel: couponsPanel,   btn: toggleCouponsBtn },
+    slots:     { panel: slotsPanel,     btn: toggleSlotsBtn },
+    push:      { panel: pushPanel,      btn: togglePushBtn },
+  };
+
+  const activateSection = (key) => {
+    if (!SECTIONS[key]) key = 'dashboard';
+
+    dashboardOnlyEls.forEach((el) => { el.style.display = key === 'dashboard' ? '' : 'none'; });
+    if (key === 'dashboard') updateBulkBar();
+    else { const bar = document.getElementById('bulkBar'); if (bar) bar.style.display = 'none'; }
+
+    Object.entries(SECTIONS).forEach(([k, s]) => {
+      if (!s.panel) return;
+      const show = k === key;
+      s.panel.style.display = show ? '' : 'none';
+      if (show) panelIn(s.panel);
+    });
+    Object.values(SECTIONS).forEach((s) => s.btn?.classList.remove('panel-active'));
+    SECTIONS[key].btn?.classList.add('panel-active');
+
+    if (key === 'charts') renderCharts(allBookings);
+    else if (key === 'customers') fetchCustomers();
+    else if (key === 'coupons') fetchCoupons();
+    else if (key === 'reviews' && !reviewsLoaded) fetchReviews();
+    else if (key === 'slots') fetchSlots();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  navDashboardBtn?.addEventListener('click', (e) => { e.preventDefault(); activateSection('dashboard'); });
+
+  activateSection('dashboard');
 });
