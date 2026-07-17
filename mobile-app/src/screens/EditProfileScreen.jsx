@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, User, Phone, Lock } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { secureFetch } from '../lib/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 export default function EditProfileScreen() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function EditProfileScreen() {
 
   useEffect(() => {
     if (!user) return;
-    secureFetch('../api/customer-profile.php')
+    secureFetch('/api/customer-profile.php')
       .then(r => r.json())
       .then(d => { if (d.ok) setForm({ name: d.customer.name || '', phone: d.customer.phone || '' }); })
       .catch(() => {});
@@ -36,7 +37,7 @@ export default function EditProfileScreen() {
     if (!/^01[0125][0-9]{8}$/.test(form.phone.trim())) { setInfoMsg({ ok: false, text: 'رقم موبايل مصري غير صحيح' }); return; }
     setSavingInfo(true); setInfoMsg(null);
     try {
-      const res = await secureFetch('../api/customer-profile.php', {
+      const res = await secureFetch('/api/customer-profile.php', {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: form.name.trim(), phone: form.phone.trim() }),
       });
@@ -55,7 +56,7 @@ export default function EditProfileScreen() {
     if (pwForm.new_password.length < 6) { setPwMsg({ ok: false, text: 'كلمة المرور الجديدة قصيرة جداً' }); return; }
     setSavingPw(true); setPwMsg(null);
     try {
-      const res = await secureFetch('../api/customer-profile.php', {
+      const res = await secureFetch('/api/customer-profile.php', {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pwForm),
       });
@@ -90,15 +91,11 @@ export default function EditProfileScreen() {
           <p className="text-sm font-black" style={{ color: 'var(--white)' }}>البيانات الشخصية</p>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>الاسم الكامل</label>
-            <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-              className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+            <Input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} icon={User} />
           </div>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>رقم الموبايل</label>
-            <input type="tel" dir="ltr" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-              className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+            <Input type="tel" dir="ltr" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} icon={Phone} />
           </div>
           {infoMsg && (
             <p className="text-xs font-bold text-center" style={{ color: infoMsg.ok ? 'var(--success)' : 'var(--error)' }}>{infoMsg.text}</p>
@@ -113,17 +110,13 @@ export default function EditProfileScreen() {
           <p className="text-sm font-black" style={{ color: 'var(--white)' }}>تغيير كلمة المرور</p>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>كلمة المرور الحالية</label>
-            <input type="password" dir="ltr" value={pwForm.current_password}
-              onChange={e => setPwForm(f => ({ ...f, current_password: e.target.value }))}
-              className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+            <Input type="password" dir="ltr" value={pwForm.current_password}
+              onChange={e => setPwForm(f => ({ ...f, current_password: e.target.value }))} icon={Lock} />
           </div>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>كلمة المرور الجديدة</label>
-            <input type="password" dir="ltr" value={pwForm.new_password}
-              onChange={e => setPwForm(f => ({ ...f, new_password: e.target.value }))}
-              className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+            <Input type="password" dir="ltr" value={pwForm.new_password}
+              onChange={e => setPwForm(f => ({ ...f, new_password: e.target.value }))} icon={Lock} />
           </div>
           {pwMsg && (
             <p className="text-xs font-bold text-center" style={{ color: pwMsg.ok ? 'var(--success)' : 'var(--error)' }}>{pwMsg.text}</p>

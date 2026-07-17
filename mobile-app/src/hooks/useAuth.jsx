@@ -7,7 +7,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('../api/customer-login.php?action=check', { credentials: 'same-origin' })
+    fetch('/api/customer-login.php?action=check', { credentials: 'same-origin' })
       .then(r => r.json())
       .then(d => setUser(d.authenticated ? d : null))
       .catch(() => setUser(null))
@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = async () => {
-    await fetch('../api/customer-login.php?action=logout', { method: 'POST', credentials: 'same-origin' });
+    await fetch('/api/customer-login.php?action=logout', { method: 'POST', credentials: 'same-origin' });
     setUser(null);
   };
 

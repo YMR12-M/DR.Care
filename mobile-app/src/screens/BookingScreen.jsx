@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Check, ChevronRight, ChevronLeft, Lightbulb, Zap, Paperclip, Loader2, Clock, Car, CarFront, Bus, Truck,
-  Wallet, Smartphone, CreditCard,
+  Wallet, Smartphone, CreditCard, User, Phone as PhoneIcon, Mail, Hash, Ticket,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { api, secureFetch } from '../lib/api';
 import Button from '../components/ui/Button';
 import IconBadge from '../components/ui/IconBadge';
+import Input from '../components/ui/Input';
+import { getPackageVisual } from '../lib/packageVisuals';
 import {
   FALLBACK_PACKAGES, FALLBACK_CAR_TYPES, FALLBACK_BRANCHES, FALLBACK_PAYMENT_METHODS,
   fetchConfig,
@@ -127,43 +129,74 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
   };
 
   return (
-    <div className="flex flex-col gap-7 p-5 pb-24">
-      {/* Packages */}
+    <div className="flex flex-col gap-7 p-5 pb-32">
+      {/* Price estimate — moved above the package list to match reference */}
+      {selected && (
+        <div
+          className="rounded-2xl p-4 text-right fade-in"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,210,31,0.14) 0%, rgba(255,210,31,0.04) 100%)',
+            border: '1px solid var(--yellow-line)',
+          }}
+        >
+          <p className="text-xs font-bold" style={{ color: 'var(--muted)' }}>السعر المتوقع</p>
+          <p className="text-3xl font-black mt-0.5" style={{ color: 'var(--yellow)' }}>
+            {price > 0 ? <>{price} <span className="text-base">جنيه</span></> : 'حسب الشغل'}
+          </p>
+        </div>
+      )}
+
+      {/* Packages — full-width list rows with colored category icons */}
       <div className="fade-in fade-in-1">
-        <p className="text-xs font-black mb-3.5" style={{ color: 'var(--muted)' }}>اختار الباقة</p>
-        <div className="grid grid-cols-2 gap-3">
-          {packages.map(p => (
-            <button
-              key={p.code}
-              type="button"
-              onClick={() => {
-                setForm(f => ({ ...f, servicePackage: p.code }));
-                setPkgError('');
-              }}
-              className="rounded-2xl p-5 text-right active:scale-95 transition-transform flex flex-col gap-1.5"
-              style={{
-                background: selected === p.code ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                border: selected === p.code ? '1.5px solid var(--yellow-line)' : '1px solid var(--line-2)',
-                boxShadow: selected === p.code ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
-                minHeight: '108px',
-              }}
-            >
-              <p
-                className="text-sm font-black leading-snug"
-                style={{ color: selected === p.code ? 'var(--yellow)' : 'var(--white)' }}
+        <p className="text-xs font-black mb-3.5" style={{ color: 'var(--muted)' }}>اختار الباقة المناسبة</p>
+        <div className="flex flex-col gap-3">
+          {packages.map(p => {
+            const v = getPackageVisual(p.code);
+            const Icon = v.icon;
+            const isSelected = selected === p.code;
+            return (
+              <button
+                key={p.code}
+                type="button"
+                onClick={() => {
+                  setForm(f => ({ ...f, servicePackage: p.code }));
+                  setPkgError('');
+                }}
+                className="w-full flex items-center justify-between gap-3 rounded-2xl p-4 active:scale-[0.98] transition-transform"
+                style={{
+                  background: isSelected ? 'var(--yellow-soft)' : 'var(--panel-2)',
+                  border: isSelected ? '1.5px solid var(--yellow-line)' : '1px solid var(--line-2)',
+                  boxShadow: isSelected ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
+                }}
               >
-                {p.name}
-              </p>
-              <p className="text-sm font-bold" style={{ color: selected === p.code ? 'var(--yellow-2)' : 'var(--muted)' }}>
-                {p.price > 0 ? `${p.price} ج` : 'حسب الشغل'}
-              </p>
-              {DUR_MAP[p.code] && (
-                <p className="inline-flex items-center gap-1 text-[10px] mt-auto pt-1" style={{ color: 'var(--muted-2)' }}>
-                  <Clock size={10} /> {DUR_MAP[p.code]}
-                </p>
-              )}
-            </button>
-          ))}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: `color-mix(in srgb, ${v.color} 16%, transparent)`, border: `1px solid color-mix(in srgb, ${v.color} 35%, transparent)` }}
+                  >
+                    <Icon size={20} style={{ color: v.color }} strokeWidth={2.2} />
+                  </div>
+                  <div className="text-right min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-black truncate" style={{ color: isSelected ? 'var(--yellow)' : 'var(--white)' }}>{p.name}</p>
+                      {v.popular && (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--yellow)', color: '#0a0800' }}>
+                          الأشهر
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--muted)' }}>{v.desc}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <p className="text-sm font-black" style={{ color: isSelected ? 'var(--yellow)' : 'var(--white-2)' }}>
+                    {p.price > 0 ? `${p.price} ج.م` : 'حسب الشغل'}
+                  </p>
+                  {isSelected && <Check size={16} strokeWidth={3} style={{ color: 'var(--yellow)' }} />}
+                </div>
+              </button>
+            );
+          })}
         </div>
         {pkgError && <p className="text-xs mt-2 font-bold" style={{ color: 'var(--error)' }}>{pkgError}</p>}
       </div>
@@ -223,26 +256,6 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
         </div>
       )}
 
-      {/* Price estimate */}
-      {selected && (
-        <div
-          className="rounded-2xl p-4 flex items-center justify-between fade-in"
-          style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}
-        >
-          <div>
-            <p className="text-xs font-bold" style={{ color: 'var(--muted)' }}>السعر المتوقع</p>
-            {DUR_MAP[selected] && (
-              <p className="inline-flex items-center gap-1 text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>
-                <Clock size={10} /> {DUR_MAP[selected]}
-              </p>
-            )}
-          </div>
-          <p className="text-2xl font-black" style={{ color: 'var(--yellow)' }}>
-            {price > 0 ? `${price} ج` : 'حسب الشغل'}
-          </p>
-        </div>
-      )}
-
       {/* Next button */}
       <Button variant="primary" size="lg" onClick={handleNext} className="w-full">
         <span className="inline-flex items-center gap-1.5">التالي <ChevronRight size={16} className="rotate-180" /></span>
@@ -262,7 +275,7 @@ function Step2({ form, setForm, onNext, onBack }) {
   const availDates = getNextDays(10);
 
   useEffect(() => {
-    fetch('../api/slots.php', { credentials: 'same-origin' })
+    fetch('/api/slots.php', { credentials: 'same-origin' })
       .then(r => r.json())
       .then(d => setAllSlots(d.slots || {}))
       .catch(() => setAllSlots({}))
@@ -279,7 +292,7 @@ function Step2({ form, setForm, onNext, onBack }) {
   const availSlots = (allSlots[form.apptDate] || []).filter(s => s.available > 0);
 
   return (
-    <div className="flex flex-col gap-7 p-5 pb-24">
+    <div className="flex flex-col gap-7 p-5 pb-32">
 
       {/* Date chips */}
       <div className="fade-in fade-in-1">
@@ -349,12 +362,11 @@ function Step2({ form, setForm, onNext, onBack }) {
           ) : (
             <div>
               <p className="text-xs mb-2" style={{ color: 'var(--muted)' }}>أدخل الوقت يدوياً</p>
-              <input
+              <Input
                 type="time"
                 value={form.apptTime}
                 onChange={e => setForm(f => ({ ...f, apptTime: e.target.value }))}
-                className="w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none"
-                style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}
+                icon={Clock}
               />
             </div>
           )}
@@ -478,7 +490,7 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
   const dur = DUR_MAP[form.servicePackage] || null;
 
   return (
-    <div className="flex flex-col gap-5 p-5 pb-28">
+    <div className="flex flex-col gap-5 p-5 pb-32">
 
       {/* Auto-fill from profile */}
       {user && (
@@ -505,18 +517,14 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
         <div>
           <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>الاسم الكامل</label>
-          <input
+          <Input
             type="text"
             placeholder="أحمد محمد"
             value={form.name || ''}
             onChange={set('name')}
             onBlur={blur('name')}
-            className="w-full rounded-xl px-4 py-3.5 text-sm placeholder-[#6e6860] focus:outline-none"
-            style={{
-              background: 'var(--panel-3)',
-              border: `1px solid ${errors.name && touched.name ? 'var(--error)' : 'var(--line-2)'}`,
-              color: 'var(--white)',
-            }}
+            icon={User}
+            error={!!(errors.name && touched.name)}
           />
           <FieldHint
             valid={touched.name && !errors.name}
@@ -527,51 +535,42 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
         <div>
           <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>رقم الموبايل</label>
-          <input
+          <Input
             type="tel"
             dir="ltr"
             placeholder="01XXXXXXXXX"
             value={form.phone || ''}
             onChange={set('phone')}
             onBlur={blur('phone')}
-            className="w-full rounded-xl px-4 py-3.5 text-sm placeholder-[#6e6860] focus:outline-none"
-            style={{
-              background: 'var(--panel-3)',
-              border: `1px solid ${errors.phone && touched.phone ? 'var(--error)' : 'var(--line-2)'}`,
-              color: 'var(--white)',
-            }}
+            icon={PhoneIcon}
+            error={!!(errors.phone && touched.phone)}
           />
           <FieldHint valid={touched.phone && !errors.phone} error={touched.phone ? errors.phone : ''} msg="رقم صح" />
         </div>
 
         <div>
           <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>البريد الإلكتروني</label>
-          <input
+          <Input
             type="email"
             dir="ltr"
             placeholder="your@gmail.com"
             value={form.email || ''}
             onChange={set('email')}
             onBlur={blur('email')}
-            className="w-full rounded-xl px-4 py-3.5 text-sm placeholder-[#6e6860] focus:outline-none"
-            style={{
-              background: 'var(--panel-3)',
-              border: `1px solid ${errors.email && touched.email ? 'var(--error)' : 'var(--line-2)'}`,
-              color: 'var(--white)',
-            }}
+            icon={Mail}
+            error={!!(errors.email && touched.email)}
           />
           <FieldHint valid={touched.email && !errors.email} error={touched.email ? errors.email : ''} msg="بريد صح" />
         </div>
 
         <div>
           <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>رقم اللوحة (اختياري)</label>
-          <input
+          <Input
             type="text"
             placeholder="أ ب ج ١٢٣٤"
             value={form.plateNumber || ''}
             onChange={set('plateNumber')}
-            className="w-full rounded-xl px-4 py-3.5 text-sm placeholder-[#6e6860] focus:outline-none"
-            style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}
+            icon={Hash}
           />
         </div>
 
@@ -582,8 +581,7 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
             placeholder="أي تعليمات خاصة..."
             value={form.notes || ''}
             onChange={set('notes')}
-            className="w-full rounded-xl px-4 py-3 text-sm placeholder-[#6e6860] focus:outline-none resize-none"
-            style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}
+            className="textarea-premium rounded-2xl px-4 py-3.5 text-[0.95rem] resize-none"
           />
         </div>
       </div>
@@ -646,14 +644,14 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
       >
         <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>كود خصم</p>
         <div className="flex gap-2">
-          <input
+          <Input
             type="text"
             dir="ltr"
             placeholder="DRCARE10"
             value={form.couponCode || ''}
             onChange={set('couponCode')}
-            className="flex-1 rounded-xl px-4 py-3 text-sm placeholder-[#6e6860] focus:outline-none"
-            style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}
+            icon={Ticket}
+            className="flex-1"
           />
           <Button variant="primary" size="md" onClick={checkCoupon} className="flex-shrink-0" style={{ padding: '0.75rem 1.1rem' }}>
             تطبيق
@@ -802,7 +800,7 @@ export default function BookingScreen() {
           : form.apptDate || null,
         couponCode:     appliedCoupon?.code || null,
       };
-      const res = await secureFetch('../api/bookings.php', {
+      const res = await secureFetch('/api/bookings.php', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload),

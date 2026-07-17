@@ -28,7 +28,7 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (!user) return;
-    secureFetch('../api/loyalty.php')
+    secureFetch('/api/loyalty.php')
       .then(r => r.json())
       .then(d => setLoyaltyBalance(d?.balance || 0))
       .catch(() => {});
@@ -51,16 +51,35 @@ export default function ProfileScreen() {
 
   if (!user) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: 'var(--black)' }}>
-        <IconBadge icon={UserIcon} size="lg" tone="yellow" className="mb-4" />
-        <h2 className="text-lg font-black mb-2" style={{ color: 'var(--white)' }}>حسابك</h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>سجل دخولك لمتابعة حجوزاتك وبياناتك</p>
-        <Button variant="primary" size="lg" onClick={() => navigate('/login')} className="w-full mb-3">
-          تسجيل الدخول
-        </Button>
-        <Button variant="secondary" size="lg" onClick={() => navigate('/register')} className="w-full">
-          إنشاء حساب جديد
-        </Button>
+      <div
+        className="h-full relative overflow-hidden flex flex-col items-center justify-center px-7 text-center"
+        style={{
+          background: 'radial-gradient(ellipse 480px 380px at 50% 32%, rgba(255,210,31,0.09), transparent 62%), var(--black)',
+        }}
+      >
+        <div className="absolute top-8 -right-16 w-56 h-56 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'var(--yellow)' }} />
+        <div className="absolute bottom-24 -left-16 w-48 h-48 rounded-full blur-3xl opacity-10 pointer-events-none" style={{ background: 'var(--cat-indigo)' }} />
+
+        <div
+          className="relative w-20 h-20 rounded-3xl flex items-center justify-center mb-5 gold-rim fade-in"
+          style={{ background: 'var(--gradient-gold-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-gold-premium)' }}
+        >
+          <UserIcon size={30} style={{ color: 'var(--yellow)' }} strokeWidth={2.2} />
+        </div>
+
+        <h2 className="text-xl font-black mb-3 fade-in fade-in-1" style={{ color: 'var(--white)' }}>حسابك في DR.Care</h2>
+        <p className="text-sm mb-9 leading-relaxed fade-in fade-in-2" style={{ color: 'var(--muted)' }}>
+          سجّل دخولك عشان تتابع حجوزاتك، نقاط الولاء، وبياناتك في مكان واحد
+        </p>
+
+        <div className="w-full flex flex-col gap-3 fade-in fade-in-3">
+          <Button variant="primary" size="lg" onClick={() => navigate('/login')} className="w-full">
+            تسجيل الدخول
+          </Button>
+          <Button variant="ghost" size="md" onClick={() => navigate('/register')} className="w-full" style={{ border: '1px solid var(--line-2)' }}>
+            إنشاء حساب جديد
+          </Button>
+        </div>
       </div>
     );
   }
@@ -74,16 +93,16 @@ export default function ProfileScreen() {
         <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حسابي</h1>
       </header>
 
-      {/* Profile Card */}
-      <Card className="mx-5 mt-5 p-5 relative overflow-hidden fade-in">
+      {/* Profile Card — premium identity card, the app's "signature" surface */}
+      <Card variant="premium" className="mx-5 mt-5 p-5 relative overflow-hidden fade-in">
         {/* glow */}
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-10 pointer-events-none"
+        <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-15 pointer-events-none"
           style={{ background: 'var(--yellow)' }}/>
         <div className="relative flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black shrink-0"
             style={{
-              background: 'linear-gradient(155deg, var(--yellow) 0%, var(--yellow-2) 100%)', color: '#0a0800',
-              boxShadow: 'var(--shadow-yellow-glow)',
+              background: 'var(--gradient-gold)', color: '#0a0800',
+              boxShadow: 'var(--shadow-gold-premium)',
             }}>
             {user.name?.[0] || 'أ'}
           </div>

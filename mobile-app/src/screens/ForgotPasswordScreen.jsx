@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Mail, KeyRound } from 'lucide-react';
 import { secureFetch } from '../lib/api';
 import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 export default function ForgotPasswordScreen() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function ForgotPasswordScreen() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError('بريد إلكتروني غير صحيح'); return; }
     setLoading(true); setError('');
     try {
-      const res = await secureFetch('../api/password-reset.php', {
+      const res = await secureFetch('/api/password-reset.php', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'request', email: email.trim() }),
       });
@@ -76,9 +77,7 @@ export default function ForgotPasswordScreen() {
             <form onSubmit={submit} className="flex flex-col gap-4 fade-in fade-in-1">
               <div>
                 <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>البريد الإلكتروني</label>
-                <input type="email" placeholder="your@gmail.com" value={email} onChange={e => setEmail(e.target.value)} dir="ltr"
-                  className="w-full rounded-xl px-4 py-3.5 text-sm placeholder-[#6e6860] focus:outline-none transition"
-                  style={{ background: 'var(--panel-2)', border: '1px solid var(--line-2)', color: 'var(--white)' }}/>
+                <Input type="email" placeholder="your@gmail.com" value={email} onChange={e => setEmail(e.target.value)} dir="ltr" icon={Mail} />
               </div>
 
               {error && (

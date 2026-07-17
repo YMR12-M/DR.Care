@@ -1,3 +1,10 @@
+FROM node:20-alpine AS mobile-build
+WORKDIR /build
+COPY mobile-app/package*.json ./
+RUN npm ci
+COPY mobile-app/ ./
+RUN npm run build
+
 FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y libsqlite3-dev \
@@ -13,6 +20,7 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
     /etc/apache2/apache2.conf
 
 COPY . /var/www/html/
+COPY --from=mobile-build /build/dist /var/www/html/app
 
 RUN mkdir -p /var/www/html/data \
     && chown -R www-data:www-data /var/www/html/data \

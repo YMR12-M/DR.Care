@@ -26,7 +26,7 @@ export const FALLBACK_PAYMENT_METHODS = ['كاش', 'Instapay'];
 export const PAYMENT_METHOD_ICONS = { 'كاش': '💵', 'Instapay': '📱' };
 
 export async function fetchConfig() {
-  const r = await fetch('../api/packages.php', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+  const r = await fetch('/api/packages.php', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
   const d = await r.json();
   return {
     packages:        d?.packages?.length        ? d.packages        : FALLBACK_PACKAGES,

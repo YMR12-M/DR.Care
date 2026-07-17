@@ -18,7 +18,7 @@ export default function CouponsScreen() {
 
   const load = () => {
     setLoading(true);
-    secureFetch('../api/loyalty.php')
+    secureFetch('/api/loyalty.php')
       .then(r => r.json())
       .then(d => { if (d.ok) setData(d); })
       .catch(() => {})
@@ -35,7 +35,7 @@ export default function CouponsScreen() {
     setRedeeming(rewardId);
     setResult(null);
     try {
-      const res = await secureFetch('../api/loyalty.php', {
+      const res = await secureFetch('/api/loyalty.php', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reward_id: rewardId }),
       });

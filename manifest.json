@@ -2,7 +2,7 @@
   "name": "DR.Care — مغسلة عربيات مصرية",
   "short_name": "DR.Care",
   "description": "احجز غسلة عربيتك أونلاين مع DR.Care",
-  "start_url": "/mobile.html",
+  "start_url": "/app/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -42,14 +42,14 @@
       "name": "احجز الآن",
       "short_name": "حجز",
       "description": "حجز غسلة جديدة",
-      "url": "/mobile.html#booking",
+      "url": "/app/book",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "حجوزاتي",
       "short_name": "حجوزاتي",
       "description": "عرض حجوزاتي",
-      "url": "/mobile-bookings.html",
+      "url": "/app/bookings",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ],

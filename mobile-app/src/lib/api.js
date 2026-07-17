@@ -1,7 +1,7 @@
 let csrfToken = null;
 
 async function fetchCsrf() {
-  const r = await fetch('../api/csrf.php', { credentials: 'same-origin' });
+  const r = await fetch('/api/csrf.php', { credentials: 'same-origin' });
   const d = await r.json();
   csrfToken = d.token;
   return csrfToken;
@@ -20,8 +20,8 @@ export async function secureFetch(url, opts = {}) {
 }
 
 export const api = {
-  get: (path) => fetch(`../api/${path}`, { credentials: 'same-origin', headers: { Accept: 'application/json' } }),
-  post: (path, body) => secureFetch(`../api/${path}`, {
+  get: (path) => fetch(`/api/${path}`, { credentials: 'same-origin', headers: { Accept: 'application/json' } }),
+  post: (path, body) => secureFetch(`/api/${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

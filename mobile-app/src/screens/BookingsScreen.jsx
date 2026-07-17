@@ -75,7 +75,7 @@ export default function BookingsScreen() {
   useEffect(() => {
     if (authLoading) return;
     if (!user)       { setLoading(false); return; }
-    secureFetch('../api/customer-bookings.php')
+    secureFetch('/api/customer-bookings.php')
       .then(r => r.json())
       .then(d => setBookings(d.bookings || []))
       .catch(() => {})

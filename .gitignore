@@ -22,6 +22,10 @@ node_modules/
 mobile-app/node_modules/
 mobile-app/dist/
 
+# mobile-app production build output, copied to /app by the Dockerfile's build
+# stage at image-build time — never a source file, never committed.
+/app/
+
 # PHP / Composer
 vendor/
 .phpunit.cache/

@@ -5,16 +5,16 @@ export default function IconBadge({ icon: Icon, size = 'md', tone = 'yellow', cl
   const px = SIZE_PX[size];
   const toneStyle = tone === 'yellow'
     ? {
-        background: 'linear-gradient(155deg, rgba(255,210,31,0.16) 0%, rgba(255,210,31,0.06) 100%)',
+        background: 'linear-gradient(155deg, rgba(255,210,31,0.22) 0%, rgba(255,210,31,0.05) 60%, rgba(255,210,31,0.14) 100%)',
         border: '1px solid var(--yellow-line)',
         color: 'var(--yellow)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 0 12px rgba(255,210,31,0.08), 0 4px 14px rgba(255,210,31,0.12)',
       }
     : {
         background: 'linear-gradient(155deg, var(--panel-4) 0%, var(--panel-3) 100%)',
         border: '1px solid var(--line-2)',
         color: 'var(--white-2)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
       };
 
   return (
