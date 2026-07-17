@@ -12,88 +12,67 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     /* ═══════════════════════════════════════════════
-       ADMIN SHELL
+       LAYOUT SHELL — sidebar + content
     ═══════════════════════════════════════════════ */
-    .admin-shell {
-      padding: 28px 0 64px;
-      display: grid;
-      gap: 18px;
-    }
+    .admin-layout { display: flex; align-items: stretch; min-height: 100vh; }
 
-    /* ═══════════════════════════════════════════════
-       ADMIN HERO
-    ═══════════════════════════════════════════════ */
-    .admin-hero {
-      position: relative;
-      overflow: hidden;
+    /* ── Sidebar ── */
+    .admin-sidebar {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 264px; z-index: 60;
       background: var(--panel);
+      border-inline-start: 1px solid var(--line);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.28s var(--transition-bounce);
+    }
+    .admin-sidebar.open { transform: translateX(0); }
+    @media (min-width: 1101px) { .admin-sidebar { transform: none; } }
+
+    .admin-sidebar__brand {
+      display: flex; align-items: center; gap: 12px;
+      padding: 20px 18px 18px;
       border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .admin-sidebar__brand img { width: 38px; height: 38px; border-radius: 9px; object-fit: cover; flex-shrink: 0; }
+    .admin-sidebar__brand strong { font-size: .95rem; font-weight: 900; display: block; line-height: 1.25; }
+    .admin-sidebar__brand small { font-size: .68rem; color: var(--muted); font-weight: 600; letter-spacing: .03em; }
+    .sidebar-close-btn {
+      margin-inline-start: auto; width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid var(--line-2); background: var(--panel-2); color: var(--muted);
+      display: grid; place-items: center; cursor: pointer; font-size: .9rem; flex-shrink: 0;
+    }
+    @media (min-width: 1101px) { .sidebar-close-btn { display: none; } }
+
+    .admin-sidebar__scroll { flex: 1; overflow-y: auto; padding: 16px 14px 10px; }
+    .sidebar-group + .sidebar-group { margin-top: 22px; }
+    .sidebar-group__label {
+      font-size: .65rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted-2); padding: 0 10px 8px;
     }
 
-    .admin-hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse at 95% 40%, rgba(255,210,31,0.09) 0%, transparent 55%),
-        radial-gradient(ellipse at 5% 80%, rgba(255,210,31,0.03) 0%, transparent 45%);
-      pointer-events: none;
+    .sidebar-nav-item {
+      width: 100%; display: flex; align-items: center; gap: 11px;
+      height: 42px; padding: 0 12px; border-radius: 10px; margin-bottom: 2px;
+      background: transparent; border: 1px solid transparent;
+      color: var(--muted); font-size: .85rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; text-align: right; text-decoration: none;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+    .sidebar-nav-item svg { flex-shrink: 0; }
+    .sidebar-nav-item .item-label { flex: 1; }
+    .sidebar-nav-item:hover { background: var(--panel-2); color: var(--white); }
+    .sidebar-nav-item.panel-active { background: var(--yellow-soft); color: var(--yellow); border-color: var(--yellow-line); }
+    .sidebar-nav-item .nav-badge {
+      font-size: .63rem; background: var(--yellow); color: #0a0800;
+      padding: 1px 7px; border-radius: 50px; font-weight: 900; flex-shrink: 0;
     }
 
-    .admin-hero-top {
-      position: relative;
-      padding: 32px 0 20px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
+    .admin-sidebar__footer {
+      padding: 16px 16px 20px; border-top: 1px solid var(--line); flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 10px;
     }
-
-    .admin-hero-text { flex: 1; min-width: 200px; }
-    .admin-hero-text h1 {
-      font-size: 1.85rem; font-weight: 900;
-      letter-spacing: -0.02em; margin-bottom: 6px;
-    }
-    .admin-hero-text p { font-size: 0.85rem; color: var(--muted); margin: 0; }
-
-    .admin-hero-utils {
-      display: flex; align-items: center; gap: 8px;
-      padding-top: 6px; flex-shrink: 0;
-    }
-
-    /* ── Panel Nav Tabs ── */
-    .admin-hero-nav {
-      position: relative;
-      display: flex; align-items: stretch; gap: 2px;
-      border-top: 1px solid var(--line);
-      padding-top: 0;
-    }
-
-    .admin-nav-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      height: 46px; padding: 0 18px;
-      background: transparent; border: none;
-      color: var(--muted); font-size: 0.82rem; font-weight: 700;
-      cursor: pointer; white-space: nowrap;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: color var(--transition), border-color var(--transition), background var(--transition);
-      font-family: var(--font);
-    }
-    .admin-nav-btn:hover { color: var(--white); background: rgba(255,255,255,0.03); }
-    .admin-nav-btn.panel-active {
-      color: var(--yellow);
-      border-bottom-color: var(--yellow);
-    }
-    .admin-nav-btn svg { flex-shrink: 0; }
-    .admin-nav-btn .nav-badge {
-      font-size: .65rem; background: var(--yellow); color: #0a0800;
-      padding: 1px 7px; border-radius: 50px; font-weight: 900;
-    }
-
-    /* legacy - keep for compat */
-    .admin-hero-inner { padding: 32px 0 28px; }
-    .admin-hero-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
     .admin-meta-chip {
       display: inline-flex; align-items: center; gap: 7px;
       padding: 7px 14px; border-radius: 50px;
@@ -101,6 +80,54 @@
       font-size: 0.78rem; font-weight: 700; color: var(--muted);
     }
     .admin-meta-chip span { color: var(--white); }
+    .sidebar-links { display: flex; gap: 8px; }
+    .sidebar-links a {
+      flex: 1; text-align: center; height: 34px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--muted);
+      font-size: .75rem; font-weight: 700; text-decoration: none;
+      transition: background var(--transition), color var(--transition);
+    }
+    .sidebar-links a:hover { background: var(--panel-3); color: var(--white); }
+
+    .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 55; }
+    .sidebar-backdrop.show { display: block; }
+    @media (min-width: 1101px) { .sidebar-backdrop { display: none !important; } }
+
+    /* ── Content column ── */
+    .admin-content { margin-inline-end: 264px; min-height: 100vh; display: flex; flex-direction: column; width: 100%; min-width: 0; }
+    @media (max-width: 1100px) { .admin-content { margin-inline-end: 0; } }
+
+    .admin-topbar {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(2,2,2,0.82);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .admin-topbar.is-scrolled { border-bottom-color: var(--line-2); box-shadow: 0 1px 60px rgba(0,0,0,.7); }
+    .admin-topbar__inner { min-height: 72px; padding: 14px 28px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+    .sidebar-toggle-btn {
+      width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line-2);
+      background: var(--panel-2); color: var(--white); display: grid; place-items: center;
+      cursor: pointer; flex-shrink: 0;
+    }
+    @media (min-width: 1101px) { .sidebar-toggle-btn { display: none; } }
+
+    .admin-topbar__title { flex: 1; min-width: 180px; }
+    .admin-topbar__title h1 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.01em; margin: 0 0 2px; }
+    .admin-topbar__title p { font-size: .78rem; color: var(--muted); margin: 0; }
+    .admin-topbar__utils { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .admin-shell {
+      padding: 24px 28px 64px; max-width: 1560px; margin-inline: auto; width: 100%;
+      display: grid; gap: 18px;
+    }
+    @media (max-width: 640px) {
+      .admin-shell { padding: 18px 16px 48px; }
+      .admin-topbar__inner { padding: 12px 16px; }
+    }
 
     /* ═══════════════════════════════════════════════
        STATS ROWS
@@ -382,7 +409,7 @@
        TOAST
     ═══════════════════════════════════════════════ */
     .toast-bar {
-      position: fixed; bottom: 28px; inset-inline-start: 50%;
+      position: fixed; bottom: 28px; inset-inline: 50%;
       transform: translateX(50%) translateY(80px);
       z-index: 200; min-width: 260px; max-width: 420px;
       display: flex; align-items: center; gap: 10px;
@@ -530,7 +557,6 @@
       .stats-row-primary   { grid-template-columns: 1fr; }
       .stats-row-secondary { grid-template-columns: 1fr 1fr; }
       .modal-info-grid { grid-template-columns: 1fr 1fr; }
-      .admin-hero-inner { flex-direction: column; align-items: flex-start; }
       .bookings-table th:nth-child(3),
       .bookings-table td:nth-child(3),
       .bookings-table th:nth-child(6),
@@ -605,498 +631,524 @@
   <!-- ── SCROLL PROGRESS ── -->
   <div id="adminScrollProgress"><div id="adminScrollBar"></div></div>
 
-  <!-- ── HEADER ── -->
-  <header class="site-header" id="siteHeader">
-    <div class="container header-inner">
-      <a class="brand" href="index.html" aria-label="DR.Care الرئيسية">
-        <img src="assets/logo.jpg" alt="DR.Care" class="brand-logo-img">
-        <span class="brand-text">
+  <div class="admin-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+
+      <div class="admin-sidebar__brand">
+        <img src="assets/logo.jpg" alt="DR.Care">
+        <div>
           <strong>DR.Care</strong>
           <small>Operations</small>
-        </span>
-      </a>
-      <nav class="main-nav" aria-label="روابط الإدارة">
-        <a href="index.html">الموقع</a>
-        <a href="CarWash-POS/">POS</a>
+        </div>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" type="button" aria-label="إغلاق القائمة">✕</button>
+      </div>
+
+      <nav class="admin-sidebar__scroll" aria-label="لوحات الإدارة">
+
+        <div class="sidebar-group">
+          <p class="sidebar-group__label">نظرة عامة</p>
+          <a href="#bookingsSection" class="sidebar-nav-item panel-active" id="navDashboardBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            <span class="item-label">الحجوزات</span>
+          </a>
+          <button class="sidebar-nav-item" type="button" id="toggleChartsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span class="item-label">تقارير</span>
+          </button>
+        </div>
+
+        <div class="sidebar-group">
+          <p class="sidebar-group__label">الإدارة</p>
+          <button class="sidebar-nav-item" type="button" id="toggleCustomersBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="item-label">العملاء</span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="toggleReviewsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="item-label">التقييمات</span>
+            <span class="nav-badge" id="reviewsBadge" style="display:none"></span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="toggleCouponsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            <span class="item-label">الكوبونات</span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="toggleSlotsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="item-label">المواعيد</span>
+          </button>
+        </div>
+
+        <div class="sidebar-group">
+          <p class="sidebar-group__label">الأدوات</p>
+          <button class="sidebar-nav-item" type="button" id="togglePushBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+            <span class="item-label">إشعار Push</span>
+          </button>
+          <button class="sidebar-nav-item" type="button" id="anniversaryNotifyBtn" title="إرسال إشعارات الذكرى لعملاء اليوم">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="item-label">ذكريات اليوم</span>
+          </button>
+        </div>
+
       </nav>
-      <div style="display:flex;align-items:center;gap:10px;margin-inline-start:auto;">
+
+      <div class="admin-sidebar__footer">
         <div class="admin-meta-chip" id="adminChip" style="display:none">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span id="adminUsername"></span>
         </div>
-        <button id="logoutBtn" class="nav-cta" type="button" style="height:36px;font-size:0.8rem;">خروج</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ── HERO ── -->
-  <div class="admin-hero">
-    <div class="container">
-
-      <!-- Top row: title + utility actions -->
-      <div class="admin-hero-top">
-        <div class="admin-hero-text">
-          <p class="section-kicker">Operations Dashboard</p>
-          <h1>لوحة إدارة DR.Care</h1>
-          <p>تابع الحجوزات، الإيراد، وحالة كل عميل من أول الطلب لحد التسليم.</p>
+        <div class="sidebar-links">
+          <a href="index.html">الموقع</a>
+          <a href="CarWash-POS/">POS</a>
         </div>
-        <div class="admin-hero-utils">
-          <button class="btn btn-ghost" type="button" id="refreshBookings" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            تحديث
+        <button id="logoutBtn" class="btn btn-ghost" type="button" style="width:100%;height:38px;font-size:.82rem">خروج</button>
+      </div>
+
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="admin-content">
+
+      <header class="admin-topbar" id="siteHeader">
+        <div class="admin-topbar__inner">
+          <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" aria-label="فتح القائمة">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
-          <button class="btn btn-ghost" type="button" id="downloadJson" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            JSON
-          </button>
-          <button class="btn btn-ghost" type="button" id="downloadCsv" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            CSV
-          </button>
-        </div>
-      </div>
-
-      <!-- Panel nav tabs -->
-      <nav class="admin-hero-nav" aria-label="لوحات الإدارة">
-        <button class="admin-nav-btn" type="button" id="toggleChartsBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          تقارير
-        </button>
-        <button class="admin-nav-btn" type="button" id="toggleCustomersBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          العملاء
-        </button>
-        <button class="admin-nav-btn" type="button" id="toggleReviewsBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          التقييمات
-          <span class="nav-badge" id="reviewsBadge" style="display:none"></span>
-        </button>
-        <button class="admin-nav-btn" type="button" id="toggleCouponsBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          الكوبونات
-        </button>
-        <button class="admin-nav-btn" type="button" id="anniversaryNotifyBtn" title="إرسال إشعارات الذكرى لعملاء اليوم">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          ذكريات اليوم
-        </button>
-        <button class="admin-nav-btn" type="button" id="toggleSlotsBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          المواعيد
-        </button>
-        <button class="admin-nav-btn" type="button" id="togglePushBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
-          إشعار Push
-        </button>
-      </nav>
-
-    </div>
-  </div>
-
-  <main>
-    <div class="container admin-shell">
-
-      <!-- ── STATS ── -->
-      <div id="statsGrid" aria-label="ملخص الأداء" style="display:contents">
-
-        <!-- Revenue Row -->
-        <p class="stats-section-label">الإيراد</p>
-        <div class="stats-row stats-row-primary">
-
-          <div class="stat-card stat-card--yellow stat-card--primary">
-            <div class="stat-card__icon-wrap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <p class="stat-card__kicker">الإيراد الإجمالي</p>
-            <div class="stat-card__value" id="expectedRevenue">—</div>
-            <p class="stat-card__label">إجمالي كل الطلبات المكتملة</p>
+          <div class="admin-topbar__title">
+            <p class="section-kicker">Operations Dashboard</p>
+            <h1>لوحة إدارة DR.Care</h1>
+            <p>تابع الحجوزات، الإيراد، وحالة كل عميل من أول الطلب لحد التسليم.</p>
           </div>
-
-          <div class="stat-card stat-card--yellow">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <p class="stat-card__kicker">إيراد الشهر</p>
-            <div class="stat-card__value" id="monthRevenue">—</div>
-            <span class="stat-trend" id="monthRevenueTrend" style="display:none"></span>
-            <p class="stat-card__label">هذا الشهر</p>
-          </div>
-
-          <div class="stat-card stat-card--yellow">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            </div>
-            <p class="stat-card__kicker">إيراد اليوم</p>
-            <div class="stat-card__value" id="todayRevenue">—</div>
-            <span class="stat-trend" id="todayRevenueTrend" style="display:none"></span>
-            <p class="stat-card__label">اليوم فقط</p>
-          </div>
-
-        </div>
-
-        <!-- Activity Row -->
-        <p class="stats-section-label">النشاط</p>
-        <div class="stats-row stats-row-secondary">
-
-          <div class="stat-card stat-card--orange">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <p class="stat-card__kicker">قيد الانتظار</p>
-            <div class="stat-card__value" id="newBookings">—</div>
-            <p class="stat-card__label">طلبات تحتاج تأكيد</p>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
-            <p class="stat-card__kicker">كل الطلبات</p>
-            <div class="stat-card__value" id="totalBookings">—</div>
-            <p class="stat-card__label">إجمالي الحجوزات</p>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <p class="stat-card__kicker">هذا الشهر</p>
-            <div class="stat-card__value" id="monthBookings">—</div>
-            <p class="stat-card__label">طلبات الشهر</p>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <p class="stat-card__kicker">اليوم</p>
-            <div class="stat-card__value" id="todayBookings">—</div>
-            <span class="stat-trend" id="todayBookingsTrend" style="display:none"></span>
-            <p class="stat-card__label">طلبات اليوم</p>
-          </div>
-
-          <div class="stat-card stat-card--blue">
-            <div class="stat-card__icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <p class="stat-card__kicker">العملاء</p>
-            <div class="stat-card__value" id="totalCustomers">—</div>
-            <p class="stat-card__label">عملاء مسجلين</p>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ── CHARTS PANEL ── -->
-      <div id="chartsPanel" style="display:none;margin-bottom:24px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
-            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الحجوزات — آخر 7 أيام</p>
-            <canvas id="chartDays" height="180"></canvas>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
-            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">توزيع الحالات</p>
-            <canvas id="chartStatus" height="180"></canvas>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
-            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الإيراد حسب الفرع (جنيه)</p>
-            <canvas id="chartBranch" height="180"></canvas>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
-            <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">أكثر الباقات طلباً</p>
-            <canvas id="chartPackages" height="180"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── PUSH PANEL ── -->
-      <div id="pushPanel" style="display:none;margin-bottom:24px">
-        <div class="push-card">
-          <div class="push-card__head">
-            <div class="push-card__icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ba4f5" stroke-width="2.2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
-            </div>
-            <div>
-              <p style="font-size:1rem;font-weight:800;margin:0 0 3px;color:var(--text)">إرسال إشعار Push مخصص</p>
-              <p style="font-size:.79rem;color:var(--muted);margin:0">يُرسَل لكل المشتركين في إشعارات DR.Care</p>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">العنوان
-              <input id="pushTitle" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="مثال: عرض خاص اليوم!" maxlength="80">
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الرابط عند الضغط
-              <input id="pushUrl" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" value="/customer-bookings.html">
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">نص الإشعار
-              <textarea id="pushBody" class="search-input" rows="3" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit" placeholder="اكتب تفاصيل الإشعار..."></textarea>
-            </label>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <button id="sendPushBtn" class="btn btn-primary" type="button" style="height:38px;padding:0 20px;font-size:.85rem;display:flex;align-items:center;gap:7px">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              إرسال الإشعار
+          <div class="admin-topbar__utils">
+            <button class="btn btn-ghost" type="button" id="refreshBookings" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              تحديث
             </button>
-            <span id="pushResult" style="font-size:.82rem;font-weight:700"></span>
+            <button class="btn btn-ghost" type="button" id="downloadJson" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              JSON
+            </button>
+            <button class="btn btn-ghost" type="button" id="downloadCsv" style="display:flex;align-items:center;gap:6px;height:36px;font-size:0.8rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              CSV
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <!-- ── CUSTOMERS PANEL ── -->
-      <div id="customersPanel" style="display:none;margin-bottom:24px">
-        <div class="filter-bar" style="margin-bottom:12px">
-          <strong style="font-size:.9rem">👥 العملاء المسجلين</strong>
-          <div class="spacer"></div>
-          <input type="search" id="customerSearch" class="search-input" placeholder="بحث باسم أو إيميل..." style="width:min(220px,100%)">
-          <span class="results-badge" id="customerCount"></span>
-        </div>
-        <div class="table-wrap">
-          <table class="bookings-table" id="customersTable">
-            <thead>
-              <tr>
-                <th>العميل</th>
-                <th>الإيميل</th>
-                <th>الموبايل</th>
-                <th>الحجوزات</th>
-                <th>إجمالي المصروف</th>
-                <th>تاريخ الانضمام</th>
-                <th>تواصل</th>
-              </tr>
-            </thead>
-            <tbody id="customersBody">
-              <tr><td colspan="7"><div class="table-empty"><span>👥</span><p>جاري التحميل...</p></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <main>
+        <div class="admin-shell">
 
-      <!-- ── SLOTS PANEL ── -->
-      <div id="slotsPanel" style="display:none;margin-bottom:24px">
+          <!-- ── STATS ── -->
+          <div id="statsGrid" aria-label="ملخص الأداء" style="display:contents">
 
-        <div class="slots-card">
-          <!-- Header -->
-          <div class="slots-card__head">
-            <div class="slots-card__icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <!-- Revenue Row -->
+            <p class="stats-section-label">الإيراد</p>
+            <div class="stats-row stats-row-primary">
+
+              <div class="stat-card stat-card--yellow stat-card--primary">
+                <div class="stat-card__icon-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <p class="stat-card__kicker">الإيراد الإجمالي</p>
+                <div class="stat-card__value" id="expectedRevenue">—</div>
+                <p class="stat-card__label">إجمالي كل الطلبات المكتملة</p>
+              </div>
+
+              <div class="stat-card stat-card--yellow">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <p class="stat-card__kicker">إيراد الشهر</p>
+                <div class="stat-card__value" id="monthRevenue">—</div>
+                <span class="stat-trend" id="monthRevenueTrend" style="display:none"></span>
+                <p class="stat-card__label">هذا الشهر</p>
+              </div>
+
+              <div class="stat-card stat-card--yellow">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <p class="stat-card__kicker">إيراد اليوم</p>
+                <div class="stat-card__value" id="todayRevenue">—</div>
+                <span class="stat-trend" id="todayRevenueTrend" style="display:none"></span>
+                <p class="stat-card__label">اليوم فقط</p>
+              </div>
+
             </div>
-            <div>
-              <p class="slots-card__title">تحديد المواعيد المتاحة</p>
-              <p class="slots-card__sub">حدد الأيام والأوقات التي يمكن للعملاء الحجز فيها</p>
+
+            <!-- Activity Row -->
+            <p class="stats-section-label">النشاط</p>
+            <div class="stats-row stats-row-secondary">
+
+              <div class="stat-card stat-card--orange">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <p class="stat-card__kicker">قيد الانتظار</p>
+                <div class="stat-card__value" id="newBookings">—</div>
+                <p class="stat-card__label">طلبات تحتاج تأكيد</p>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <p class="stat-card__kicker">كل الطلبات</p>
+                <div class="stat-card__value" id="totalBookings">—</div>
+                <p class="stat-card__label">إجمالي الحجوزات</p>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <p class="stat-card__kicker">هذا الشهر</p>
+                <div class="stat-card__value" id="monthBookings">—</div>
+                <p class="stat-card__label">طلبات الشهر</p>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <p class="stat-card__kicker">اليوم</p>
+                <div class="stat-card__value" id="todayBookings">—</div>
+                <span class="stat-trend" id="todayBookingsTrend" style="display:none"></span>
+                <p class="stat-card__label">طلبات اليوم</p>
+              </div>
+
+              <div class="stat-card stat-card--blue">
+                <div class="stat-card__icon-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <p class="stat-card__kicker">العملاء</p>
+                <div class="stat-card__value" id="totalCustomers">—</div>
+                <p class="stat-card__label">عملاء مسجلين</p>
+              </div>
+
             </div>
           </div>
 
-          <!-- Form -->
-          <div class="slots-form">
-            <!-- Date -->
-            <div>
-              <span class="slots-label">اليوم</span>
-              <input type="date" id="slotDateInput" class="search-input slots-day-input">
-            </div>
-
-            <!-- Times -->
-            <div>
-              <span class="slots-label">
-                الأوقات
-                <span class="slots-count-badge" id="slotSelectedCount" data-empty></span>
-              </span>
-              <div id="slotTimePicker" class="slots-time-grid"><!-- JS --></div>
-            </div>
-
-            <!-- Max -->
-            <div>
-              <span class="slots-label">حجوزات / وقت</span>
-              <div class="slots-stepper">
-                <button type="button" id="slotDecBtn" class="slots-stepper__btn">−</button>
-                <span class="slots-stepper__val" id="slotMaxDisplay">1</span>
-                <input type="hidden" id="slotMaxInput" value="1">
-                <button type="button" id="slotIncBtn" class="slots-stepper__btn">+</button>
+          <!-- ── CHARTS PANEL ── -->
+          <div id="chartsPanel" style="display:none;margin-bottom:24px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+              <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+                <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الحجوزات — آخر 7 أيام</p>
+                <canvas id="chartDays" height="180"></canvas>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+                <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">توزيع الحالات</p>
+                <canvas id="chartStatus" height="180"></canvas>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+                <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">الإيراد حسب الفرع (جنيه)</p>
+                <canvas id="chartBranch" height="180"></canvas>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px">
+                <p style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">أكثر الباقات طلباً</p>
+                <canvas id="chartPackages" height="180"></canvas>
               </div>
             </div>
           </div>
 
-          <button type="button" id="addSlotBtn" class="btn btn-primary" style="height:40px;font-size:.85rem;padding:0 22px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-left:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            إضافة مواعيد
-          </button>
-        </div>
-
-        <!-- Slots list -->
-        <div class="table-wrap">
-          <table class="bookings-table" id="slotsTable">
-            <thead>
-              <tr>
-                <th>اليوم</th>
-                <th>الوقت</th>
-                <th>الحجوزات</th>
-                <th>الحالة</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="slotsBody">
-              <tr><td colspan="5"><div class="table-empty"><span>📅</span><p>لا توجد مواعيد بعد</p></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ── BULK BAR ── -->
-      <div id="bulkBar" class="bulk-bar" style="display:none">
-        <span style="font-weight:800;color:var(--yellow);font-size:.85rem" id="bulkCountText">0 محدد</span>
-        <div class="spacer"></div>
-        <select id="bulkStatusSelect" class="search-input" style="height:34px;min-width:160px">
-          <option value="">غيّر الحالة إلى...</option>
-          <option value="confirmed">مؤكد</option>
-          <option value="in_service">قيد التنفيذ</option>
-          <option value="completed">تم التسليم</option>
-          <option value="cancelled">ملغي</option>
-        </select>
-        <button id="bulkApplyBtn" class="btn btn-primary" type="button" style="height:34px;padding:0 16px;font-size:.82rem">تطبيق</button>
-        <button id="bulkSelectAllBtn" class="details-btn" type="button" style="height:34px">تحديد الكل</button>
-        <button id="bulkClearBtn" class="details-btn" type="button" style="height:34px;color:var(--error)">إلغاء التحديد</button>
-      </div>
-
-      <!-- ── FILTER BAR ── -->
-      <div class="filter-bar" role="toolbar" aria-label="أدوات الفلترة">
-        <span class="filter-bar__label">الحالة</span>
-        <div class="filter-bar__group" id="filterButtons" role="group" aria-label="فلترة بالحالة">
-          <button class="filter-btn filter-btn--all active" type="button" data-filter="all">الكل</button>
-          <button class="filter-btn filter-btn--new" type="button" data-filter="new">جديد</button>
-          <button class="filter-btn filter-btn--confirmed" type="button" data-filter="confirmed">مؤكد</button>
-          <button class="filter-btn filter-btn--in_service" type="button" data-filter="in_service">قيد التنفيذ</button>
-          <button class="filter-btn filter-btn--completed" type="button" data-filter="completed">تم التسليم</button>
-          <button class="filter-btn filter-btn--cancelled" type="button" data-filter="cancelled">ملغي</button>
-        </div>
-
-        <div class="filter-bar__sep"></div>
-
-        <select id="branchFilter" class="search-input" aria-label="فلترة حسب الفرع">
-          <option value="all">كل الفروع</option>
-        </select>
-        <select id="paymentFilter" class="search-input" aria-label="فلترة حسب الدفع">
-          <option value="all">كل طرق الدفع</option>
-        </select>
-
-        <div class="filter-bar__sep"></div>
-
-        <div class="filter-bar__group" id="datePresets" role="group" aria-label="فلترة سريعة بالتاريخ">
-          <button class="filter-btn" type="button" data-preset="today">اليوم</button>
-          <button class="filter-btn" type="button" data-preset="week">7 أيام</button>
-          <button class="filter-btn" type="button" data-preset="month">هذا الشهر</button>
-        </div>
-
-        <input type="date" id="dateFrom" class="search-input" aria-label="من تاريخ" style="width:140px" title="من تاريخ">
-        <input type="date" id="dateTo"   class="search-input" aria-label="إلى تاريخ" style="width:140px" title="إلى تاريخ">
-        <button id="clearDateRange" class="filter-btn" type="button" title="مسح الفترة" aria-label="مسح فلتر التاريخ" style="display:none;padding:0 10px">✕</button>
-
-        <div class="spacer"></div>
-
-        <input type="search" id="searchInput" class="search-input" placeholder="بحث..." aria-label="بحث" style="width:min(200px,100%)">
-
-        <span class="results-badge" id="resultsCount" aria-live="polite"></span>
-
-        <button id="waBroadcastBtn" class="details-btn" type="button" style="display:flex;align-items:center;gap:7px;height:34px;background:rgba(37,211,102,.07);color:#25d366;border-color:rgba(37,211,102,.3)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-          WhatsApp جماعي
-        </button>
-      </div>
-
-      <!-- ── COUPONS PANEL ── -->
-      <div id="couponsPanel" style="display:none">
-        <div class="filter-bar" style="flex-wrap:wrap;gap:14px">
-          <strong style="font-size:.9rem">إدارة الكوبونات</strong>
-          <div class="spacer"></div>
-          <button class="btn-primary" type="button" id="showCouponFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ كوبون جديد</button>
-        </div>
-
-        <!-- Create coupon form -->
-        <div id="couponCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
-          <p style="font-weight:800;margin-bottom:16px">إنشاء كوبون جديد</p>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">كود الخصم
-              <input id="cc_code" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px;text-transform:uppercase" placeholder="SUMMER20">
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">نوع الخصم
-              <select id="cc_type" class="search-input" style="width:100%;height:40px;margin-top:6px">
-                <option value="percent">نسبة مئوية %</option>
-                <option value="fixed">مبلغ ثابت</option>
-              </select>
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">القيمة
-              <input id="cc_value" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="20">
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الحد الأدنى للطلب (ج)
-              <input id="cc_min" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="0" value="0">
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">أقصى استخدام (فارغ = غير محدود)
-              <input id="cc_max_uses" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="∞">
-            </label>
-            <label style="font-size:.8rem;font-weight:700;color:var(--muted)">تاريخ الانتهاء (اختياري)
-              <input id="cc_expires" type="datetime-local" class="search-input" style="width:100%;height:40px;margin-top:6px">
-            </label>
+          <!-- ── PUSH PANEL ── -->
+          <div id="pushPanel" style="display:none;margin-bottom:24px">
+            <div class="push-card">
+              <div class="push-card__head">
+                <div class="push-card__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ba4f5" stroke-width="2.2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                <div>
+                  <p style="font-size:1rem;font-weight:800;margin:0 0 3px;color:var(--text)">إرسال إشعار Push مخصص</p>
+                  <p style="font-size:.79rem;color:var(--muted);margin:0">يُرسَل لكل المشتركين في إشعارات DR.Care</p>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">العنوان
+                  <input id="pushTitle" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="مثال: عرض خاص اليوم!" maxlength="80">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الرابط عند الضغط
+                  <input id="pushUrl" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px" value="/customer-bookings.html">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted);grid-column:1/-1">نص الإشعار
+                  <textarea id="pushBody" class="search-input" rows="3" style="width:100%;margin-top:6px;padding:10px 12px;resize:vertical;font-family:inherit" placeholder="اكتب تفاصيل الإشعار..."></textarea>
+                </label>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button id="sendPushBtn" class="btn btn-primary" type="button" style="height:38px;padding:0 20px;font-size:.85rem;display:flex;align-items:center;gap:7px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  إرسال الإشعار
+                </button>
+                <span id="pushResult" style="font-size:.82rem;font-weight:700"></span>
+              </div>
+            </div>
           </div>
-          <div style="display:flex;gap:10px">
-            <button type="button" id="createCouponBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">إنشاء الكوبون</button>
-            <button type="button" id="cancelCouponFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+
+          <!-- ── CUSTOMERS PANEL ── -->
+          <div id="customersPanel" style="display:none;margin-bottom:24px">
+            <div class="filter-bar" style="margin-bottom:12px">
+              <strong style="font-size:.9rem">👥 العملاء المسجلين</strong>
+              <div class="spacer"></div>
+              <input type="search" id="customerSearch" class="search-input" placeholder="بحث باسم أو إيميل..." style="width:min(220px,100%)">
+              <span class="results-badge" id="customerCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="bookings-table" id="customersTable">
+                <thead>
+                  <tr>
+                    <th>العميل</th>
+                    <th>الإيميل</th>
+                    <th>الموبايل</th>
+                    <th>الحجوزات</th>
+                    <th>إجمالي المصروف</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>تواصل</th>
+                  </tr>
+                </thead>
+                <tbody id="customersBody">
+                  <tr><td colspan="7"><div class="table-empty"><span>👥</span><p>جاري التحميل...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <p id="couponFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
-        </div>
 
-        <!-- Coupons table -->
-        <div class="table-wrap">
-          <table class="bookings-table" id="couponsTable">
-            <thead>
-              <tr>
-                <th>الكود</th>
-                <th>النوع</th>
-                <th>القيمة</th>
-                <th>الحد الأدنى</th>
-                <th>الاستخدام</th>
-                <th>الانتهاء</th>
-                <th>الحالة</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody id="couponsBody">
-              <tr><td colspan="8"><div class="table-empty"><span>🎫</span><p>لا توجد كوبونات</p></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+          <!-- ── SLOTS PANEL ── -->
+          <div id="slotsPanel" style="display:none;margin-bottom:24px">
 
-      <!-- ── REVIEWS PANEL ── -->
-      <div id="reviewsPanel" style="display:none;margin-bottom:24px">
-        <div class="filter-bar" style="margin-bottom:16px">
-          <strong style="font-size:.9rem">⭐ التقييمات</strong>
-          <div class="spacer"></div>
-          <span id="reviewsSummary" style="font-size:.82rem;color:var(--muted)"></span>
-        </div>
-        <div id="reviewsList" style="display:grid;gap:12px">
-          <div style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem">جاري تحميل التقييمات...</div>
-        </div>
-      </div>
+            <div class="slots-card">
+              <!-- Header -->
+              <div class="slots-card__head">
+                <div class="slots-card__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div>
+                  <p class="slots-card__title">تحديد المواعيد المتاحة</p>
+                  <p class="slots-card__sub">حدد الأيام والأوقات التي يمكن للعملاء الحجز فيها</p>
+                </div>
+              </div>
 
-      <!-- ── BOOKING CARDS ── -->
-      <div class="bk-toolbar" role="toolbar" aria-label="إحصائية العرض">
-        <span class="results-badge" id="resultsCount" aria-live="polite"></span>
-        <div class="spacer"></div>
-        <label class="bk-compact-toggle" title="وضع مضغوط">
-          <input type="checkbox" id="compactMode"> مضغوط
-        </label>
-      </div>
-      <div class="bk-list" id="bookingsBody" role="list" aria-label="قائمة الطلبات">
-        <div class="table-empty"><span>🔐</span><p>جاري التحقق من الجلسة...</p></div>
-      </div>
+              <!-- Form -->
+              <div class="slots-form">
+                <!-- Date -->
+                <div>
+                  <span class="slots-label">اليوم</span>
+                  <input type="date" id="slotDateInput" class="search-input slots-day-input">
+                </div>
 
-      <!-- ── MODAL ── -->
-      <div class="detail-modal" id="bookingDetailsModal" aria-hidden="true">
-        <div class="detail-modal-backdrop" data-close-modal></div>
-        <div class="detail-modal-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-          <button type="button" class="modal-close" id="modalCloseBtn" aria-label="إغلاق">✕</button>
-          <div id="bookingDetailsContent"></div>
+                <!-- Times -->
+                <div>
+                  <span class="slots-label">
+                    الأوقات
+                    <span class="slots-count-badge" id="slotSelectedCount" data-empty></span>
+                  </span>
+                  <div id="slotTimePicker" class="slots-time-grid"><!-- JS --></div>
+                </div>
+
+                <!-- Max -->
+                <div>
+                  <span class="slots-label">حجوزات / وقت</span>
+                  <div class="slots-stepper">
+                    <button type="button" id="slotDecBtn" class="slots-stepper__btn">−</button>
+                    <span class="slots-stepper__val" id="slotMaxDisplay">1</span>
+                    <input type="hidden" id="slotMaxInput" value="1">
+                    <button type="button" id="slotIncBtn" class="slots-stepper__btn">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <button type="button" id="addSlotBtn" class="btn btn-primary" style="height:40px;font-size:.85rem;padding:0 22px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-left:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                إضافة مواعيد
+              </button>
+            </div>
+
+            <!-- Slots list -->
+            <div class="table-wrap">
+              <table class="bookings-table" id="slotsTable">
+                <thead>
+                  <tr>
+                    <th>اليوم</th>
+                    <th>الوقت</th>
+                    <th>الحجوزات</th>
+                    <th>الحالة</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="slotsBody">
+                  <tr><td colspan="5"><div class="table-empty"><span>📅</span><p>لا توجد مواعيد بعد</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── BULK BAR ── -->
+          <div id="bulkBar" class="bulk-bar" style="display:none">
+            <span style="font-weight:800;color:var(--yellow);font-size:.85rem" id="bulkCountText">0 محدد</span>
+            <div class="spacer"></div>
+            <select id="bulkStatusSelect" class="search-input" style="height:34px;min-width:160px">
+              <option value="">غيّر الحالة إلى...</option>
+              <option value="confirmed">مؤكد</option>
+              <option value="in_service">قيد التنفيذ</option>
+              <option value="completed">تم التسليم</option>
+              <option value="cancelled">ملغي</option>
+            </select>
+            <button id="bulkApplyBtn" class="btn btn-primary" type="button" style="height:34px;padding:0 16px;font-size:.82rem">تطبيق</button>
+            <button id="bulkSelectAllBtn" class="details-btn" type="button" style="height:34px">تحديد الكل</button>
+            <button id="bulkClearBtn" class="details-btn" type="button" style="height:34px;color:var(--error)">إلغاء التحديد</button>
+          </div>
+
+          <!-- ── FILTER BAR ── -->
+          <div class="filter-bar" role="toolbar" aria-label="أدوات الفلترة">
+            <span class="filter-bar__label">الحالة</span>
+            <div class="filter-bar__group" id="filterButtons" role="group" aria-label="فلترة بالحالة">
+              <button class="filter-btn filter-btn--all active" type="button" data-filter="all">الكل</button>
+              <button class="filter-btn filter-btn--new" type="button" data-filter="new">جديد</button>
+              <button class="filter-btn filter-btn--confirmed" type="button" data-filter="confirmed">مؤكد</button>
+              <button class="filter-btn filter-btn--in_service" type="button" data-filter="in_service">قيد التنفيذ</button>
+              <button class="filter-btn filter-btn--completed" type="button" data-filter="completed">تم التسليم</button>
+              <button class="filter-btn filter-btn--cancelled" type="button" data-filter="cancelled">ملغي</button>
+            </div>
+
+            <div class="filter-bar__sep"></div>
+
+            <select id="branchFilter" class="search-input" aria-label="فلترة حسب الفرع">
+              <option value="all">كل الفروع</option>
+            </select>
+            <select id="paymentFilter" class="search-input" aria-label="فلترة حسب الدفع">
+              <option value="all">كل طرق الدفع</option>
+            </select>
+
+            <div class="filter-bar__sep"></div>
+
+            <div class="filter-bar__group" id="datePresets" role="group" aria-label="فلترة سريعة بالتاريخ">
+              <button class="filter-btn" type="button" data-preset="today">اليوم</button>
+              <button class="filter-btn" type="button" data-preset="week">7 أيام</button>
+              <button class="filter-btn" type="button" data-preset="month">هذا الشهر</button>
+            </div>
+
+            <input type="date" id="dateFrom" class="search-input" aria-label="من تاريخ" style="width:140px" title="من تاريخ">
+            <input type="date" id="dateTo"   class="search-input" aria-label="إلى تاريخ" style="width:140px" title="إلى تاريخ">
+            <button id="clearDateRange" class="filter-btn" type="button" title="مسح الفترة" aria-label="مسح فلتر التاريخ" style="display:none;padding:0 10px">✕</button>
+
+            <div class="spacer"></div>
+
+            <input type="search" id="searchInput" class="search-input" placeholder="بحث..." aria-label="بحث" style="width:min(200px,100%)">
+
+            <span class="results-badge" id="resultsCount" aria-live="polite"></span>
+
+            <button id="waBroadcastBtn" class="details-btn" type="button" style="display:flex;align-items:center;gap:7px;height:34px;background:rgba(37,211,102,.07);color:#25d366;border-color:rgba(37,211,102,.3)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+              WhatsApp جماعي
+            </button>
+          </div>
+
+          <!-- ── COUPONS PANEL ── -->
+          <div id="couponsPanel" style="display:none">
+            <div class="filter-bar" style="flex-wrap:wrap;gap:14px">
+              <strong style="font-size:.9rem">إدارة الكوبونات</strong>
+              <div class="spacer"></div>
+              <button class="btn-primary" type="button" id="showCouponFormBtn" style="height:36px;font-size:.82rem;padding:0 16px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;cursor:pointer">+ كوبون جديد</button>
+            </div>
+
+            <!-- Create coupon form -->
+            <div id="couponCreateForm" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px">
+              <p style="font-weight:800;margin-bottom:16px">إنشاء كوبون جديد</p>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">كود الخصم
+                  <input id="cc_code" type="text" class="search-input" style="width:100%;height:40px;margin-top:6px;text-transform:uppercase" placeholder="SUMMER20">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">نوع الخصم
+                  <select id="cc_type" class="search-input" style="width:100%;height:40px;margin-top:6px">
+                    <option value="percent">نسبة مئوية %</option>
+                    <option value="fixed">مبلغ ثابت</option>
+                  </select>
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">القيمة
+                  <input id="cc_value" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="20">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">الحد الأدنى للطلب (ج)
+                  <input id="cc_min" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="0" value="0">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">أقصى استخدام (فارغ = غير محدود)
+                  <input id="cc_max_uses" type="number" class="search-input" style="width:100%;height:40px;margin-top:6px" placeholder="∞">
+                </label>
+                <label style="font-size:.8rem;font-weight:700;color:var(--muted)">تاريخ الانتهاء (اختياري)
+                  <input id="cc_expires" type="datetime-local" class="search-input" style="width:100%;height:40px;margin-top:6px">
+                </label>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="button" id="createCouponBtn" style="height:38px;padding:0 20px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.85rem;cursor:pointer">إنشاء الكوبون</button>
+                <button type="button" id="cancelCouponFormBtn" class="icon-btn" style="width:auto;padding:0 14px;border-radius:8px">إلغاء</button>
+              </div>
+              <p id="couponFormMsg" style="margin-top:10px;font-size:.8rem;font-weight:700"></p>
+            </div>
+
+            <!-- Coupons table -->
+            <div class="table-wrap">
+              <table class="bookings-table" id="couponsTable">
+                <thead>
+                  <tr>
+                    <th>الكود</th>
+                    <th>النوع</th>
+                    <th>القيمة</th>
+                    <th>الحد الأدنى</th>
+                    <th>الاستخدام</th>
+                    <th>الانتهاء</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="couponsBody">
+                  <tr><td colspan="8"><div class="table-empty"><span>🎫</span><p>لا توجد كوبونات</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── REVIEWS PANEL ── -->
+          <div id="reviewsPanel" style="display:none;margin-bottom:24px">
+            <div class="filter-bar" style="margin-bottom:16px">
+              <strong style="font-size:.9rem">⭐ التقييمات</strong>
+              <div class="spacer"></div>
+              <span id="reviewsSummary" style="font-size:.82rem;color:var(--muted)"></span>
+            </div>
+            <div id="reviewsList" style="display:grid;gap:12px">
+              <div style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem">جاري تحميل التقييمات...</div>
+            </div>
+          </div>
+
+          <!-- ── BOOKING CARDS ── -->
+          <div id="bookingsSection">
+            <div class="bk-toolbar" role="toolbar" aria-label="إحصائية العرض">
+              <span class="results-badge" id="resultsCount" aria-live="polite"></span>
+              <div class="spacer"></div>
+              <label class="bk-compact-toggle" title="وضع مضغوط">
+                <input type="checkbox" id="compactMode"> مضغوط
+              </label>
+            </div>
+            <div class="bk-list" id="bookingsBody" role="list" aria-label="قائمة الطلبات">
+              <div class="table-empty"><span>🔐</span><p>جاري التحقق من الجلسة...</p></div>
+            </div>
+          </div>
+
+          <!-- ── MODAL ── -->
+          <div class="detail-modal" id="bookingDetailsModal" aria-hidden="true">
+            <div class="detail-modal-backdrop" data-close-modal></div>
+            <div class="detail-modal-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+              <button type="button" class="modal-close" id="modalCloseBtn" aria-label="إغلاق">✕</button>
+              <div id="bookingDetailsContent"></div>
+            </div>
+          </div>
+
         </div>
-      </div>
+      </main>
 
-    </div>
-  </main>
+    </div><!-- /admin-content -->
+  </div><!-- /admin-layout -->
 
   <!-- ── TOAST ── -->
   <div class="toast-bar" id="toastBar" role="status" aria-live="polite">
@@ -1140,5 +1192,33 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="admin.js"></script>
   <script src="idb.js"></script>
+  <script>
+    /* ── Sidebar toggle (mobile off-canvas) — presentation only, no admin.js interference ── */
+    (function () {
+      const sidebar   = document.getElementById('adminSidebar');
+      const backdrop  = document.getElementById('sidebarBackdrop');
+      const openBtn   = document.getElementById('sidebarToggleBtn');
+      const closeBtn  = document.getElementById('sidebarCloseBtn');
+
+      const openSidebar  = () => { sidebar?.classList.add('open'); backdrop?.classList.add('show'); };
+      const closeSidebar = () => { sidebar?.classList.remove('open'); backdrop?.classList.remove('show'); };
+
+      openBtn?.addEventListener('click', openSidebar);
+      closeBtn?.addEventListener('click', closeSidebar);
+      backdrop?.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+
+      /* close the drawer after tapping a nav item on mobile */
+      sidebar?.querySelectorAll('.sidebar-nav-item').forEach((item) => {
+        item.addEventListener('click', () => { if (window.innerWidth <= 1100) closeSidebar(); });
+      });
+
+      document.getElementById('navDashboardBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('bookingsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (window.innerWidth <= 1100) closeSidebar();
+      });
+    })();
+  </script>
 </body>
 </html>
