@@ -1,5 +1,5 @@
-// DR.Care Service Worker v2.1
-const CACHE_NAME = 'drcare-v4';
+// DR.Care Service Worker v2.2
+const CACHE_NAME = 'drcare-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -85,6 +85,25 @@ self.addEventListener('fetch', (event) => {
           headers: { 'Content-Type': 'application/json; charset=utf-8' }
         })
       )
+    );
+    return;
+  }
+
+  // Page navigations (index.html/mobile.html/admin.html/...): network-first.
+  // These carry the mobile-vs-desktop redirect logic itself, so serving a
+  // stale cached copy after a deploy means visitors keep landing on old
+  // routing forever — cache is only a fallback for genuinely offline visits.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((resp) => {
+          if (resp.ok) {
+            const clone = resp.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+          }
+          return resp;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
     );
     return;
   }
