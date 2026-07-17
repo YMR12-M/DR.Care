@@ -14,6 +14,15 @@
     /* ═══════════════════════════════════════════════
        LAYOUT SHELL — sidebar + content
     ═══════════════════════════════════════════════ */
+    /* styles.css applies `body { animation: page-in ... }` site-wide for a page-entrance
+       effect. Its final keyframe sets transform: translateY(0) scale(1) — not the literal
+       keyword `none` — and animation-fill-mode "both" keeps holding that after the animation
+       ends. Any non-`none` transform on an ancestor becomes the containing block for
+       position:fixed descendants, so the sidebar/modals here were anchored to the body
+       element's box instead of the real viewport and scrolled away with the page.
+       Disable it on this page. */
+    body.admin-page { animation: none; }
+
     .admin-layout { display: flex; align-items: stretch; min-height: 100vh; }
 
     /* ── Sidebar ── */
