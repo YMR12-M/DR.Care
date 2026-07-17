@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Check, ChevronRight, ChevronLeft, Lightbulb, Zap, Paperclip, Loader2, Clock, Car, CarFront, Bus, Truck,
+  Check, ChevronRight, ChevronLeft, Lightbulb, Zap, Paperclip, Loader2, Clock, CalendarDays, Car, CarFront, Bus, Truck,
   Wallet, Smartphone, CreditCard, User, Phone as PhoneIcon, Mail, Hash, Ticket,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -53,16 +53,6 @@ function formatTimeAr(timeStr) {
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
-function getNextDays(n = 7) {
-  const days = [];
-  const today = new Date();
-  for (let i = 0; i < n; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    days.push(d.toISOString().split('T')[0]);
-  }
-  return days;
-}
 
 /* ─── Small UI pieces ──────────────────────────────────── */
 function FieldHint({ valid, error, msg }) {
@@ -272,7 +262,12 @@ function Step2({ form, setForm, onNext, onBack }) {
   const [allSlots, setAllSlots] = useState({});
   const [loading, setLoading]   = useState(true);
   const dateScrollRef = useRef(null);
-  const availDates = getNextDays(10);
+  /* مشتقة من نفس البيانات اللي حددها الأدمن فعلياً (Object.keys(allSlots))، مش قائمة
+     أيام ثابتة — نفس منطق populateSlotDates في script.js (الموقع الرئيسي)، عشان الأيام
+     المعروضة هنا تطابق بالظبط اللي الأدمن حطه في لوحة الإدارة. */
+  const availDates = Object.keys(allSlots).sort().filter(date =>
+    (allSlots[date] || []).some(s => s.available > 0)
+  );
 
   useEffect(() => {
     fetch('/api/slots.php', { credentials: 'same-origin' })
@@ -297,34 +292,52 @@ function Step2({ form, setForm, onNext, onBack }) {
       {/* Date chips */}
       <div className="fade-in fade-in-1">
         <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>اختار اليوم</p>
-        <div
-          ref={dateScrollRef}
-          className="flex gap-2 overflow-x-auto pb-2 scroll-fade-x"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {availDates.map(d => {
-            const { day, num, month } = formatDateAr(d);
-            const sel = form.apptDate === d;
-            return (
-              <button
-                key={d}
-                type="button"
-                onClick={() => setForm(f => ({ ...f, apptDate: d, apptTime: '' }))}
-                className="flex-shrink-0 flex flex-col items-center gap-0.5 rounded-2xl px-5 py-3.5 active:scale-95 transition-transform"
-                style={{
-                  background: sel ? 'var(--yellow-soft)' : 'var(--panel-2)',
-                  border: sel ? '1.5px solid var(--yellow)' : '1px solid var(--line-2)',
-                  boxShadow: sel ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
-                  minWidth: '76px',
-                }}
-              >
-                <span className="text-[10px] font-bold" style={{ color: sel ? 'var(--yellow)' : 'var(--muted)' }}>{day}</span>
-                <span className="text-xl font-black" style={{ color: sel ? 'var(--yellow)' : 'var(--white)' }}>{num}</span>
-                <span className="text-[10px]" style={{ color: 'var(--muted-2)' }}>{month}</span>
-              </button>
-            );
-          })}
-        </div>
+        {loading ? (
+          <div className="flex gap-2">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-[76px] w-[76px] rounded-2xl skeleton flex-shrink-0" />
+            ))}
+          </div>
+        ) : availDates.length > 0 ? (
+          <div
+            ref={dateScrollRef}
+            className="flex gap-2 overflow-x-auto pb-2 scroll-fade-x"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {availDates.map(d => {
+              const { day, num, month } = formatDateAr(d);
+              const sel = form.apptDate === d;
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, apptDate: d, apptTime: '' }))}
+                  className="flex-shrink-0 flex flex-col items-center gap-0.5 rounded-2xl px-5 py-3.5 active:scale-95 transition-transform"
+                  style={{
+                    background: sel ? 'var(--yellow-soft)' : 'var(--panel-2)',
+                    border: sel ? '1.5px solid var(--yellow)' : '1px solid var(--line-2)',
+                    boxShadow: sel ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
+                    minWidth: '76px',
+                  }}
+                >
+                  <span className="text-[10px] font-bold" style={{ color: sel ? 'var(--yellow)' : 'var(--muted)' }}>{day}</span>
+                  <span className="text-xl font-black" style={{ color: sel ? 'var(--yellow)' : 'var(--white)' }}>{num}</span>
+                  <span className="text-[10px]" style={{ color: 'var(--muted-2)' }}>{month}</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div>
+            <p className="text-xs mb-2" style={{ color: 'var(--muted)' }}>مفيش مواعيد محددة دلوقتي — اختار يوم يدوياً</p>
+            <Input
+              type="date"
+              value={form.apptDate}
+              onChange={e => setForm(f => ({ ...f, apptDate: e.target.value, apptTime: '' }))}
+              icon={CalendarDays}
+            />
+          </div>
+        )}
       </div>
 
       {/* Time slots */}
