@@ -539,6 +539,7 @@ const showBookingDetails = (booking) => {
   bookingDetailsModal.dataset.currentBookingId = booking.id;
   bookingDetailsModal.classList.add('open');
   bookingDetailsModal.setAttribute('aria-hidden', 'false');
+  bookingDetailsModal.querySelector('.detail-modal-panel')?.scrollTo(0, 0);
   loadSlotsForBooking(booking.id);
 };
 
