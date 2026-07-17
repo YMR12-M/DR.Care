@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Car, CarFront, Bus, Truck, Star, MapPin, Phone, Clock, Gift,
-  ChevronLeft, ChevronRight, Loader2, CheckCircle2, Wallet, Zap,
+  ChevronLeft, ChevronRight, ChevronDown, Loader2, CheckCircle2, Wallet, Zap,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import PromoBanner from '../components/PromoBanner';
@@ -91,31 +91,6 @@ function ServiceTile({ s, navigate }) {
   );
 }
 
-/* ─── Package carousel card ──────────────────────────── */
-function PackageCard({ pkg, navigate }) {
-  const v = getPackageVisual(pkg.code);
-  const Icon = v.icon;
-  return (
-    <button
-      type="button"
-      onClick={() => navigate('/book', { state: { service: pkg.code } })}
-      className="flex-shrink-0 w-44 text-right rounded-2xl p-5 active:scale-95 transition-transform"
-      style={{ background: 'linear-gradient(165deg, var(--panel-3) 0%, var(--panel-2) 100%)', boxShadow: 'var(--shadow-elevated)', border: '1px solid var(--line-2)' }}
-    >
-      <div
-        className="w-11 h-11 rounded-2xl flex items-center justify-center mb-3"
-        style={{ background: `color-mix(in srgb, ${v.color} 18%, transparent)`, border: `1px solid color-mix(in srgb, ${v.color} 38%, transparent)` }}
-      >
-        <Icon size={22} style={{ color: v.color }} strokeWidth={2.2} />
-      </div>
-      <p className="text-xs font-black mb-1 leading-tight" style={{ color: 'var(--white)' }}>{pkg.name}</p>
-      <p className="text-sm font-black" style={{ color: 'var(--yellow)' }}>
-        {pkg.price > 0 ? `${pkg.price} ج` : 'حسب الشغل'}
-      </p>
-    </button>
-  );
-}
-
 /* ─── Compact price calculator ───────────────────────── */
 function PriceCalculator({ packages }) {
   const navigate = useNavigate();
@@ -138,37 +113,46 @@ function PriceCalculator({ packages }) {
 
   return (
     <Card className="p-4">
-      <div className="flex items-center gap-2 mb-3">
+      <p className="text-sm font-black mb-3.5" style={{ color: 'var(--white)' }}>احسب سعرك</p>
+
+      <label className="text-[10px] font-bold block mb-1.5" style={{ color: 'var(--muted)' }}>الباقة</label>
+      <div className="relative mb-3.5">
         <select
           value={pkgCode}
           onChange={e => setPkgCode(e.target.value)}
-          className="flex-1 rounded-xl px-3 py-2.5 text-xs font-bold appearance-none"
-          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)' }}
+          className="w-full rounded-xl py-3 text-xs font-bold appearance-none"
+          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white)', paddingRight: '0.9rem', paddingLeft: '2.25rem' }}
         >
           {packages.filter(p => p.price > 0).map(p => (
             <option key={p.code} value={p.code} style={{ background: '#141414' }}>{p.name}</option>
           ))}
         </select>
-        <div className="flex gap-1">
-          {CAR_TYPES.map(c => (
+        <ChevronDown size={15} className="absolute top-1/2 -translate-y-1/2 pointer-events-none" style={{ left: '0.85rem', color: 'var(--muted)' }} />
+      </div>
+
+      <label className="text-[10px] font-bold block mb-1.5" style={{ color: 'var(--muted)' }}>نوع العربية</label>
+      <div className="grid grid-cols-4 gap-1.5 mb-4">
+        {CAR_TYPES.map(c => {
+          const sel = carType === c.code;
+          return (
             <button
               key={c.code}
               type="button"
               onClick={() => setCarType(c.code)}
-              className="w-9 h-9 rounded-lg flex items-center justify-center active:scale-90 transition-transform"
+              className="flex flex-col items-center gap-1 rounded-xl py-2.5 active:scale-95 transition-transform"
               style={{
-                background: carType === c.code ? 'var(--yellow-soft)' : 'var(--panel-3)',
-                border: `1px solid ${carType === c.code ? 'var(--yellow-line)' : 'var(--line-2)'}`,
-                color: carType === c.code ? 'var(--yellow)' : 'var(--muted)',
+                background: sel ? 'var(--yellow-soft)' : 'var(--panel-3)',
+                border: `1px solid ${sel ? 'var(--yellow-line)' : 'var(--line-2)'}`,
               }}
-              aria-label={c.name}
             >
-              <c.Icon size={16} strokeWidth={2.2} />
+              <c.Icon size={17} strokeWidth={2.2} style={{ color: sel ? 'var(--yellow)' : 'var(--muted)' }} />
+              <span className="text-[9px] font-bold" style={{ color: sel ? 'var(--yellow)' : 'var(--muted-2)' }}>{c.name}</span>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
-      <div className="flex items-center justify-between">
+
+      <div className="flex items-center justify-between pt-3.5" style={{ borderTop: '1px solid var(--line)' }}>
         <div>
           <p className="text-[10px] font-bold" style={{ color: 'var(--muted)' }}>السعر التقديري</p>
           <p
@@ -327,19 +311,6 @@ export default function HomeScreen() {
           <p className="text-sm font-black mb-3" style={{ color: 'var(--white)' }}>اختار الخدمة</p>
           <div className="grid grid-cols-3 gap-2.5">
             {SERVICE_TILES.map(s => <ServiceTile key={s.code} s={s} navigate={navigate} />)}
-          </div>
-        </div>
-
-        {/* Packages — horizontal carousel for price-focused browsing */}
-        <div className="fade-in fade-in-4">
-          <div className="flex items-center justify-between mb-2.5">
-            <p className="text-sm font-black" style={{ color: 'var(--white)' }}>الباقات</p>
-            <button type="button" onClick={() => navigate('/book')} className="text-[11px] font-bold active:opacity-70" style={{ color: 'var(--yellow)' }}>
-              كل الباقات
-            </button>
-          </div>
-          <div className="flex gap-2.5 overflow-x-auto pb-1 scroll-fade-x" style={{ scrollbarWidth: 'none' }}>
-            {packages.map(p => <PackageCard key={p.code} pkg={p} navigate={navigate} />)}
           </div>
         </div>
 
