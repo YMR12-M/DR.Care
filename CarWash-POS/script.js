@@ -317,10 +317,8 @@ const renderPackageCard = (p) => {
     : `<div class="pkg-price"><small>ج</small>${Number(p.price)}</div>`;
   return `
     <button type="button" class="package-card" data-code="${esc(p.code)}" data-price="${Number(p.price)}" aria-pressed="false" title="${esc(p.name)}">
-      <div class="pkg-top">
-        <span class="pkg-icon">${PACKAGE_ICONS[p.code] || '🧴'}</span>
-        <strong>${esc(p.name)}</strong>
-      </div>
+      <span class="pkg-icon">${PACKAGE_ICONS[p.code] || '🧴'}</span>
+      <strong>${esc(p.name)}</strong>
       ${priceHtml}
     </button>`;
 };
