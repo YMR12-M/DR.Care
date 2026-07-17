@@ -65,86 +65,22 @@
 
         <div class="pos-body">
 
-          <!-- Token -->
+          <!-- Token + Staff (outside the form so posForm.reset() doesn't clear them) -->
           <div class="pos-token-strip">
             <label for="posToken">رمز الموظف</label>
             <input id="posToken" type="password" placeholder="••••••••" autocomplete="off">
           </div>
+          <div class="pos-token-strip">
+            <label for="posStaff">الكاشير الحالي</label>
+            <select id="posStaff"><option value="">— اختياري —</option></select>
+          </div>
 
           <form id="posForm" autocomplete="off">
 
-            <!-- Packages -->
+            <!-- Packages (loaded live from api/packages.php — see fetchPackages() in script.js) -->
             <p class="pos-kicker">Service Package</p>
             <div class="pos-packages-wrap" id="packageGrid">
-
-              <!-- Car wash services -->
-              <div class="pos-pkg-cat">
-                <div class="pos-pkg-cat__head"><span>🚗</span><span>خدمات غسيل السيارات</span></div>
-                <div class="pos-pkg-cards">
-                  <button type="button" class="package-card" data-code="inside-out" data-price="150" aria-pressed="false">
-                    <span class="pkg-icon">🚿</span>
-                    <span class="pkg-label">Inside + Out</span>
-                    <strong>داخلي وخارجي</strong>
-                    <div class="pkg-price"><small>ج</small>150</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="outside" data-price="100" aria-pressed="false">
-                    <span class="pkg-icon">✨</span>
-                    <span class="pkg-label">Exterior</span>
-                    <strong>خارجي فقط</strong>
-                    <div class="pkg-price"><small>ج</small>100</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="deep" data-price="250" aria-pressed="false">
-                    <span class="pkg-icon">💎</span>
-                    <span class="pkg-label">Deep Cleaning</span>
-                    <strong>غسيل متخصص</strong>
-                    <div class="pkg-price"><small>ج</small>250</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="cover" data-price="50" aria-pressed="false">
-                    <span class="pkg-icon">🛡️</span>
-                    <span class="pkg-label">Cover Wash</span>
-                    <strong>غطاء السيارة</strong>
-                    <div class="pkg-price"><small>ج</small>50</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="rims" data-price="100" aria-pressed="false">
-                    <span class="pkg-icon">⭕</span>
-                    <span class="pkg-label">Rims</span>
-                    <strong>غسيل الجنوط</strong>
-                    <div class="pkg-price"><small>ج</small>100</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="engine" data-price="100" aria-pressed="false">
-                    <span class="pkg-icon">⚙️</span>
-                    <span class="pkg-label">Engine Wash</span>
-                    <strong>غسيل الموتور</strong>
-                    <div class="pkg-price"><small>ج</small>100</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="chemical" data-price="0" aria-pressed="false">
-                    <span class="pkg-icon">🧪</span>
-                    <span class="pkg-label">Chemical</span>
-                    <strong>غسيل كيماوي</strong>
-                    <div class="pkg-price pkg-price--contract">حسب الشغل</div>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Carpet & blanket -->
-              <div class="pos-pkg-cat">
-                <div class="pos-pkg-cat__head"><span>🧺</span><span>غسيل سجاد وبطاطين</span></div>
-                <div class="pos-pkg-cards pos-pkg-cards--2">
-                  <button type="button" class="package-card" data-code="carpet" data-price="0" aria-pressed="false">
-                    <span class="pkg-icon">🧺</span>
-                    <span class="pkg-label">Carpet</span>
-                    <strong>غسيل سجاد</strong>
-                    <div class="pkg-price pkg-price--contract">15 ج / متر</div>
-                  </button>
-                  <button type="button" class="package-card" data-code="blanket" data-price="80" aria-pressed="false">
-                    <span class="pkg-icon">🛏️</span>
-                    <span class="pkg-label">Blanket</span>
-                    <strong>غسيل بطاطين</strong>
-                    <div class="pkg-price"><small>ج</small>80</div>
-                  </button>
-                </div>
-              </div>
-
+              <p class="pos-log-empty" id="packageGridLoading">جاري تحميل الباقات...</p>
             </div>
 
             <!-- Customer info -->

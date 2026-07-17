@@ -58,8 +58,9 @@ const checkConnection = async () => {
       posConnLabel.textContent = 'متصل بالخادم';
       posForm.style.opacity   = '1';
       posForm.style.pointerEvents = 'auto';
-      /* Load today's log once connected */
+      /* Load today's log + staff list once connected */
       fetchTodayLog();
+      fetchStaff();
     } else throw new Error();
   } catch {
     posConn.className       = 'pos-conn error';
@@ -134,6 +135,22 @@ const fetchTodayLog = async () => {
       : `<tr><td colspan="9" class="pos-log-empty" style="padding:28px">لا توجد فواتير اليوم بعد</td></tr>`;
 
   } catch { /* silent */ }
+};
+
+/* ── Active staff list (for the cashier dropdown) ── */
+const posStaffEl = document.getElementById('posStaff');
+const fetchStaff = async () => {
+  const token = getToken();
+  if (!token || !posStaffEl) return;
+  try {
+    const res  = await fetch(`${API}?action=staff`, { headers: { Accept: 'application/json', 'X-POS-Token': token } });
+    const data = await res.json();
+    if (!data.ok) return;
+    const current = posStaffEl.value;
+    posStaffEl.innerHTML = '<option value="">— اختياري —</option>' +
+      (data.staff || []).map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    posStaffEl.value = current; /* keep the cashier's selection across reloads/log refreshes */
+  } catch { /* silent — dropdown just stays empty, doesn't block invoicing */ }
 };
 
 /* ── Sound notification ── */
@@ -274,6 +291,68 @@ document.getElementById('searchQuery')?.addEventListener('keydown', e => {
   });
 });
 
+/* ── Live packages/prices (admin-editable via api/packages.php) ──
+   Falls back to a hardcoded copy if the API is unreachable, so the
+   till keeps working through a brief network blip. */
+const PACKAGE_ICONS = {
+  'inside-out': '🚿', outside: '✨', deep: '💎', cover: '🛡️',
+  rims: '⭕', engine: '⚙️', chemical: '🧪', carpet: '🧺', blanket: '🛏️',
+};
+const PACKAGE_LABELS = {
+  'inside-out': 'Inside + Out', outside: 'Exterior', deep: 'Deep Cleaning', cover: 'Cover Wash',
+  rims: 'Rims', engine: 'Engine Wash', chemical: 'Chemical', carpet: 'Carpet', blanket: 'Blanket',
+};
+const FALLBACK_PACKAGES = [
+  { code: 'inside-out', name: 'داخلي وخارجي',  price: 150 },
+  { code: 'outside',    name: 'خارجي فقط',      price: 100 },
+  { code: 'deep',       name: 'غسيل متخصص',     price: 250 },
+  { code: 'cover',      name: 'غطاء السيارة',    price: 50  },
+  { code: 'rims',       name: 'غسيل الجنوط',     price: 100 },
+  { code: 'engine',     name: 'غسيل الموتور',    price: 100 },
+  { code: 'chemical',   name: 'غسيل كيماوي',     price: 0   },
+  { code: 'carpet',     name: 'غسيل سجاد',       price: 0   },
+  { code: 'blanket',    name: 'غسيل بطاطين',     price: 80  },
+];
+
+const renderPackageCard = (p) => {
+  const isVariable = p.code === 'carpet' || p.code === 'chemical';
+  const priceHtml = isVariable
+    ? `<div class="pkg-price pkg-price--contract">${p.code === 'carpet' ? '15 ج / متر' : 'حسب الشغل'}</div>`
+    : `<div class="pkg-price"><small>ج</small>${Number(p.price)}</div>`;
+  return `
+    <button type="button" class="package-card" data-code="${esc(p.code)}" data-price="${Number(p.price)}" aria-pressed="false">
+      <span class="pkg-icon">${PACKAGE_ICONS[p.code] || '🧴'}</span>
+      <span class="pkg-label">${esc(PACKAGE_LABELS[p.code] || p.code)}</span>
+      <strong>${esc(p.name)}</strong>
+      ${priceHtml}
+    </button>`;
+};
+
+const renderPackageGrid = (packages) => {
+  if (!packageGrid) return;
+  const carPkgs    = packages.filter(p => p.code !== 'carpet' && p.code !== 'blanket');
+  const fabricPkgs = packages.filter(p => p.code === 'carpet' || p.code === 'blanket');
+  packageGrid.innerHTML = `
+    <div class="pos-pkg-cat">
+      <div class="pos-pkg-cat__head"><span>🚗</span><span>خدمات غسيل السيارات</span></div>
+      <div class="pos-pkg-cards">${carPkgs.map(renderPackageCard).join('')}</div>
+    </div>
+    <div class="pos-pkg-cat">
+      <div class="pos-pkg-cat__head"><span>🧺</span><span>غسيل سجاد وبطاطين</span></div>
+      <div class="pos-pkg-cards pos-pkg-cards--2">${fabricPkgs.map(renderPackageCard).join('')}</div>
+    </div>`;
+};
+
+const fetchPackages = async () => {
+  try {
+    const res  = await fetch('../api/packages.php', { headers: { Accept: 'application/json' } });
+    const data = await res.json();
+    renderPackageGrid(data.ok && data.packages?.length ? data.packages : FALLBACK_PACKAGES);
+  } catch {
+    renderPackageGrid(FALLBACK_PACKAGES);
+  }
+};
+
 /* ── Package selection ── */
 packageGrid?.addEventListener('click', (e) => {
   const card = e.target.closest('.package-card');
@@ -283,6 +362,21 @@ packageGrid?.addEventListener('click', (e) => {
   card.setAttribute('aria-pressed', 'true');
   selectedPackage = { code: card.dataset.code, name: card.querySelector('strong').textContent.trim(), price: Number(card.dataset.price) };
   updateLivePrice();
+});
+
+/* ── Speed: jump straight to customer name after picking a package ── */
+packageGrid?.addEventListener('click', (e) => {
+  if (e.target.closest('.package-card')) document.getElementById('customerName')?.focus();
+});
+
+/* ── Speed: Enter moves to the next field instead of submitting early ── */
+['customerName', 'plateNumber', 'customerPhone', 'customerEmail'].forEach((id, i, ids) => {
+  document.getElementById(id)?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const nextId = ids[i + 1] || 'carType';
+    document.getElementById(nextId)?.focus();
+  });
 });
 
 /* ── Live price bar ── */
@@ -410,6 +504,7 @@ posForm?.addEventListener('submit', async (e) => {
       token, name, phone, email,
       packageCode: selectedPackage.code, carType, branch, paymentMethod,
       plateNumber: plate, notes,
+      staffId: posStaffEl?.value || '',
       coupon_code:          appliedCoupon?.code     || '',
       manual_discount:      manualDiscAmount         || 0,
       manual_discount_type: manualDiscType,
@@ -568,11 +663,12 @@ let _tokenDebounce;
 document.getElementById('posToken')?.addEventListener('input', () => {
   clearTimeout(_tokenDebounce);
   _tokenDebounce = setTimeout(() => {
-    if (getToken().length >= 4) fetchTodayLog();
+    if (getToken().length >= 4) { fetchTodayLog(); fetchStaff(); }
   }, 400);
 });
 
 /* ── Init ── */
 posForm.style.opacity      = '0.45';
 posForm.style.pointerEvents = 'none';
+fetchPackages(); /* public endpoint, no token needed — load regardless of connection state */
 checkConnection();

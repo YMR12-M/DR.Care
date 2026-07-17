@@ -336,6 +336,7 @@ try {
   addMissingColumn($pdo, 'bookings', 'claim_token',        'TEXT DEFAULT NULL');
   addMissingColumn($pdo, 'bookings', 'payment_screenshot', 'TEXT DEFAULT NULL');
   addMissingColumn($pdo, 'bookings', 'admin_notes',        'TEXT DEFAULT NULL');
+  addMissingColumn($pdo, 'bookings', 'pos_staff_id',       'INTEGER DEFAULT NULL');
   $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_claim ON bookings(claim_token) WHERE claim_token IS NOT NULL");
 
   $pdo->exec("CREATE TABLE IF NOT EXISTS admin_users (

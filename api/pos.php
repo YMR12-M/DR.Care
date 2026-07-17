@@ -59,6 +59,12 @@ if ($method === 'GET') {
     jsonResponse(['ok' => true, 'bookings' => $bookings, 'revenue' => $revenue]);
   }
 
+  /* Active staff list (for the staff-selection dropdown) */
+  if ($action === 'staff') {
+    $stmt = $pdo->query("SELECT id, name FROM staff WHERE is_active = 1 ORDER BY name");
+    jsonResponse(['ok' => true, 'staff' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+  }
+
   /* All POS bookings (history) */
   if ($action === 'history') {
     $limit  = max(1, min(200, (int)($_GET['limit'] ?? 50)));
@@ -229,6 +235,7 @@ if ($method === 'POST') {
   $paymentMethod  = trim($input['paymentMethod']  ?? '');
   $plate          = trim($input['plateNumber']    ?? '') ?: null;
   $notes          = trim($input['notes']          ?? '') ?: null;
+  $staffId        = (int)($input['staffId']       ?? 0) ?: null;
   $couponCode     = strtoupper(trim($input['coupon_code']        ?? ''));
   $manualDisc     = max(0, (float)($input['manual_discount']     ?? 0));
   $manualDiscType = trim($input['manual_discount_type'] ?? 'fixed');
@@ -290,15 +297,15 @@ if ($method === 'POST') {
   $pdo->prepare('INSERT INTO bookings
     (name, email, phone, package_code, package_name, car_type_code, car_type_name,
      branch, payment_method, plate_number, notes, total_price, pkg_price, car_extra_price,
-     discount_amount, discount_note, claim_token, created_at, status, source)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\'new\',\'pos\')')
+     discount_amount, discount_note, claim_token, created_at, pos_staff_id, status, source)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\'new\',\'pos\')')
   ->execute([
     $name, $email, $phone,
     $pkg['code'], $pkg['name'],
     $car['code'], $car['name'],
     $branch, $paymentMethod, $plate, $notes,
     $total, $pkgPrice, $carExtra,
-    $discountAmount, $discountNote, $claimToken, $now,
+    $discountAmount, $discountNote, $claimToken, $now, $staffId,
   ]);
 
   /* Increment coupon usage */
