@@ -136,10 +136,11 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
         </div>
       )}
 
-      {/* Packages — full-width list rows with colored category icons */}
+      {/* Packages — compact 2-column grid (icon beside text, not stacked) instead of
+          9 tall full-width rows, so the whole list fits in roughly a third of the height */}
       <div className="fade-in fade-in-1">
         <p className="text-xs font-black mb-3.5" style={{ color: 'var(--muted)' }}>اختار الباقة المناسبة</p>
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {packages.map(p => {
             const v = getPackageVisual(p.code);
             const Icon = v.icon;
@@ -152,38 +153,39 @@ function Step1({ packages, carTypes, form, setForm, onNext }) {
                   setForm(f => ({ ...f, servicePackage: p.code }));
                   setPkgError('');
                 }}
-                className="w-full flex items-center justify-between gap-3 rounded-2xl p-4 active:scale-[0.98] transition-transform"
+                className="relative flex items-center gap-2.5 rounded-xl p-2.5 text-right active:scale-95 transition-transform"
                 style={{
                   background: isSelected ? 'var(--yellow-soft)' : 'var(--panel-2)',
                   border: isSelected ? '1.5px solid var(--yellow-line)' : '1px solid var(--line-2)',
                   boxShadow: isSelected ? 'var(--shadow-yellow-glow)' : 'var(--shadow-card)',
                 }}
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `color-mix(in srgb, ${v.color} 16%, transparent)`, border: `1px solid color-mix(in srgb, ${v.color} 35%, transparent)` }}
+                {v.popular && (
+                  <span
+                    className="absolute -top-1.5 text-[8px] font-black px-1.5 py-0.5 rounded-full"
+                    style={{ left: '0.5rem', background: 'var(--yellow)', color: '#0a0800' }}
                   >
-                    <Icon size={20} style={{ color: v.color }} strokeWidth={2.2} />
-                  </div>
-                  <div className="text-right min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-black truncate" style={{ color: isSelected ? 'var(--yellow)' : 'var(--white)' }}>{p.name}</p>
-                      {v.popular && (
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--yellow)', color: '#0a0800' }}>
-                          الأشهر
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--muted)' }}>{v.desc}</p>
-                  </div>
+                    الأشهر
+                  </span>
+                )}
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: `color-mix(in srgb, ${v.color} 16%, transparent)`, border: `1px solid color-mix(in srgb, ${v.color} 35%, transparent)` }}
+                >
+                  <Icon size={16} style={{ color: v.color }} strokeWidth={2.2} />
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <p className="text-sm font-black" style={{ color: isSelected ? 'var(--yellow)' : 'var(--white-2)' }}>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className="text-[11px] font-black leading-tight"
+                    style={{ color: isSelected ? 'var(--yellow)' : 'var(--white)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                  >
+                    {p.name}
+                  </p>
+                  <p className="text-[11px] font-bold mt-1" style={{ color: isSelected ? 'var(--yellow)' : 'var(--muted)' }}>
                     {p.price > 0 ? `${p.price} ج.م` : 'حسب الشغل'}
                   </p>
-                  {isSelected && <Check size={16} strokeWidth={3} style={{ color: 'var(--yellow)' }} />}
                 </div>
+                {isSelected && <Check size={13} strokeWidth={3} className="flex-shrink-0" style={{ color: 'var(--yellow)' }} />}
               </button>
             );
           })}
