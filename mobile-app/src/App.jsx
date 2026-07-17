@@ -3,7 +3,6 @@ import { AuthProvider } from './hooks/useAuth';
 import { ToastProvider } from './hooks/useToast';
 import Toast from './components/Toast';
 import OfflineToast from './components/OfflineToast';
-import WhatsAppBtn from './components/WhatsAppBtn';
 import BottomNav from './components/BottomNav';
 import HomeScreen from './screens/HomeScreen';
 import BookingScreen from './screens/BookingScreen';
@@ -16,12 +15,10 @@ import CouponsScreen from './screens/CouponsScreen';
 import BookingSuccessScreen from './screens/BookingSuccessScreen';
 
 const HIDE_NAV     = ['/login', '/register', '/booking-success', '/forgot-password', '/edit-profile'];
-const HIDE_WAAPP   = ['/login', '/register', '/booking-success', '/forgot-password', '/edit-profile', '/book'];
 
 function AppShell() {
   const location = useLocation();
   const hideNav    = HIDE_NAV.some(p => location.pathname.startsWith(p));
-  const hideWhApp  = HIDE_WAAPP.some(p => location.pathname.startsWith(p));
 
   return (
     <div className="relative h-full flex flex-col" style={{ background: 'var(--black)' }}>
@@ -44,8 +41,7 @@ function AppShell() {
         </Routes>
       </main>
 
-      {!hideNav    && <BottomNav />}
-      {!hideWhApp  && <WhatsAppBtn />}
+      {!hideNav && <BottomNav />}
     </div>
   );
 }
