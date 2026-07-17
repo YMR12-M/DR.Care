@@ -298,10 +298,6 @@ const PACKAGE_ICONS = {
   'inside-out': '🚿', outside: '✨', deep: '💎', cover: '🛡️',
   rims: '⭕', engine: '⚙️', chemical: '🧪', carpet: '🧺', blanket: '🛏️',
 };
-const PACKAGE_LABELS = {
-  'inside-out': 'Inside + Out', outside: 'Exterior', deep: 'Deep Cleaning', cover: 'Cover Wash',
-  rims: 'Rims', engine: 'Engine Wash', chemical: 'Chemical', carpet: 'Carpet', blanket: 'Blanket',
-};
 const FALLBACK_PACKAGES = [
   { code: 'inside-out', name: 'داخلي وخارجي',  price: 150 },
   { code: 'outside',    name: 'خارجي فقط',      price: 100 },
@@ -320,10 +316,11 @@ const renderPackageCard = (p) => {
     ? `<div class="pkg-price pkg-price--contract">${p.code === 'carpet' ? '15 ج / متر' : 'حسب الشغل'}</div>`
     : `<div class="pkg-price"><small>ج</small>${Number(p.price)}</div>`;
   return `
-    <button type="button" class="package-card" data-code="${esc(p.code)}" data-price="${Number(p.price)}" aria-pressed="false">
-      <span class="pkg-icon">${PACKAGE_ICONS[p.code] || '🧴'}</span>
-      <span class="pkg-label">${esc(PACKAGE_LABELS[p.code] || p.code)}</span>
-      <strong>${esc(p.name)}</strong>
+    <button type="button" class="package-card" data-code="${esc(p.code)}" data-price="${Number(p.price)}" aria-pressed="false" title="${esc(p.name)}">
+      <div class="pkg-top">
+        <span class="pkg-icon">${PACKAGE_ICONS[p.code] || '🧴'}</span>
+        <strong>${esc(p.name)}</strong>
+      </div>
       ${priceHtml}
     </button>`;
 };

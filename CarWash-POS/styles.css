@@ -300,13 +300,13 @@ button, input, select, textarea { font: inherit; cursor: pointer; }
 
 .pos-pkg-cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 8px;
 }
 
 .pos-pkg-cards--2 {
   grid-template-columns: repeat(2, minmax(0,1fr));
-  max-width: 460px;
+  max-width: 340px;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -322,57 +322,53 @@ button, input, select, textarea { font: inherit; cursor: pointer; }
   position: relative;
   background: var(--panel-2);
   border: 1px solid var(--line-2);
-  border-radius: var(--radius-lg);
-  padding: 18px 16px 16px;
+  border-radius: var(--radius-sm);
+  padding: 9px 10px 8px;
   text-align: right;
   transition: transform var(--transition-bounce), border-color var(--transition), box-shadow var(--transition), background var(--transition);
-  display: flex; flex-direction: column; gap: 4px;
+  display: flex; flex-direction: column; gap: 3px;
 }
 
 .package-card:hover {
   border-color: rgba(255,255,255,0.18);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .package-card[aria-pressed="true"] {
   border-color: var(--yellow-line);
   background: linear-gradient(160deg, rgba(255,210,31,0.07) 0%, var(--panel-2) 60%);
   box-shadow: var(--shadow-gold);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-/* Checkmark — same style as main badge */
+/* Checkmark — same style as main badge, scaled down for the compact card */
 .package-card[aria-pressed="true"]::before {
   content: '✓';
-  position: absolute; top: 10px; left: 10px;
-  width: 22px; height: 22px; border-radius: 50%;
+  position: absolute; top: 5px; left: 5px;
+  width: 15px; height: 15px; border-radius: 50%;
   background: var(--yellow); color: #0a0800;
   display: grid; place-items: center;
-  font-size: 0.7rem; font-weight: 900;
-  box-shadow: 0 2px 8px rgba(255,210,31,0.4);
+  font-size: 0.58rem; font-weight: 900;
+  box-shadow: 0 2px 6px rgba(255,210,31,0.4);
 }
 
-.pkg-icon { font-size: 1.3rem; line-height: 1; margin-bottom: 6px; }
-
-.pkg-label {
-  font-family: var(--font-en); font-size: 0.62rem; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-2);
-  margin-bottom: 2px;
-}
+/* Icon + name share one line instead of stacking — the main space saving */
+.pkg-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.pkg-icon { font-size: 1rem; line-height: 1; flex-shrink: 0; }
 
 .package-card strong {
-  font-size: 0.98rem; font-weight: 900; letter-spacing: -0.01em;
+  font-size: 0.8rem; font-weight: 800; letter-spacing: -0.01em;
   color: var(--white); line-height: 1.2;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
 .pkg-price {
-  font-family: var(--font-en); font-size: 1.3rem; font-weight: 900;
-  color: var(--yellow); letter-spacing: -0.03em; line-height: 1;
-  margin: 4px 0 2px;
+  font-family: var(--font-en); font-size: 0.95rem; font-weight: 900;
+  color: var(--yellow); letter-spacing: -0.02em; line-height: 1;
 }
-.pkg-price small { font-size: 0.7rem; font-weight: 600; color: var(--muted); margin-right: 2px; letter-spacing: 0; }
-.pkg-price--contract { font-size: 0.88rem; color: var(--muted); font-family: var(--font); letter-spacing: 0; }
+.pkg-price small { font-size: 0.6rem; font-weight: 600; color: var(--muted); margin-right: 2px; letter-spacing: 0; }
+.pkg-price--contract { font-size: 0.7rem; color: var(--muted); font-family: var(--font); letter-spacing: 0; }
 
 .package-card p {
   font-size: 0.76rem; color: var(--muted); line-height: 1.55; margin: 0;
