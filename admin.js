@@ -1685,7 +1685,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bookingsSectionEl = document.getElementById('bookingsSection');
   const statsGridEl       = document.getElementById('statsGrid');
   const navDashboardBtn   = document.getElementById('navDashboardBtn');
-  const dashboardOnlyEls  = [statsGridEl, bookingsFilterBar, bookingsSectionEl].filter(Boolean);
+  const dashboardOnlyEls  = [
+    { el: statsGridEl,       shown: 'contents' },
+    { el: bookingsFilterBar, shown: '' },
+    { el: bookingsSectionEl, shown: '' },
+  ].filter((x) => x.el);
 
   const SECTIONS = {
     dashboard: { panel: null,          btn: navDashboardBtn },
@@ -1700,7 +1704,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const activateSection = (key) => {
     if (!SECTIONS[key]) key = 'dashboard';
 
-    dashboardOnlyEls.forEach((el) => { el.style.display = key === 'dashboard' ? '' : 'none'; });
+    dashboardOnlyEls.forEach(({ el, shown }) => {
+      const show = key === 'dashboard';
+      el.style.display = show ? shown : 'none';
+      if (show) panelIn(el);
+    });
     if (key === 'dashboard') updateBulkBar();
     else { const bar = document.getElementById('bulkBar'); if (bar) bar.style.display = 'none'; }
 
