@@ -4286,51 +4286,10 @@ label[for] > .form-label-text { margin-bottom: 0; }
 }
 .date-slot-btn.selected .date-slot-btn__month { color: rgba(10,8,0,.55); }
 
-/* ── PWA Splash Screen ──────────────────────────────── */
-#splashScreen {
-  position: fixed; inset: 0;
-  background: var(--ink);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  z-index: 99999;
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
-#splashScreen.hidden {
-  opacity: 0;
-  transform: scale(1.05);
-  pointer-events: none;
-}
-.splash-logo {
-  width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px;
-  object-fit: cover;
-  animation: splash-pop 0.5s var(--transition-bounce) both;
-}
 @keyframes splash-pop {
   from { transform: scale(0.5); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
-.splash-name {
-  font-family: var(--font-en); font-size: 1.6rem; font-weight: 900;
-  color: var(--yellow); letter-spacing: -0.02em;
-  animation: splash-pop 0.5s 0.1s var(--transition-bounce) both;
-}
-.splash-tagline {
-  font-size: .82rem; color: var(--muted); margin-top: 6px;
-  animation: splash-pop 0.5s 0.2s var(--transition-bounce) both;
-}
-.splash-loader {
-  margin-top: 32px; width: 40px; height: 3px;
-  background: var(--line-2); border-radius: 3px; overflow: hidden;
-  animation: splash-pop 0.3s 0.3s ease both;
-}
-.splash-loader::after {
-  content: '';
-  display: block; height: 100%; border-radius: 3px;
-  background: var(--yellow);
-  animation: splash-fill 0.8s 0.4s ease forwards;
-  width: 0%;
-}
-@keyframes splash-fill { to { width: 100%; } }
 
 /* ── Focus-visible for keyboard navigation ───────────── */
 *:focus-visible {

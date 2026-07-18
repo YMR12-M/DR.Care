@@ -1227,21 +1227,6 @@ document.addEventListener('click', (e) => {
   document.getElementById('bfBack3')?.addEventListener('click', () => goTo(1, true));
 })();
 
-// ─── PWA Splash Screen ────────────────────────────
-(function () {
-  const splash = document.getElementById('splashScreen');
-  if (!splash) return;
-  const hide = () => {
-    splash.classList.add('hidden');
-    splash.addEventListener('transitionend', () => splash.remove(), { once: true });
-  };
-  if (document.readyState === 'complete') {
-    setTimeout(hide, 900);
-  } else {
-    window.addEventListener('load', () => setTimeout(hide, 900));
-  }
-})();
-
 // ─── Promo Banner Countdown + Dismiss ─────────────
 (function () {
   const banner   = document.getElementById('promoBanner');
