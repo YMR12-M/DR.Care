@@ -1387,33 +1387,3 @@ if (mCounterEls.length) {
     })
     .catch(() => {});
 })();
-
-// ── First-Time Onboarding Tooltip ────────────────────
-(function () {
-  const tip = document.getElementById('mOnboardingTip');
-  if (!tip || localStorage.getItem('dr_m_onboarded')) return;
-
-  const stickyCta = document.getElementById('stickyCta');
-  if (!stickyCta) return;
-
-  const show = () => {
-    tip.style.display = '';
-    tip.setAttribute('aria-hidden', 'false');
-    requestAnimationFrame(() => requestAnimationFrame(() => tip.classList.add('visible')));
-    const dismiss = () => {
-      tip.classList.remove('visible');
-      setTimeout(() => tip.remove(), 420);
-      localStorage.setItem('dr_m_onboarded', '1');
-    };
-    document.getElementById('mOnboardingClose')?.addEventListener('click', dismiss);
-    setTimeout(dismiss, 7000);
-    obs.disconnect();
-  };
-
-  const obs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) show();
-  }, { threshold: 0.5 });
-
-  // Show when sticky CTA becomes visible (user has scrolled down)
-  obs.observe(stickyCta);
-})();

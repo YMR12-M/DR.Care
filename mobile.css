@@ -2938,57 +2938,6 @@ body.page-exit { pointer-events:none !important; animation: page-out .28s cubic-
   border-inline-start: 2px solid var(--yellow);
 }
 
-/* ── Onboarding Tooltip ── */
-.m-onboarding-tip {
-  position: fixed;
-  bottom: 86px;
-  left: 50%;
-  transform: translateX(-50%) translateY(16px);
-  z-index: 9200;
-  background: var(--yellow);
-  color: #0a0800;
-  border-radius: 14px;
-  padding: 10px 14px 10px 10px;
-  font-size: .84rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 8px 30px rgba(255,210,31,.45);
-  opacity: 0;
-  transition: opacity .38s ease, transform .38s cubic-bezier(.22,1,.36,1);
-  font-family: var(--font, 'Cairo', sans-serif);
-  white-space: nowrap;
-}
-.m-onboarding-tip::after {
-  content: '';
-  position: absolute;
-  bottom: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 7px solid transparent;
-  border-top-color: var(--yellow);
-  border-bottom: none;
-}
-.m-onboarding-tip.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-.m-onboarding-tip__close {
-  background: rgba(0,0,0,.14);
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  font-size: .65rem;
-  flex-shrink: 0;
-  color: #0a0800;
-  font-family: monospace;
-}
-
 /* ══ v9.0 Professional UX Redesign ══════════════════ */
 
 /* ── Hero — new elements ── */

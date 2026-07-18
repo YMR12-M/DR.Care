@@ -1319,28 +1319,3 @@ document.addEventListener('click', (e) => {
     })
     .catch(() => {});
 })();
-
-// ─── First-Time Onboarding Tooltip ────────────────
-(function () {
-  if (localStorage.getItem('onboarded')) return;
-  const bookingEl = document.getElementById('booking');
-  if (!bookingEl) return;
-
-  const tip = document.createElement('div');
-  tip.className = 'onboarding-tip';
-  tip.textContent = '👇 احجز غسلتك هنا بسهولة';
-  tip.setAttribute('aria-hidden', 'true');
-  tip.setAttribute('role', 'presentation');
-  document.body.appendChild(tip);
-
-  const obs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      tip.remove();
-      localStorage.setItem('onboarded', '1');
-      obs.disconnect();
-    }
-  }, { threshold: 0.4 });
-  obs.observe(bookingEl);
-
-  setTimeout(() => { tip.style.opacity = '0'; tip.style.transition = 'opacity .4s'; setTimeout(() => tip.remove(), 400); }, 6000);
-})();

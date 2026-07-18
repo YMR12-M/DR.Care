@@ -4374,31 +4374,6 @@ button:focus-visible, a:focus-visible {
 .next-appt-widget__link:hover { text-decoration: underline; }
 
 
-/* ── Onboarding Tooltip ───────────────────────────── */
-.onboarding-tip {
-  position: fixed;
-  bottom: 88px;
-  inset-inline-end: 90px;
-  background: var(--yellow);
-  color: #0a0800;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem; font-weight: 800;
-  z-index: 800;
-  box-shadow: 0 8px 32px rgba(255,210,31,.4);
-  animation: splash-pop 0.4s 1.5s cubic-bezier(.34,1.56,.64,1) both;
-  pointer-events: none;
-}
-.onboarding-tip::after {
-  content: '';
-  position: absolute;
-  bottom: -7px;
-  inset-inline-end: 18px;
-  border: 7px solid transparent;
-  border-top-color: var(--yellow);
-  border-bottom: none;
-}
-
 /* ── Estimated Duration hint in slots ─────────────── */
 .slot-duration-hint {
   font-size: 0.75rem;
