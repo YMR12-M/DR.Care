@@ -21,7 +21,7 @@ export default function Button({ variant = 'primary', size = 'lg', className = '
   return (
     <button
       type="button"
-      className={`active:scale-95 active:brightness-90 transition-all duration-150 disabled:opacity-50 ${variant === 'primary' ? 'btn-shine' : ''} ${className}`}
+      className={`active:scale-95 active:brightness-90 transition-all duration-150 disabled:opacity-50 ${className}`}
       style={{ ...VARIANT_STYLE[variant], ...SIZE_STYLE[size], ...style }}
       {...props}
     >

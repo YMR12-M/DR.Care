@@ -121,21 +121,6 @@ body::before {
   background: linear-gradient(90deg, transparent, rgba(255,210,31,0.7), transparent);
 }
 
-/* ── Shine sweep — a light streak crossing the surface, classic premium-CTA cue ── */
-.btn-shine { position: relative; overflow: hidden; }
-.btn-shine::after {
-  content: '';
-  position: absolute; top: -50%; bottom: -50%; width: 45%;
-  background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
-  transform: translateX(-220%) skewX(-18deg);
-  animation: shineSweep 4.5s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes shineSweep {
-  0%, 55%  { transform: translateX(-220%) skewX(-18deg); }
-  85%, 100% { transform: translateX(220%) skewX(-18deg); }
-}
-
 .scroll-hide::-webkit-scrollbar { display: none; }
 .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
