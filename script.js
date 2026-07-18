@@ -20,9 +20,6 @@ const formMessage    = document.getElementById('formMessage');
 const submitBtn      = document.getElementById('submitBtn');
 
 // PWA Elements
-const pwaInstallBanner = document.getElementById('pwaInstallBanner');
-const pwaInstallBtn    = document.getElementById('pwaInstallBtn');
-const pwaDismissBtn    = document.getElementById('pwaDismissBtn');
 const offlineToast     = document.getElementById('offlineToast');
 
 // ─── Fallback Config ────────────────────────────────
@@ -50,7 +47,6 @@ const fallbackConfig = {
 };
 
 let appConfig = { ...fallbackConfig };
-let deferredInstallPrompt = null;
 
 // ─── Utils ─────────────────────────────────────────
 const formatPrice = (value) =>
@@ -107,39 +103,6 @@ function showUpdateNotice() {
   toast.addEventListener('click', () => window.location.reload());
   document.body.appendChild(toast);
 }
-
-// ─── PWA — Install Banner ──────────────────────────
-window.addEventListener('beforeinstallprompt', (event) => {
-  event.preventDefault();
-  deferredInstallPrompt = event;
-
-  // Show banner after 3 seconds if not dismissed
-  const dismissed = sessionStorage.getItem('pwa-dismissed');
-  if (!dismissed && pwaInstallBanner) {
-    setTimeout(() => pwaInstallBanner.classList.add('visible'), 3000);
-  }
-});
-
-pwaInstallBtn?.addEventListener('click', async () => {
-  if (!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  const { outcome } = await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt = null;
-  pwaInstallBanner?.classList.remove('visible');
-  if (outcome === 'accepted') {
-    console.log('[PWA] Installed by user');
-  }
-});
-
-pwaDismissBtn?.addEventListener('click', () => {
-  pwaInstallBanner?.classList.remove('visible');
-  sessionStorage.setItem('pwa-dismissed', '1');
-});
-
-window.addEventListener('appinstalled', () => {
-  pwaInstallBanner?.classList.remove('visible');
-  deferredInstallPrompt = null;
-});
 
 // ─── Offline / Online Detection ───────────────────
 function updateOnlineStatus() {
@@ -402,10 +365,9 @@ const populateForm = () => {
   const numEl = document.getElementById('instapayNumberDisplay');
   if (numEl) numEl.textContent = appConfig.instapayNumber;
   updateEstimate();
-  /* Sync car type cards + price calc after config loads */
+  /* Sync car type cards after config loads */
   requestAnimationFrame(() => {
     if (carType?.value) carType.dispatchEvent(new Event('change', { bubbles: true }));
-    window._calcPopulateHook?.();
   });
 };
 
@@ -1288,98 +1250,6 @@ document.addEventListener('click', (e) => {
       widget.style.display = 'flex';
     })
     .catch(() => {});
-})();
-
-// ─── Live Price Calculator ─────────────────────────
-(function () {
-  const calcPkg    = document.getElementById('calcPackage');
-  const calcCarRow = document.getElementById('calcCarRow');
-  const calcResult = document.getElementById('calcResult');
-  const calcDur    = document.getElementById('calcDuration');
-  const calcDurVal = document.getElementById('calcDurationVal');
-  const calcBtn    = document.getElementById('calcBookBtn');
-  if (!calcPkg || !calcResult) return;
-
-  let calcCar = 'sedan';
-
-  const durMap = {
-    'inside-out': '~45 دقيقة', outside: '~20 دقيقة', deep: '~90 دقيقة',
-    cover: '~30 دقيقة', rims: '~30 دقيقة', engine: '~45 دقيقة',
-    chemical: 'يتحدد حسب الحالة', carpet: 'يتحدد حسب المتر', blanket: '~60 دقيقة',
-  };
-
-  const updateCalc = () => {
-    const code = calcPkg.value;
-    const pkg  = appConfig.packages.find(p => p.code === code);
-    const car  = appConfig.carTypes.find(c => c.code === calcCar);
-    if (!pkg) { calcResult.textContent = 'اختار الباقة'; return; }
-    if (pkg.price === 0) {
-      calcResult.textContent = code === 'carpet' ? '15 ج / متر' : 'حسب الشغل';
-    } else {
-      const total = Number(pkg.price) + Number(car?.extra ?? 0);
-      const newTxt = `${total.toLocaleString('ar-EG')} جنيه`;
-      if (calcResult.textContent !== newTxt) {
-        calcResult.textContent = newTxt;
-        calcResult.classList.remove('bump');
-        void calcResult.offsetWidth;
-        calcResult.classList.add('bump');
-      }
-    }
-    if (calcDur && calcDurVal) {
-      const dur = durMap[code];
-      if (dur) { calcDurVal.textContent = dur; calcDur.style.display = 'flex'; }
-      else      { calcDur.style.display = 'none'; }
-    }
-  };
-
-  const populateCalcSelect = () => {
-    if (!appConfig.packages.length) return;
-    calcPkg.innerHTML = appConfig.packages.map(p =>
-      `<option value="${p.code}">${p.name}${p.price > 0 ? ` — ${p.price} جنيه` : ''}</option>`
-    ).join('');
-    updateCalc();
-  };
-
-  calcPkg.addEventListener('change', updateCalc);
-
-  calcCarRow?.querySelectorAll('.price-calc__car-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      calcCarRow.querySelectorAll('.price-calc__car-btn').forEach(b => {
-        b.classList.remove('selected');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('selected');
-      btn.setAttribute('aria-pressed', 'true');
-      calcCar = btn.dataset.calcCar;
-      updateCalc();
-      /* Sync booking form car type cards */
-      const ct = document.getElementById('carType');
-      if (ct) { ct.value = calcCar; ct.dispatchEvent(new Event('change', { bubbles: true })); }
-      document.querySelectorAll('.car-type-card').forEach(c => {
-        c.classList.toggle('selected', c.dataset.car === calcCar);
-        c.setAttribute('aria-pressed', String(c.dataset.car === calcCar));
-      });
-    });
-  });
-
-  calcBtn?.addEventListener('click', () => {
-    const code = calcPkg?.value;
-    if (code) {
-      const sp = document.getElementById('servicePackage');
-      if (sp) { sp.value = code; sp.dispatchEvent(new Event('change', { bubbles: true })); }
-    }
-    document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  /* Populate once config loads */
-  if (appConfig.packages.length) {
-    populateCalcSelect();
-  } else {
-    setTimeout(populateCalcSelect, 1500);
-  }
-  /* Also re-populate after loadConfig fires populateForm */
-  const _origPopulateForm = populateForm;
-  window._calcPopulateHook = populateCalcSelect;
 })();
 
 // ─── Estimated Duration in Time Slot Header ────────
