@@ -31,10 +31,18 @@ if ($method === 'GET') {
   $customerEmail = $_SESSION['customer_email'];
 
   if ($customerId) {
-    $stmt = $pdo->prepare('SELECT * FROM bookings WHERE customer_id = :customer_id ORDER BY id DESC');
+    $stmt = $pdo->prepare('
+      SELECT b.*, r.rating AS review_rating, r.comment AS review_comment
+      FROM bookings b LEFT JOIN reviews r ON r.booking_id = b.id
+      WHERE b.customer_id = :customer_id ORDER BY b.id DESC
+    ');
     $stmt->execute([':customer_id' => $customerId]);
   } else {
-    $stmt = $pdo->prepare('SELECT * FROM bookings WHERE email = :email ORDER BY id DESC');
+    $stmt = $pdo->prepare('
+      SELECT b.*, r.rating AS review_rating, r.comment AS review_comment
+      FROM bookings b LEFT JOIN reviews r ON r.booking_id = b.id
+      WHERE b.email = :email ORDER BY b.id DESC
+    ');
     $stmt->execute([':email' => $customerEmail]);
   }
   $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);

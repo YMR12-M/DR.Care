@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Clock, CheckCircle2, XCircle, Loader2, Car } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle2, XCircle, Loader2, Car, Star } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { secureFetch } from '../lib/api';
+import { useToast } from '../hooks/useToast';
+import { secureFetch, api } from '../lib/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import IconBadge from '../components/ui/IconBadge';
@@ -15,7 +16,98 @@ const STATUS_MAP = {
   cancelled:  { label: 'ملغي',          bg: 'rgba(240,83,62,0.12)',  color: '#f0533e', Icon: XCircle },
 };
 
-function BookingCard({ booking, index }) {
+function StarRow({ value, onSelect, size = 22 }) {
+  return (
+    <div className="flex items-center gap-1.5" dir="ltr">
+      {[1, 2, 3, 4, 5].map(n => (
+        <button
+          key={n}
+          type="button"
+          disabled={!onSelect}
+          onClick={onSelect ? () => onSelect(n) : undefined}
+          aria-label={`${n} من 5`}
+          className={onSelect ? 'active:scale-90 transition-transform' : ''}
+          style={{ background: 'none', border: 'none', padding: 2, cursor: onSelect ? 'pointer' : 'default' }}
+        >
+          <Star
+            size={size}
+            fill={n <= value ? 'var(--yellow)' : 'none'}
+            stroke={n <= value ? 'var(--yellow)' : 'var(--muted-2)'}
+            strokeWidth={1.8}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ReviewBlock({ booking, onReviewed }) {
+  const { showToast } = useToast();
+  const [rating, setRating]       = useState(0);
+  const [comment, setComment]     = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  /* Already rated — show the stars they gave */
+  if (booking.review_rating) {
+    return (
+      <div className="mt-4 pt-4 flex items-center justify-between gap-3" style={{ borderTop: '1px solid var(--line-2)' }}>
+        <span className="text-xs font-bold" style={{ color: 'var(--muted)' }}>تقييمك للخدمة</span>
+        <StarRow value={Number(booking.review_rating)} size={17} />
+      </div>
+    );
+  }
+
+  const submit = async () => {
+    if (!rating || submitting) return;
+    setSubmitting(true);
+    try {
+      const res  = await api.post('reviews.php', { booking_id: Number(booking.id), rating, comment: comment.trim() });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        showToast(data.message || 'شكراً على تقييمك! ⭐', 'success');
+        onReviewed(booking.id, rating, comment.trim());
+      } else {
+        showToast(data.message || 'حصل خطأ — حاول تاني', 'error');
+      }
+    } catch {
+      showToast('مفيش اتصال بالإنترنت', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--line-2)' }}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-bold" style={{ color: 'var(--white-2)' }}>قيّم الخدمة</span>
+        <StarRow value={rating} onSelect={setRating} />
+      </div>
+      {rating > 0 && (
+        <div className="mt-3 fade-in">
+          <textarea
+            rows={2}
+            maxLength={500}
+            placeholder="اكتب رأيك (اختياري)..."
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            className="textarea-premium rounded-2xl px-4 py-3 text-sm resize-none w-full"
+          />
+          <Button
+            variant="primary"
+            size="md"
+            className="w-full mt-2"
+            disabled={submitting}
+            onClick={submit}
+          >
+            {submitting ? 'جاري الإرسال...' : 'إرسال التقييم'}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BookingCard({ booking, index, onReviewed }) {
   const s = STATUS_MAP[booking.status] || { label: booking.status, bg: 'var(--faint)', color: 'var(--muted)', Icon: Clock };
   const date = booking.appointment
     ? new Date(booking.appointment).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
@@ -47,6 +139,9 @@ function BookingCard({ booking, index }) {
           <span className="font-bold" style={{ color: 'var(--yellow)' }}>{booking.total_price} جنيه</span>
         )}
       </div>
+      {booking.status === 'completed' && (
+        <ReviewBlock booking={booking} onReviewed={onReviewed} />
+      )}
     </Card>
   );
 }
@@ -71,6 +166,12 @@ export default function BookingsScreen() {
   const { user, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading]   = useState(true);
+
+  const markReviewed = (bookingId, rating, comment) => {
+    setBookings(prev => prev.map(b =>
+      b.id === bookingId ? { ...b, review_rating: rating, review_comment: comment || null } : b
+    ));
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -120,7 +221,7 @@ export default function BookingsScreen() {
             </Button>
           </div>
         ) : (
-          bookings.map((b, i) => <BookingCard key={b.id || i} booking={b} index={i} />)
+          bookings.map((b, i) => <BookingCard key={b.id || i} booking={b} index={i} onReviewed={markReviewed} />)
         )}
       </div>
     </div>
