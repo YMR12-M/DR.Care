@@ -497,6 +497,19 @@ try {
     is_active  INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL
   )");
+  addMissingColumn($pdo, 'staff', 'salary', 'REAL NOT NULL DEFAULT 0');
+
+  /* ── Staff payroll (bonuses / deductions) ── */
+  $pdo->exec("CREATE TABLE IF NOT EXISTS staff_payroll (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    staff_id   INTEGER NOT NULL,
+    type       TEXT NOT NULL CHECK (type IN ('bonus','deduction')),
+    amount     REAL NOT NULL,
+    note       TEXT,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (staff_id) REFERENCES staff(id)
+  )");
+  $pdo->exec("CREATE INDEX IF NOT EXISTS idx_payroll_staff ON staff_payroll(staff_id)");
 
   /* ── Audit log ── */
   $pdo->exec("CREATE TABLE IF NOT EXISTS audit_log (

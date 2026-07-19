@@ -1852,6 +1852,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td class="price-val">${formatPrice(s.total_expenses || 0)}</td>
         <td>${s.is_active ? '<span style="color:var(--success);font-weight:700">نشط</span>' : '<span style="color:var(--error)">معطّل</span>'}</td>
         <td style="display:flex;gap:6px">
+          <button class="details-btn" data-payroll-staff="${s.id}" style="color:var(--yellow)">ملف</button>
           <button class="details-btn" data-edit-staff="${s.id}">تعديل</button>
           <button class="details-btn" data-toggle-staff="${s.id}" data-active="${s.is_active}">${s.is_active ? 'تعطيل' : 'تفعيل'}</button>
         </td>
@@ -1913,9 +1914,128 @@ document.addEventListener('DOMContentLoaded', async () => {
     finally { btn.disabled = false; btn.textContent = 'حفظ الموظف'; }
   });
 
+  /* ── Staff payroll modal ── */
+  const payrollModal = document.getElementById('staffPayrollModal');
+  let payrollStaffId = null;
+
+  const openPayrollModal  = () => { payrollModal?.classList.add('open'); payrollModal?.setAttribute('aria-hidden', 'false'); };
+  const closePayrollModal = () => { payrollModal?.classList.remove('open'); payrollModal?.setAttribute('aria-hidden', 'true'); payrollStaffId = null; };
+
+  document.getElementById('payrollCloseBtn')?.addEventListener('click', closePayrollModal);
+  payrollModal?.querySelector('[data-close-payroll]')?.addEventListener('click', closePayrollModal);
+
+  const renderPayroll = (data) => {
+    const { staff, entries, totals } = data;
+    document.getElementById('payrollStaffName').textContent = staff.name;
+    document.getElementById('payrollStaffRole').textContent = [staff.role, staff.phone].filter(Boolean).join(' · ') || '—';
+    document.getElementById('payrollSalaryTotal').textContent    = formatPrice(totals.salary);
+    document.getElementById('payrollBonusTotal').textContent     = formatPrice(totals.bonus);
+    document.getElementById('payrollDeductionTotal').textContent = formatPrice(totals.deduction);
+    document.getElementById('payrollNet').textContent            = formatPrice(totals.net);
+    document.getElementById('payrollSalaryInput').value = totals.salary || '';
+
+    const list = document.getElementById('payrollEntriesList');
+    if (!entries.length) {
+      list.innerHTML = '<p style="color:var(--muted);font-size:.82rem;text-align:center;padding:14px">لا يوجد بونص أو خصومات مسجلة</p>';
+      return;
+    }
+    list.innerHTML = entries.map((en) => {
+      const isBonus = en.type === 'bonus';
+      const when = new Date(en.created_at).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+      return `
+        <div style="display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 14px">
+          <span style="font-size:1rem">${isBonus ? '➕' : '➖'}</span>
+          <div style="flex:1;min-width:0">
+            <strong style="font-size:.85rem;color:${isBonus ? 'var(--success)' : 'var(--error)'}">${isBonus ? '+' : '-'}${formatPrice(en.amount)}</strong>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:2px">${escapeHtml(en.note || (isBonus ? 'بونص' : 'خصم'))} · ${when}</p>
+          </div>
+          <button class="details-btn" data-del-payroll="${en.id}" style="color:var(--error)">حذف</button>
+        </div>`;
+    }).join('');
+  };
+
+  const fetchPayroll = async (staffId) => {
+    const res  = await adminFetch(`api/staff-payroll.php?staff_id=${staffId}`);
+    const data = await res.json().catch(() => ({}));
+    if (data.ok) renderPayroll(data);
+    else showToast(data.message || 'تعذر تحميل ملف الموظف', 'error');
+  };
+
+  document.getElementById('payrollSaveSalaryBtn')?.addEventListener('click', async () => {
+    if (!payrollStaffId) return;
+    const salary = Number(document.getElementById('payrollSalaryInput').value || 0);
+    const btn = document.getElementById('payrollSaveSalaryBtn');
+    btn.disabled = true;
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/staff-payroll.php', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ staff_id: payrollStaffId, salary }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) { showToast('✓ تم حفظ المرتب', 'success'); fetchPayroll(payrollStaffId); }
+      else showToast(data.message || 'فشل الحفظ', 'error');
+    } catch { showToast('خطأ في الاتصال', 'error'); }
+    finally { btn.disabled = false; }
+  });
+
+  document.getElementById('payrollAddEntryBtn')?.addEventListener('click', async () => {
+    if (!payrollStaffId) return;
+    const type   = document.getElementById('payrollTypeInput').value;
+    const amount = Number(document.getElementById('payrollAmountInput').value || 0);
+    const note   = document.getElementById('payrollNoteInput').value.trim();
+    const msgEl  = document.getElementById('payrollFormMsg');
+    if (amount <= 0) {
+      if (msgEl) { msgEl.textContent = 'اكتب مبلغ صحيح أولاً'; msgEl.style.color = 'var(--error)'; }
+      return;
+    }
+    const btn = document.getElementById('payrollAddEntryBtn');
+    btn.disabled = true; if (msgEl) msgEl.textContent = '';
+    try {
+      await fetchAdminCsrf();
+      const res  = await adminFetch('api/staff-payroll.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ staff_id: payrollStaffId, type, amount, note }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        showToast(`✓ ${data.message}`, 'success');
+        document.getElementById('payrollAmountInput').value = '';
+        document.getElementById('payrollNoteInput').value = '';
+        fetchPayroll(payrollStaffId);
+      } else if (msgEl) { msgEl.textContent = data.message || 'فشل الحفظ'; msgEl.style.color = 'var(--error)'; }
+    } catch { if (msgEl) { msgEl.textContent = 'خطأ في الاتصال'; msgEl.style.color = 'var(--error)'; } }
+    finally { btn.disabled = false; }
+  });
+
+  document.getElementById('payrollEntriesList')?.addEventListener('click', async (e) => {
+    const delBtn = e.target.closest('[data-del-payroll]');
+    if (!delBtn || !payrollStaffId) return;
+    if (!confirm('متأكد من حذف السجل ده؟')) return;
+    await fetchAdminCsrf();
+    const res  = await adminFetch('api/staff-payroll.php', {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: Number(delBtn.dataset.delPayroll) }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok) { showToast('✓ تم حذف السجل', 'success'); fetchPayroll(payrollStaffId); }
+    else showToast(data.message || 'فشل الحذف', 'error');
+  });
+
   document.getElementById('staffTable')?.addEventListener('click', async (e) => {
-    const editBtn   = e.target.closest('[data-edit-staff]');
-    const toggleBtn = e.target.closest('[data-toggle-staff]');
+    const editBtn    = e.target.closest('[data-edit-staff]');
+    const toggleBtn  = e.target.closest('[data-toggle-staff]');
+    const payrollBtn = e.target.closest('[data-payroll-staff]');
+
+    if (payrollBtn) {
+      payrollStaffId = Number(payrollBtn.dataset.payrollStaff);
+      document.getElementById('payrollStaffName').textContent = '...';
+      document.getElementById('payrollEntriesList').innerHTML = '<p style="color:var(--muted);font-size:.82rem">جاري التحميل...</p>';
+      document.getElementById('payrollFormMsg').textContent = '';
+      openPayrollModal();
+      fetchPayroll(payrollStaffId);
+      return;
+    }
 
     if (editBtn) {
       const row = allStaff.find((s) => String(s.id) === editBtn.dataset.editStaff);

@@ -1440,6 +1440,83 @@
             </div>
           </div>
 
+          <!-- ── STAFF PAYROLL MODAL ── -->
+          <div class="detail-modal" id="staffPayrollModal" aria-hidden="true">
+            <div class="detail-modal-backdrop" data-close-payroll></div>
+            <div class="detail-modal-panel" role="dialog" aria-modal="true" aria-labelledby="payrollStaffName">
+              <button type="button" class="modal-close" id="payrollCloseBtn" aria-label="إغلاق">✕</button>
+
+              <div class="modal-header">
+                <div>
+                  <p class="modal-header__kicker">ملف الموظف</p>
+                  <h2 id="payrollStaffName">—</h2>
+                  <p class="modal-header__summary" id="payrollStaffRole"></p>
+                </div>
+                <div class="modal-header__price">
+                  <small>صافي المستحق</small>
+                  <strong id="payrollNet">0 جنيه</strong>
+                </div>
+              </div>
+
+              <div class="modal-body">
+                <!-- Totals -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+                  <div style="background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:14px;text-align:center">
+                    <p style="font-size:.7rem;color:var(--muted);font-weight:700;margin-bottom:6px">المرتب الأساسي</p>
+                    <strong id="payrollSalaryTotal" style="font-size:1rem">0 جنيه</strong>
+                  </div>
+                  <div style="background:rgba(111,207,71,.07);border:1px solid rgba(111,207,71,.25);border-radius:12px;padding:14px;text-align:center">
+                    <p style="font-size:.7rem;color:var(--muted);font-weight:700;margin-bottom:6px">إجمالي البونص</p>
+                    <strong id="payrollBonusTotal" style="font-size:1rem;color:var(--success)">0 جنيه</strong>
+                  </div>
+                  <div style="background:rgba(240,83,62,.07);border:1px solid rgba(240,83,62,.25);border-radius:12px;padding:14px;text-align:center">
+                    <p style="font-size:.7rem;color:var(--muted);font-weight:700;margin-bottom:6px">إجمالي الخصومات</p>
+                    <strong id="payrollDeductionTotal" style="font-size:1rem;color:var(--error)">0 جنيه</strong>
+                  </div>
+                </div>
+
+                <!-- Base salary -->
+                <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:22px;flex-wrap:wrap">
+                  <label style="flex:1;min-width:180px;font-size:.8rem;font-weight:700;color:var(--muted)">
+                    المرتب الأساسي (جنيه)
+                    <input type="number" id="payrollSalaryInput" class="search-input" min="0" step="50" style="width:100%;margin-top:6px" placeholder="0">
+                  </label>
+                  <button type="button" id="payrollSaveSalaryBtn" style="height:38px;padding:0 18px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.82rem;cursor:pointer">حفظ المرتب</button>
+                </div>
+
+                <!-- Add entry -->
+                <div style="background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:16px;margin-bottom:22px">
+                  <p style="font-size:.85rem;font-weight:800;margin-bottom:12px">إضافة بونص / خصم</p>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                    <label style="font-size:.75rem;font-weight:700;color:var(--muted)">
+                      النوع
+                      <select id="payrollTypeInput" class="search-input" style="display:block;margin-top:6px;min-width:120px">
+                        <option value="bonus">➕ بونص</option>
+                        <option value="deduction">➖ خصم</option>
+                      </select>
+                    </label>
+                    <label style="font-size:.75rem;font-weight:700;color:var(--muted)">
+                      المبلغ (جنيه)
+                      <input type="number" id="payrollAmountInput" class="search-input" min="1" step="10" style="display:block;margin-top:6px;width:130px" placeholder="0">
+                    </label>
+                    <label style="flex:1;min-width:160px;font-size:.75rem;font-weight:700;color:var(--muted)">
+                      السبب (اختياري)
+                      <input type="text" id="payrollNoteInput" class="search-input" maxlength="200" style="display:block;margin-top:6px;width:100%" placeholder="مثال: شغل إضافي يوم الجمعة">
+                    </label>
+                    <button type="button" id="payrollAddEntryBtn" style="height:38px;padding:0 18px;border:none;border-radius:8px;background:var(--yellow);color:#0a0800;font-weight:800;font-size:.82rem;cursor:pointer">إضافة</button>
+                  </div>
+                  <p id="payrollFormMsg" style="margin-top:10px;font-size:.78rem;font-weight:700"></p>
+                </div>
+
+                <!-- Entries list -->
+                <p style="font-size:.85rem;font-weight:800;margin-bottom:10px">سجل البونص والخصومات</p>
+                <div id="payrollEntriesList" style="display:flex;flex-direction:column;gap:8px">
+                  <p style="color:var(--muted);font-size:.82rem">جاري التحميل...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
 
@@ -1486,7 +1563,7 @@
   <div id="printArea"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <script src="admin.js"></script>
+  <script src="admin.js?v=10"></script>
   <script src="idb.js?v=9"></script>
   <script>
     /* ── Sidebar toggle (mobile off-canvas) — presentation only, no admin.js interference ── */
