@@ -1,20 +1,51 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Gift, CheckCircle2 } from 'lucide-react';
+import { Gift, CheckCircle2, Copy, Check } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import { secureFetch } from '../lib/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import IconBadge from '../components/ui/IconBadge';
 
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    ta.remove();
+    return ok;
+  }
+}
+
 export default function CouponsScreen() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { showToast } = useToast();
 
   const [data, setData]         = useState(null);
   const [loading, setLoading]   = useState(true);
   const [redeeming, setRedeeming] = useState(null);
   const [result, setResult]     = useState(null);
+  const [copied, setCopied]     = useState(false);
+
+  const copyCode = async (code) => {
+    const ok = await copyText(code);
+    if (ok) {
+      setCopied(true);
+      showToast('تم نسخ الكود ✓', 'success');
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      showToast('تعذر النسخ — انسخ الكود يدوياً', 'error');
+    }
+  };
 
   const load = () => {
     setLoading(true);
@@ -103,8 +134,19 @@ export default function CouponsScreen() {
                   <p className="inline-flex items-center gap-1.5 text-sm font-black" style={{ color: 'var(--success)' }}>
                     <CheckCircle2 size={15} /> تم استبدال «{result.label}»
                   </p>
-                  <p className="text-lg font-black mt-1 tracking-wider" dir="ltr" style={{ color: 'var(--white)' }}>{result.code}</p>
-                  <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>استخدم الكود ده عند حجزك الجاي</p>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <p className="text-lg font-black tracking-wider" dir="ltr" style={{ color: 'var(--white)' }}>{result.code}</p>
+                    <button
+                      type="button"
+                      onClick={() => copyCode(result.code)}
+                      className="inline-flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+                      style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}
+                    >
+                      {copied ? <Check size={13} strokeWidth={3} /> : <Copy size={13} />}
+                      {copied ? 'اتنسخ' : 'نسخ الكود'}
+                    </button>
+                  </div>
+                  <p className="text-xs mt-1.5" style={{ color: 'var(--muted)' }}>استخدم الكود ده عند حجزك الجاي</p>
                 </>
               ) : (
                 <p className="text-sm font-bold" style={{ color: 'var(--error)' }}>{result.text}</p>

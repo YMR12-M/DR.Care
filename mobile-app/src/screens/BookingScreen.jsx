@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Check, ChevronRight, Zap, Paperclip, Loader2, Clock, CalendarDays, Car, CarFront, Bus, Truck,
-  Wallet, Smartphone, CreditCard, User, Phone as PhoneIcon, Mail, Hash, Ticket,
+  Wallet, Smartphone, CreditCard, User, Phone as PhoneIcon, Mail, Hash, Ticket, AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { api, secureFetch } from '../lib/api';
@@ -600,8 +600,15 @@ function Step3({ packages, carTypes, paymentMethods, form, setForm, onBack, onSu
 
         {form.paymentMethod === 'Instapay' && (
           <div className="mt-4">
+            <div className="flex items-start gap-2.5 rounded-xl p-3.5 mb-3"
+              style={{ background: 'rgba(240,83,62,0.08)', border: '1px solid rgba(240,83,62,0.35)' }}>
+              <AlertTriangle size={16} strokeWidth={2.4} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--error)' }} />
+              <p className="text-xs font-bold leading-relaxed" style={{ color: 'var(--error)' }}>
+                تنبيه مهم: لو مرفعتش صورة إيصال التحويل، <span style={{ textDecoration: 'underline' }}>الدفع مش هيتحسب</span> وهيتعامل مع الحجز على إنه غير مدفوع
+              </p>
+            </div>
             <p className="text-xs font-bold mb-2" style={{ color: 'var(--muted)' }}>
-              ارفع صورة إيصال الدفع (اختياري)
+              ارفع صورة إيصال الدفع
             </p>
             <label
               className="flex flex-col items-center justify-center rounded-xl py-5 cursor-pointer active:scale-[0.98] transition-transform"

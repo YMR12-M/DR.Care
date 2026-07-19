@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Clock, CheckCircle2, XCircle, Loader2, Car, Star } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle2, XCircle, Loader2, Car, Star, MapPin, ChevronDown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { secureFetch, api } from '../lib/api';
@@ -15,6 +15,74 @@ const STATUS_MAP = {
   completed:  { label: 'مكتمل',         bg: 'rgba(111,207,71,0.12)', color: '#6fcf47', Icon: CheckCircle2 },
   cancelled:  { label: 'ملغي',          bg: 'rgba(240,83,62,0.12)',  color: '#f0533e', Icon: XCircle },
 };
+
+const TRACK_STAGES = [
+  { key: 'new',        label: 'استلمنا الحجز',    desc: 'الحجز وصلنا وهنراجعه' },
+  { key: 'confirmed',  label: 'تم تأكيد الموعد',  desc: 'الموعد اتأكد — مستنيينك' },
+  { key: 'in_service', label: 'العربية في الخدمة', desc: 'فريقنا شغال على عربيتك دلوقتي' },
+  { key: 'completed',  label: 'اكتملت الخدمة',    desc: 'عربيتك جاهزة — بالهنا!' },
+];
+
+function TrackTimeline({ status }) {
+  const currentIdx = TRACK_STAGES.findIndex(s => s.key === status);
+  return (
+    <div className="mt-3 flex flex-col">
+      {TRACK_STAGES.map((stage, i) => {
+        const done    = i < currentIdx;
+        const current = i === currentIdx;
+        const color   = done || current ? 'var(--yellow)' : 'var(--muted-2)';
+        return (
+          <div key={stage.key} className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <span
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: done || current ? 'var(--yellow-soft)' : 'var(--panel-3)',
+                  border: `1.5px solid ${done || current ? 'var(--yellow)' : 'var(--line-2)'}`,
+                  boxShadow: current ? '0 0 10px rgba(255,210,31,0.35)' : 'none',
+                }}
+              >
+                {done
+                  ? <CheckCircle2 size={12} strokeWidth={2.6} style={{ color }} />
+                  : current
+                    ? <Loader2 size={11} strokeWidth={2.6} className={status !== 'completed' ? 'animate-spin' : ''} style={{ color }} />
+                    : <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--muted-2)' }} />}
+              </span>
+              {i < TRACK_STAGES.length - 1 && (
+                <span className="w-px flex-1 my-0.5" style={{ background: done ? 'var(--yellow)' : 'var(--line-2)', minHeight: 18 }} />
+              )}
+            </div>
+            <div className="pb-3">
+              <p className="text-xs font-black" style={{ color: done || current ? 'var(--white)' : 'var(--muted-2)' }}>{stage.label}</p>
+              {current && <p className="text-[11px] mt-0.5" style={{ color: 'var(--muted)' }}>{stage.desc}</p>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TrackBlock({ booking }) {
+  const [open, setOpen] = useState(booking.status === 'in_service');
+  if (booking.status === 'cancelled') return null;
+  return (
+    <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--line-2)' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between active:scale-[0.99] transition-transform"
+        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
+        <span className="inline-flex items-center gap-2 text-xs font-black" style={{ color: 'var(--yellow)' }}>
+          <MapPin size={14} strokeWidth={2.4} /> تتبع الحجز
+        </span>
+        <ChevronDown size={15} style={{ color: 'var(--muted)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .25s' }} />
+      </button>
+      {open && <TrackTimeline status={booking.status} />}
+    </div>
+  );
+}
 
 function StarRow({ value, onSelect, size = 22 }) {
   return (
@@ -139,6 +207,7 @@ function BookingCard({ booking, index, onReviewed }) {
           <span className="font-bold" style={{ color: 'var(--yellow)' }}>{booking.total_price} جنيه</span>
         )}
       </div>
+      {booking.status !== 'completed' && <TrackBlock booking={booking} />}
       {booking.status === 'completed' && (
         <ReviewBlock booking={booking} onReviewed={onReviewed} />
       )}
