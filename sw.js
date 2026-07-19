@@ -1,5 +1,5 @@
 // DR.Care Service Worker v2.2
-const CACHE_NAME = 'drcare-v7';
+const CACHE_NAME = 'drcare-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

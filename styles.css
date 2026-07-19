@@ -3856,9 +3856,6 @@ body.page-exit {
   color: var(--white);
   margin-bottom: 10px;
 }
-#timeSlotLabel {
-  display: none;
-}
 .time-slot-grid {
   display: flex;
   flex-wrap: wrap;
