@@ -568,17 +568,28 @@ button, input, select, textarea { font: inherit; cursor: pointer; }
 }
 
 @media (max-width: 720px) {
-  .page-shell { width: 100%; padding-inline: 16px; }
-  .pos-header__inner { width: 100%; padding-inline: 16px; grid-template-columns: 1fr auto; }
+  .page-shell { width: 100%; padding-inline: 14px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .pos-header__inner { width: 100%; padding-inline: 14px; grid-template-columns: 1fr auto; height: 60px; }
   .pos-header__end { grid-column: auto; }
   .pos-conn { display: none; }
-  .pos-clock { font-size: 1.1rem; }
-  .pos-body { padding: 18px 18px 22px; }
-  .panel-head { padding: 18px 18px 14px; }
-  .form-grid, .packages-grid, .pos-pkg-cards, .pos-pkg-cards--2 { grid-template-columns: 1fr; }
+  .pos-clock { font-size: 1.05rem; }
+  .pos-today-stats { display: none !important; }
+  .pos-brand__text small { display: none; }
+  .pos-body { padding: 16px 14px 20px; }
+  .panel-head { padding: 16px 14px 12px; }
+
+  /* Touch-first controls: 2-col package grid, big tap targets, no iOS zoom */
+  .form-grid { grid-template-columns: 1fr; }
+  .packages-grid, .pos-pkg-cards, .pos-pkg-cards--2 { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
   .pos-pkg-cards--2 { max-width: 100%; }
+  .package-card { min-height: 104px; }
+  .m-form__label input,
+  .m-form__label select,
+  .search-input { font-size: 16px; min-height: 48px; }
+  button { min-height: 44px; }
   .item-row { grid-template-columns: 1.4fr 0.9fr 0.5fr 1fr; font-size: 0.75rem; }
   .invoice-info-grid { grid-template-columns: 1fr; }
+  .invoice-card { border-radius: 14px; }
 }
 
 /* ═══════════════════════════════════════════════════════

@@ -63,27 +63,6 @@ function TrackTimeline({ status }) {
   );
 }
 
-function TrackBlock({ booking }) {
-  const [open, setOpen] = useState(booking.status === 'in_service');
-  if (booking.status === 'cancelled') return null;
-  return (
-    <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--line-2)' }}>
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between active:scale-[0.99] transition-transform"
-        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-      >
-        <span className="inline-flex items-center gap-2 text-xs font-black" style={{ color: 'var(--yellow)' }}>
-          <MapPin size={14} strokeWidth={2.4} /> تتبع الحجز
-        </span>
-        <ChevronDown size={15} style={{ color: 'var(--muted)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .25s' }} />
-      </button>
-      {open && <TrackTimeline status={booking.status} />}
-    </div>
-  );
-}
-
 function StarRow({ value, onSelect, size = 22 }) {
   return (
     <div className="flex items-center gap-1.5" dir="ltr">
@@ -175,41 +154,69 @@ function ReviewBlock({ booking, onReviewed }) {
   );
 }
 
-function BookingCard({ booking, index, onReviewed }) {
+function BookingCard({ booking, index, onReviewed, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
   const s = STATUS_MAP[booking.status] || { label: booking.status, bg: 'var(--faint)', color: 'var(--muted)', Icon: Clock };
-  const date = booking.appointment
-    ? new Date(booking.appointment).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
-    : new Date(booking.created_at).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+  const shortDate = booking.appointment
+    ? new Date(booking.appointment).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' })
+    : new Date(booking.created_at).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+  const fullDate = booking.appointment
+    ? new Date(booking.appointment).toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+    : new Date(booking.created_at).toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <Card className={`p-5 fade-in fade-in-${Math.min(index + 1, 7)}`}>
-      <div className="flex items-start gap-3 mb-3">
+    <Card className={`fade-in fade-in-${Math.min(index + 1, 7)}`}>
+      {/* Compact row — always visible, tap to expand */}
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 p-4 text-right active:opacity-80"
+        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+      >
         <IconBadge icon={Car} size="sm" tone="panel" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-black" style={{ color: 'var(--white)' }}>
+          <p className="text-sm font-black truncate" style={{ color: 'var(--white)' }}>
             {booking.package_name || booking.servicePackage}
           </p>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-            {booking.car_type_name}
+          <p className="text-[11px] mt-0.5 flex items-center gap-2" style={{ color: 'var(--muted-2)' }}>
+            <span className="inline-flex items-center gap-1"><Clock size={11} /> {shortDate}</span>
+            {booking.total_price && <span className="font-bold" style={{ color: 'var(--yellow)' }}>{booking.total_price} ج</span>}
+            {booking.review_rating && (
+              <span className="inline-flex items-center gap-0.5" style={{ color: 'var(--yellow)' }}>
+                <Star size={10} fill="var(--yellow)" stroke="var(--yellow)" /> {booking.review_rating}
+              </span>
+            )}
           </p>
         </div>
-        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0" style={{ background: s.bg, color: s.color }}>
-          <s.Icon size={11} className={booking.status === 'in_service' ? 'animate-spin' : ''} />
+        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ background: s.bg, color: s.color }}>
+          <s.Icon size={10} className={booking.status === 'in_service' ? 'animate-spin' : ''} />
           {s.label}
         </span>
-      </div>
-      <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--muted-2)' }}>
-        <span className="flex items-center gap-1">
-          <Clock size={13} />
-          {date}
-        </span>
-        {booking.total_price && (
-          <span className="font-bold" style={{ color: 'var(--yellow)' }}>{booking.total_price} جنيه</span>
-        )}
-      </div>
-      {booking.status !== 'completed' && <TrackBlock booking={booking} />}
-      {booking.status === 'completed' && (
-        <ReviewBlock booking={booking} onReviewed={onReviewed} />
+        <ChevronDown size={15} className="flex-shrink-0" style={{ color: 'var(--muted-2)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .25s' }} />
+      </button>
+
+      {/* Expanded details */}
+      {open && (
+        <div className="px-4 pb-4 fade-in">
+          <div className="rounded-xl p-3 text-xs flex flex-col gap-1.5" style={{ background: 'var(--panel-3)', border: '1px solid var(--line)' }}>
+            <div className="flex justify-between"><span style={{ color: 'var(--muted)' }}>نوع العربية</span><span className="font-bold" style={{ color: 'var(--white-2)' }}>{booking.car_type_name || '—'}</span></div>
+            <div className="flex justify-between"><span style={{ color: 'var(--muted)' }}>الموعد</span><span className="font-bold" style={{ color: 'var(--white-2)' }}>{fullDate}</span></div>
+            {booking.branch && <div className="flex justify-between"><span style={{ color: 'var(--muted)' }}>الفرع</span><span className="font-bold" style={{ color: 'var(--white-2)' }}>{booking.branch}</span></div>}
+            {booking.total_price && <div className="flex justify-between"><span style={{ color: 'var(--muted)' }}>الإجمالي</span><span className="font-black" style={{ color: 'var(--yellow)' }}>{booking.total_price} جنيه</span></div>}
+          </div>
+
+          {booking.status !== 'completed' && booking.status !== 'cancelled' && (
+            <>
+              <p className="inline-flex items-center gap-2 text-xs font-black mt-4" style={{ color: 'var(--yellow)' }}>
+                <MapPin size={14} strokeWidth={2.4} /> تتبع الحجز
+              </p>
+              <TrackTimeline status={booking.status} />
+            </>
+          )}
+          {booking.status === 'completed' && (
+            <ReviewBlock booking={booking} onReviewed={onReviewed} />
+          )}
+        </div>
       )}
     </Card>
   );
@@ -230,11 +237,23 @@ function Skeleton() {
   );
 }
 
+const ACTIVE_STATUSES = ['new', 'confirmed', 'in_service'];
+
+const FILTERS = [
+  { key: 'all',       label: 'الكل',    test: () => true },
+  { key: 'active',    label: 'نشطة',    test: b => ACTIVE_STATUSES.includes(b.status) },
+  { key: 'completed', label: 'مكتملة',  test: b => b.status === 'completed' },
+  { key: 'cancelled', label: 'ملغية',   test: b => b.status === 'cancelled' },
+];
+
 export default function BookingsScreen() {
   const navigate           = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState('all');
+
+  const visible = bookings.filter(FILTERS.find(f => f.key === filter).test);
 
   const markReviewed = (bookingId, rating, comment) => {
     setBookings(prev => prev.map(b =>
@@ -268,16 +287,43 @@ export default function BookingsScreen() {
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
       <header
-        className="sticky top-0 z-40 px-5 py-4"
+        className="sticky top-0 z-40"
         style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
-        <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حجوزاتي</h1>
-        {!loading && (
-          <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{bookings.length} حجز</p>
+        <div className="px-5 pt-4 pb-2 flex items-baseline justify-between">
+          <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حجوزاتي</h1>
+          {!loading && (
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>{visible.length} من {bookings.length} حجز</p>
+          )}
+        </div>
+        {/* Filter chips */}
+        {!loading && bookings.length > 0 && (
+          <div className="flex gap-2 px-5 pb-3 overflow-x-auto scroll-hide">
+            {FILTERS.map(f => {
+              const count  = bookings.filter(f.test).length;
+              const active = filter === f.key;
+              if (f.key !== 'all' && count === 0) return null;
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => setFilter(f.key)}
+                  className="flex-shrink-0 text-xs font-bold px-3.5 py-1.5 rounded-full active:scale-95 transition-transform"
+                  style={{
+                    background: active ? 'var(--yellow-soft)' : 'var(--panel-3)',
+                    border: `1px solid ${active ? 'var(--yellow-line)' : 'var(--line-2)'}`,
+                    color: active ? 'var(--yellow)' : 'var(--muted)',
+                  }}
+                >
+                  {f.label} <span style={{ opacity: 0.75 }}>({count})</span>
+                </button>
+              );
+            })}
+          </div>
         )}
       </header>
 
-      <div className="p-5 flex flex-col gap-4">
+      <div className="p-5 flex flex-col gap-3">
         {loading ? (
           [1,2,3].map(i => <Skeleton key={i}/>)
         ) : bookings.length === 0 ? (
@@ -289,8 +335,18 @@ export default function BookingsScreen() {
               احجز دلوقتي
             </Button>
           </div>
+        ) : visible.length === 0 ? (
+          <p className="text-center text-sm py-12" style={{ color: 'var(--muted)' }}>مفيش حجوزات في التصنيف ده</p>
         ) : (
-          bookings.map((b, i) => <BookingCard key={b.id || i} booking={b} index={i} onReviewed={markReviewed} />)
+          visible.map((b, i) => (
+            <BookingCard
+              key={b.id || i}
+              booking={b}
+              index={i}
+              onReviewed={markReviewed}
+              defaultOpen={b.status === 'in_service'}
+            />
+          ))
         )}
       </div>
     </div>

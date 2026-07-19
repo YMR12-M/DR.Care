@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, UserRoundPen, Gift, Phone, MapPin, LogOut, User as UserIcon, ChevronLeft, Star } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import { secureFetch } from '../lib/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -53,8 +54,24 @@ function ContactCard({ className = '' }) {
 export default function ProfileScreen() {
   const navigate              = useNavigate();
   const { user, loading, logout } = useAuth();
+  const { showToast } = useToast();
   const [loggingOut, setLoggingOut] = useState(false);
   const [loyaltyBalance, setLoyaltyBalance] = useState(0);
+
+  /* Hidden POS entry: 7 quick taps on the version line opens the POS */
+  const posTaps = useRef({ count: 0, timer: null });
+  const handleVersionTap = () => {
+    const t = posTaps.current;
+    clearTimeout(t.timer);
+    t.count += 1;
+    if (t.count >= 7) {
+      t.count = 0;
+      showToast('فتح نظام POS...', 'info');
+      setTimeout(() => { window.location.href = '/CarWash-POS/'; }, 400);
+      return;
+    }
+    t.timer = setTimeout(() => { t.count = 0; }, 1500);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -181,7 +198,11 @@ export default function ProfileScreen() {
         </button>
       </Card>
 
-      <p className="text-center text-xs mt-6 mb-2" style={{ color: 'var(--muted-2)' }}>
+      <p
+        className="text-center text-xs mt-6 mb-2 select-none"
+        style={{ color: 'var(--muted-2)' }}
+        onClick={handleVersionTap}
+      >
         DR.Care v2.0 — مغسلة عربيات مصرية
       </p>
     </div>
