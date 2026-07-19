@@ -67,7 +67,7 @@ export default function ProfileScreen() {
     if (t.count >= 7) {
       t.count = 0;
       showToast('فتح نظام POS...', 'info');
-      setTimeout(() => { window.location.href = '/CarWash-POS/'; }, 400);
+      setTimeout(() => navigate('/pos'), 400);
       return;
     }
     t.timer = setTimeout(() => { t.count = 0; }, 1500);
