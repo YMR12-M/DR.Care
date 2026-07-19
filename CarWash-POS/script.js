@@ -558,7 +558,7 @@ const showInvoice = (b) => {
     qrWrap.innerHTML = '';
     const claimToken = b.claim_token;
     if (window.QRCode && claimToken) {
-      const qrUrl = `${location.origin}/claim-booking.html?token=${claimToken}`;
+      const qrUrl = `${location.origin}/app/claim?token=${claimToken}`;
       qrWrap.style.display = '';
       const qrDiv = document.createElement('div');
       qrWrap.appendChild(qrDiv);
