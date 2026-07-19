@@ -148,8 +148,8 @@ button, input, select, textarea { font: inherit; cursor: pointer; }
   text-shadow: 0 0 32px rgba(255,210,31,0.25);
 }
 
-/* Connection pill */
-.pos-header__end { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+/* Clock + connection pill (left side of the header) */
+.pos-header__end { grid-column: 3; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
 
 .pos-conn {
   display: inline-flex; align-items: center; gap: 7px;
@@ -570,7 +570,8 @@ button, input, select, textarea { font: inherit; cursor: pointer; }
 @media (max-width: 720px) {
   .page-shell { width: 100%; padding-inline: 16px; }
   .pos-header__inner { width: 100%; padding-inline: 16px; grid-template-columns: 1fr auto; }
-  .pos-header__end { display: none; }
+  .pos-header__end { grid-column: auto; }
+  .pos-conn { display: none; }
   .pos-clock { font-size: 1.1rem; }
   .pos-body { padding: 18px 18px 22px; }
   .panel-head { padding: 18px 18px 14px; }
