@@ -402,6 +402,7 @@ const closeBookingDetails = () => {
   if (!bookingDetailsModal) return;
   bookingDetailsModal.classList.remove('open');
   bookingDetailsModal.setAttribute('aria-hidden', 'true');
+  if (!document.querySelector('.detail-modal.open')) document.body.classList.remove('modal-open');
 };
 
 const showBookingDetails = (booking) => {
@@ -539,6 +540,7 @@ const showBookingDetails = (booking) => {
   bookingDetailsModal.dataset.currentBookingId = booking.id;
   bookingDetailsModal.classList.add('open');
   bookingDetailsModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
   bookingDetailsModal.querySelector('.detail-modal-panel')?.scrollTo(0, 0);
   loadSlotsForBooking(booking.id);
 };
@@ -1918,8 +1920,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const payrollModal = document.getElementById('staffPayrollModal');
   let payrollStaffId = null;
 
-  const openPayrollModal  = () => { payrollModal?.classList.add('open'); payrollModal?.setAttribute('aria-hidden', 'false'); };
-  const closePayrollModal = () => { payrollModal?.classList.remove('open'); payrollModal?.setAttribute('aria-hidden', 'true'); payrollStaffId = null; };
+  const openPayrollModal  = () => { payrollModal?.classList.add('open'); payrollModal?.setAttribute('aria-hidden', 'false'); document.body.classList.add('modal-open'); };
+  const closePayrollModal = () => {
+    payrollModal?.classList.remove('open');
+    payrollModal?.setAttribute('aria-hidden', 'true');
+    payrollStaffId = null;
+    if (!document.querySelector('.detail-modal.open')) document.body.classList.remove('modal-open');
+  };
 
   document.getElementById('payrollCloseBtn')?.addEventListener('click', closePayrollModal);
   payrollModal?.querySelector('[data-close-payroll]')?.addEventListener('click', closePayrollModal);

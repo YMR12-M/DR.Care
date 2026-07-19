@@ -447,6 +447,9 @@
     }
     .detail-modal.open { display: flex; }
 
+    /* While a modal is open, freeze the page behind it so the dialog stays put */
+    body.modal-open { overflow: hidden; }
+
     .detail-modal-backdrop {
       position: absolute; inset: 0;
       background: rgba(0,0,0,0.78); backdrop-filter: blur(6px);
@@ -456,6 +459,7 @@
       position: relative; z-index: 1;
       width: min(720px, 100%); max-height: min(92vh, 800px);
       overflow: auto; display: flex; flex-direction: column;
+      overscroll-behavior: contain;
       background: var(--panel);
       border: 1px solid var(--line-2);
       border-radius: var(--radius-xl);
@@ -1563,7 +1567,7 @@
   <div id="printArea"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <script src="admin.js?v=10"></script>
+  <script src="admin.js?v=11"></script>
   <script src="idb.js?v=9"></script>
   <script>
     /* ── Sidebar toggle (mobile off-canvas) — presentation only, no admin.js interference ── */
