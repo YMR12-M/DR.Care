@@ -1,6 +1,7 @@
 /* =====================================================
    DR.Care — Admin Script v3.0
    ===================================================== */
+/* global Chart */
 
 'use strict';
 
@@ -2164,7 +2165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res  = await adminFetch('api/slots.php?admin=1');
       const data = await res.json().catch(() => ({}));
       renderSlots(data.all_slots || []);
-    } catch (_) {}
+    } catch { /* slots fetch failed — keep current view */ }
   };
 
   toggleSlotsBtn?.addEventListener('click', () => activateSection('slots'));
@@ -2365,7 +2366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             body: JSON.stringify({ id: Number(id), status })
           });
           done++;
-        } catch {}
+        } catch { /* skip failed row, continue batch */ }
       }
       showToast(`✓ تم تحديث ${done} حجز`, 'success');
       selectedBookingIds.clear();

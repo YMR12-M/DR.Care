@@ -487,7 +487,7 @@ bookingForm?.addEventListener('submit', async (e) => {
         await window.drcareIDB.saveOutbox(payload);
         if ('serviceWorker' in navigator && 'SyncManager' in window) {
           const reg = await navigator.serviceWorker.ready;
-          try { await reg.sync.register('sync-bookings'); } catch {}
+          try { await reg.sync.register('sync-bookings'); } catch { /* background sync unavailable */ }
         }
         setMessage('تم حفظ الحجز مؤقتاً وسيتم مزامنته عند استعادة الاتصال.', 'success');
         bookingForm.reset();
@@ -495,7 +495,7 @@ bookingForm?.addEventListener('submit', async (e) => {
         setMinimumAppointment();
         return;
       }
-    } catch {}
+    } catch { /* offline queue unavailable — fall through to error message */ }
 
     setMessage(error.message || 'حدث خطأ أثناء تسجيل الطلب.', 'error');
   } finally {

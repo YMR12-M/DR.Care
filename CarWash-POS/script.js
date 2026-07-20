@@ -1,4 +1,5 @@
 'use strict';
+/* global QRCode */
 
 const API = '../api/pos.php';
 
@@ -163,7 +164,7 @@ const beep = (freq = 880, dur = 130, vol = 0.12) => {
     osc.frequency.value = freq; gain.gain.value = vol;
     osc.start(); osc.stop(ctx.currentTime + dur / 1000);
     osc.onended = () => ctx.close();
-  } catch {}
+  } catch { /* audio unsupported — silent */ }
 };
 
 /* ── Generic status update handler ── */
