@@ -1319,3 +1319,22 @@ document.addEventListener('click', (e) => {
     })
     .catch(() => {});
 })();
+
+// ─── Hidden Admin Links (7 taps on the copyright line) ─────
+(function () {
+  const trigger = document.getElementById('footerCopyright');
+  const links   = document.getElementById('footerAdminLinks');
+  if (!trigger || !links) return;
+  let count = 0, timer = null;
+  trigger.addEventListener('click', () => {
+    clearTimeout(timer);
+    count += 1;
+    if (count >= 7) {
+      count = 0;
+      links.style.display = '';
+      showToast('تم إظهار روابط الإدارة 🔓', 'success');
+      return;
+    }
+    timer = setTimeout(() => { count = 0; }, 1500);
+  });
+})();
