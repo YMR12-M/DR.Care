@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ShieldCheck, Loader2, LayoutDashboard, LogOut, User, KeyRound,
-  Wallet, CalendarDays, Sparkles, RefreshCw, Users, Receipt,
-  Search, X, ChevronDown, Car, Check,
+  Wallet, CalendarDays, Sparkles, RefreshCw, Users,
+  Search, X, ChevronDown, Car, Check, Phone, MessageCircle,
+  AlertTriangle, TrendingUp, Percent, Award, Building2, CreditCard,
 } from 'lucide-react';
 import { api, secureFetch } from '../lib/api';
 import { useToast } from '../hooks/useToast';
@@ -60,6 +61,15 @@ function groupByDay(list) {
     map.get(key).items.push(b);
   }
   return groups;
+}
+
+function isOverdue(b) {
+  return !!b.appointment && new Date(b.appointment) < new Date() && ['new', 'confirmed'].includes(b.status);
+}
+
+function waLink(phone) {
+  const digits = (phone || '').replace(/\D/g, '');
+  return `https://wa.me/20${digits.replace(/^0/, '')}`;
 }
 
 /* ══════════ Login gate ══════════ */
@@ -153,11 +163,13 @@ function DetailRow({ label, value, gold }) {
   );
 }
 
-function BookingCard({ booking: b, onStatusChange, onNotesSave }) {
+function BookingCard({ booking: b, onStatusChange, onNotesSave, onPaymentStatusChange }) {
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState(b.admin_notes || '');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [savingPayment, setSavingPayment] = useState(false);
   const notesDirty = notes !== (b.admin_notes || '');
+  const overdue = isOverdue(b);
 
   const saveNotes = async () => {
     setSavingNotes(true);
@@ -165,27 +177,59 @@ function BookingCard({ booking: b, onStatusChange, onNotesSave }) {
     setSavingNotes(false);
   };
 
+  const markPaid = async () => {
+    setSavingPayment(true);
+    await onPaymentStatusChange(b.id, 'paid');
+    setSavingPayment(false);
+  };
+
   return (
-    <Card className="overflow-hidden">
-      <button type="button" onClick={() => setOpen(o => !o)}
-        className="w-full flex items-start gap-3 p-4 text-right active:opacity-80" style={{ background: 'none', border: 'none' }}>
-        <IconBadge icon={Car} size="sm" tone="panel" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-black truncate" style={{ color: 'var(--white)' }}>#{b.id} — {b.name}</p>
-          <p className="text-[11px] mt-0.5" style={{ color: 'var(--muted)' }}>{b.phone}</p>
-          <div className="flex justify-between items-center mt-1.5">
-            <span className="text-xs" style={{ color: 'var(--muted)' }}>{b.package_name || b.package_code}</span>
-            <span className="text-xs font-black" style={{ color: 'var(--yellow)' }}>{b.total_price} ج</span>
+    <Card className="overflow-hidden" style={overdue ? { border: '1px solid rgba(240,83,62,0.4)' } : undefined}>
+      <div className="flex items-start gap-2 px-4 pt-4">
+        <button type="button" onClick={() => setOpen(o => !o)}
+          className="flex-1 min-w-0 flex items-start gap-3 text-right active:opacity-80" style={{ background: 'none', border: 'none' }}>
+          <IconBadge icon={Car} size="sm" tone="panel" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-black truncate" style={{ color: 'var(--white)' }}>#{b.id} — {b.name}</p>
+            <p className="text-[11px] mt-0.5" style={{ color: 'var(--muted)' }}>{b.phone}</p>
+            <div className="flex justify-between items-center mt-1.5">
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>{b.package_name || b.package_code}</span>
+              <span className="text-xs font-black" style={{ color: 'var(--yellow)' }}>{b.total_price} ج</span>
+            </div>
           </div>
-        </div>
+        </button>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
           <span className="text-[10px] font-black px-2.5 py-1 rounded-full"
             style={{ background: `${STATUS_COLORS[b.status]}22`, color: STATUS_COLORS[b.status] }}>
             {STATUS_LABELS[b.status] || b.status}
           </span>
-          <ChevronDown size={14} style={{ color: 'var(--muted-2)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+          {overdue && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full"
+              style={{ background: 'rgba(240,83,62,0.15)', color: 'var(--error)' }}>
+              <AlertTriangle size={10} /> متأخر
+            </span>
+          )}
         </div>
-      </button>
+      </div>
+
+      {/* Quick contact + expand toggle */}
+      <div className="flex items-center gap-2 px-4 pb-3 pt-2">
+        <a href={`tel:${b.phone}`} onClick={e => e.stopPropagation()}
+          className="flex-1 flex items-center justify-center gap-1.5 text-[11px] font-bold py-2 rounded-xl active:scale-95 transition-transform"
+          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white-2)' }}>
+          <Phone size={12} /> اتصال
+        </a>
+        <a href={waLink(b.phone)} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}
+          className="flex-1 flex items-center justify-center gap-1.5 text-[11px] font-bold py-2 rounded-xl active:scale-95 transition-transform"
+          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white-2)' }}>
+          <MessageCircle size={12} /> واتساب
+        </a>
+        <button type="button" onClick={() => setOpen(o => !o)}
+          className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}>
+          <ChevronDown size={14} style={{ color: 'var(--muted-2)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+        </button>
+      </div>
 
       {open && (
         <div className="px-4 pb-4 fade-in">
@@ -196,12 +240,21 @@ function BookingCard({ booking: b, onStatusChange, onNotesSave }) {
             <DetailRow label="رقم اللوحة" value={b.plate_number} />
             <DetailRow label="طريقة الدفع" value={b.payment_method} />
             {b.payment_status && (
-              <div className="flex justify-between text-xs py-1">
+              <div className="flex justify-between items-center text-xs py-1">
                 <span style={{ color: 'var(--muted)' }}>حالة الدفع</span>
-                <span className="font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: `${PAYMENT_STATUS_COLORS[b.payment_status]}22`, color: PAYMENT_STATUS_COLORS[b.payment_status] }}>
-                  {PAYMENT_STATUS_LABELS[b.payment_status] || b.payment_status}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold px-2 py-0.5 rounded-full"
+                    style={{ background: `${PAYMENT_STATUS_COLORS[b.payment_status]}22`, color: PAYMENT_STATUS_COLORS[b.payment_status] }}>
+                    {PAYMENT_STATUS_LABELS[b.payment_status] || b.payment_status}
+                  </span>
+                  {b.payment_status === 'pending' && (
+                    <button type="button" onClick={markPaid} disabled={savingPayment}
+                      className="text-[10px] font-black px-2 py-0.5 rounded-full active:scale-95 transition-transform"
+                      style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}>
+                      {savingPayment ? '...' : 'تحديد كمدفوع'}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
             {b.discount_amount > 0 && <DetailRow label="الخصم" value={`- ${b.discount_amount} ج`} />}
@@ -247,9 +300,16 @@ function BookingCard({ booking: b, onStatusChange, onNotesSave }) {
   );
 }
 
-function BookingsPanel({ bookings, loading, onRefresh, onStatusChange, onNotesSave }) {
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'الأحدث' },
+  { value: 'oldest', label: 'الأقدم' },
+  { value: 'price',  label: 'الأعلى سعر' },
+];
+
+function BookingsPanel({ bookings, loading, onRefresh, onStatusChange, onNotesSave, onPaymentStatusChange }) {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('newest');
 
   const counts = useMemo(() => {
     const c = { all: bookings.length };
@@ -269,10 +329,14 @@ function BookingsPanel({ bookings, loading, onRefresh, onStatusChange, onNotesSa
         (b.plate_number || '').toLowerCase().includes(q)
       );
     }
+    list = [...list];
+    if (sort === 'oldest') list.reverse();
+    else if (sort === 'price') list.sort((a, b) => Number(b.total_price || 0) - Number(a.total_price || 0));
     return list;
-  }, [bookings, filter, search]);
+  }, [bookings, filter, search, sort]);
 
-  const groups = useMemo(() => groupByDay(filtered), [filtered]);
+  const chronological = sort === 'newest' || sort === 'oldest';
+  const groups = useMemo(() => (chronological ? groupByDay(filtered) : [{ label: null, items: filtered }]), [filtered, chronological]);
 
   const filterOptions = [
     { value: 'all', label: 'الكل' },
@@ -309,6 +373,23 @@ function BookingsPanel({ bookings, loading, onRefresh, onStatusChange, onNotesSa
         </button>
       </div>
 
+      <div className="flex gap-2 overflow-x-auto scroll-hide">
+        {SORT_OPTIONS.map(opt => {
+          const active = sort === opt.value;
+          return (
+            <button key={opt.value} type="button" onClick={() => setSort(opt.value)}
+              className="flex-shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+              style={{
+                background: active ? 'var(--panel-4)' : 'transparent',
+                border: `1px solid ${active ? 'var(--line-2)' : 'transparent'}`,
+                color: active ? 'var(--white-2)' : 'var(--muted-2)',
+              }}>
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+
       {loading && bookings.length === 0 ? (
         <div className="flex flex-col gap-3">
           <BookingSkeleton /><BookingSkeleton /><BookingSkeleton />
@@ -319,11 +400,11 @@ function BookingsPanel({ bookings, loading, onRefresh, onStatusChange, onNotesSa
         </p>
       ) : (
         <div className="flex flex-col gap-4">
-          {groups.map(g => (
-            <div key={g.label} className="flex flex-col gap-3">
-              <p className="text-[11px] font-black" style={{ color: 'var(--muted-2)' }}>{g.label}</p>
+          {groups.map((g, i) => (
+            <div key={g.label || i} className="flex flex-col gap-3">
+              {g.label && <p className="text-[11px] font-black" style={{ color: 'var(--muted-2)' }}>{g.label}</p>}
               {g.items.map(b => (
-                <BookingCard key={b.id} booking={b} onStatusChange={onStatusChange} onNotesSave={onNotesSave} />
+                <BookingCard key={b.id} booking={b} onStatusChange={onStatusChange} onNotesSave={onNotesSave} onPaymentStatusChange={onPaymentStatusChange} />
               ))}
             </div>
           ))}
@@ -344,41 +425,151 @@ function StatTile({ icon, label, value, tone }) {
   );
 }
 
-function ProfitsPanel({ bookings }) {
-  const stats = useMemo(() => {
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+function BarRow({ label, value, max, suffix = '' }) {
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+  return (
+    <div className="mb-2.5 last:mb-0">
+      <div className="flex justify-between text-xs mb-1">
+        <span className="font-bold truncate" style={{ color: 'var(--white-2)' }}>{label}</span>
+        <span className="font-black" style={{ color: 'var(--yellow)' }}>{value}{suffix}</span>
+      </div>
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--panel-3)' }}>
+        <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: 'var(--gradient-gold)' }} />
+      </div>
+    </div>
+  );
+}
 
-    const notCancelled = bookings.filter(b => b.status !== 'cancelled');
+const RANGE_OPTIONS = [
+  { value: 'today', label: 'اليوم' },
+  { value: 'week',  label: 'الأسبوع' },
+  { value: 'month', label: 'الشهر' },
+  { value: 'all',   label: 'الكل' },
+];
+
+function rangeStartDate(range) {
+  const now = new Date();
+  if (range === 'today') return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (range === 'week') {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    d.setDate(d.getDate() - 6);
+    return d;
+  }
+  if (range === 'month') return new Date(now.getFullYear(), now.getMonth(), 1);
+  return null;
+}
+
+function topEntries(map, n = 5) {
+  return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
+}
+
+function ProfitsPanel({ bookings }) {
+  const [range, setRange] = useState('today');
+
+  const stats = useMemo(() => {
+    const start = rangeStartDate(range);
+    const inRange = start ? bookings.filter(b => new Date(b.created_at) >= start) : bookings;
+    const notCancelled = inRange.filter(b => b.status !== 'cancelled');
     const sumPrice = (list) => list.reduce((sum, b) => sum + Number(b.total_price || 0), 0);
 
-    const todayBookings = notCancelled.filter(b => new Date(b.created_at) >= startOfDay);
-    const monthBookings = notCancelled.filter(b => new Date(b.created_at) >= startOfMonth);
+    const revenue = sumPrice(notCancelled);
+    const count = notCancelled.length;
+    const avgOrder = count > 0 ? Math.round(revenue / count) : 0;
+    const cancelledCount = inRange.length - count;
+    const cancelRate = inRange.length > 0 ? Math.round((cancelledCount / inRange.length) * 100) : 0;
 
-    const uniqueCustomers = new Set(
-      bookings.map(b => b.email || b.phone).filter(Boolean)
-    );
+    const byBranch = new Map();
+    const byPayment = new Map();
+    const byPackage = new Map();
+    for (const b of notCancelled) {
+      if (b.branch) byBranch.set(b.branch, (byBranch.get(b.branch) || 0) + Number(b.total_price || 0));
+      if (b.payment_method) byPayment.set(b.payment_method, (byPayment.get(b.payment_method) || 0) + Number(b.total_price || 0));
+      const pkg = b.package_name || b.package_code;
+      if (pkg) byPackage.set(pkg, (byPackage.get(pkg) || 0) + 1);
+    }
+
+    const uniqueCustomers = new Set(inRange.map(b => b.email || b.phone).filter(Boolean));
 
     return {
-      todayRevenue: sumPrice(todayBookings),
-      todayCount: todayBookings.length,
-      monthRevenue: sumPrice(monthBookings),
-      monthCount: monthBookings.length,
-      totalRevenue: sumPrice(notCancelled),
-      totalCount: bookings.length,
+      revenue, count, avgOrder, cancelRate,
       uniqueCustomers: uniqueCustomers.size,
+      byBranch: topEntries(byBranch),
+      byPayment: topEntries(byPayment),
+      topPackage: topEntries(byPackage, 1)[0] || null,
     };
+  }, [bookings, range]);
+
+  const trend = useMemo(() => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
+      const next = new Date(d); next.setDate(d.getDate() + 1);
+      const revenue = bookings
+        .filter(b => b.status !== 'cancelled')
+        .filter(b => { const t = new Date(b.created_at); return t >= d && t < next; })
+        .reduce((sum, b) => sum + Number(b.total_price || 0), 0);
+      days.push({ label: d.toLocaleDateString('ar-EG', { weekday: 'short' }), revenue });
+    }
+    return days;
   }, [bookings]);
+  const trendMax = Math.max(1, ...trend.map(d => d.revenue));
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <StatTile icon={Wallet} tone="yellow" label="إيراد اليوم" value={`${stats.todayRevenue} ج`} />
-      <StatTile icon={CalendarDays} tone="panel" label="حجوزات اليوم" value={stats.todayCount} />
-      <StatTile icon={Wallet} tone="yellow" label="إيراد الشهر" value={`${stats.monthRevenue} ج`} />
-      <StatTile icon={CalendarDays} tone="panel" label="حجوزات الشهر" value={stats.monthCount} />
-      <StatTile icon={Receipt} tone="panel" label="الإيراد الكلي" value={`${stats.totalRevenue} ج`} />
-      <StatTile icon={Users} tone="panel" label="عملاء فريدون" value={stats.uniqueCustomers} />
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-2 overflow-x-auto scroll-hide pb-1">
+        {RANGE_OPTIONS.map(opt => {
+          const active = range === opt.value;
+          return (
+            <button key={opt.value} type="button" onClick={() => setRange(opt.value)}
+              className="flex-shrink-0 text-xs font-bold px-3.5 py-2 rounded-full active:scale-95 transition-transform"
+              style={{
+                background: active ? 'var(--yellow-soft)' : 'var(--panel-3)',
+                border: `1px solid ${active ? 'var(--yellow-line)' : 'var(--line-2)'}`,
+                color: active ? 'var(--yellow)' : 'var(--muted)',
+              }}>
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <StatTile icon={Wallet} tone="yellow" label="الإيراد" value={`${stats.revenue} ج`} />
+        <StatTile icon={CalendarDays} tone="panel" label="عدد الحجوزات" value={stats.count} />
+        <StatTile icon={TrendingUp} tone="panel" label="متوسط الفاتورة" value={`${stats.avgOrder} ج`} />
+        <StatTile icon={Percent} tone="panel" label="نسبة الإلغاء" value={`${stats.cancelRate}%`} />
+        <StatTile icon={Users} tone="panel" label="عملاء فريدون" value={stats.uniqueCustomers} />
+        <StatTile icon={Award} tone="panel" label="الباقة الأكثر طلباً" value={stats.topPackage ? stats.topPackage[0] : '—'} />
+      </div>
+
+      {stats.byBranch.length > 0 && (
+        <Card className="p-4">
+          <p className="text-xs font-black mb-3 inline-flex items-center gap-1.5" style={{ color: 'var(--white)' }}>
+            <Building2 size={13} style={{ color: 'var(--yellow)' }} /> الإيراد بالفروع
+          </p>
+          {stats.byBranch.map(([branch, rev]) => (
+            <BarRow key={branch} label={branch} value={rev} max={stats.byBranch[0][1]} suffix=" ج" />
+          ))}
+        </Card>
+      )}
+
+      {stats.byPayment.length > 0 && (
+        <Card className="p-4">
+          <p className="text-xs font-black mb-3 inline-flex items-center gap-1.5" style={{ color: 'var(--white)' }}>
+            <CreditCard size={13} style={{ color: 'var(--yellow)' }} /> الإيراد بطريقة الدفع
+          </p>
+          {stats.byPayment.map(([method, rev]) => (
+            <BarRow key={method} label={method} value={rev} max={stats.byPayment[0][1]} suffix=" ج" />
+          ))}
+        </Card>
+      )}
+
+      <Card className="p-4">
+        <p className="text-xs font-black mb-3 inline-flex items-center gap-1.5" style={{ color: 'var(--white)' }}>
+          <TrendingUp size={13} style={{ color: 'var(--yellow)' }} /> الإيراد آخر 7 أيام
+        </p>
+        {trend.map(d => <BarRow key={d.label} label={d.label} value={d.revenue} max={trendMax} suffix=" ج" />)}
+      </Card>
     </div>
   );
 }
@@ -461,6 +652,24 @@ export default function AdminScreen() {
     }
   };
 
+  const handlePaymentStatusChange = async (id, payment_status) => {
+    try {
+      const res = await secureFetch('/api/bookings.php', {
+        method: 'PATCH',
+        body: JSON.stringify({ id, payment_status }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok) {
+        setBookings(bs => bs.map(b => (b.id === id ? { ...b, payment_status } : b)));
+        showToast('اتحدّثت حالة الدفع ✓', 'success');
+      } else {
+        showToast(d.message || 'فشل تحديث حالة الدفع', 'error');
+      }
+    } catch {
+      showToast('مفيش اتصال بالسيرفر', 'error');
+    }
+  };
+
   const logout = async () => {
     try {
       await secureFetch('/api/admin-login.php', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });
@@ -505,7 +714,7 @@ export default function AdminScreen() {
 
       <div className="flex-1 overflow-y-auto scroll-hide px-5 pb-6">
         {tab === 'bookings' && (
-          <BookingsPanel bookings={bookings} loading={loadingBookings} onRefresh={loadBookings} onStatusChange={handleStatusChange} onNotesSave={handleNotesSave} />
+          <BookingsPanel bookings={bookings} loading={loadingBookings} onRefresh={loadBookings} onStatusChange={handleStatusChange} onNotesSave={handleNotesSave} onPaymentStatusChange={handlePaymentStatusChange} />
         )}
         {tab === 'profits' && <ProfitsPanel bookings={bookings} />}
         {tab === 'featured' && <FeaturedCarsPanel />}
