@@ -15,8 +15,10 @@ import CouponsScreen from './screens/CouponsScreen';
 import BookingSuccessScreen from './screens/BookingSuccessScreen';
 import ClaimBookingScreen from './screens/ClaimBookingScreen';
 import PosScreen from './screens/PosScreen';
+import AdminScreen from './screens/AdminScreen';
+import StaffGateScreen from './screens/StaffGateScreen';
 
-const HIDE_NAV     = ['/login', '/register', '/booking-success', '/forgot-password', '/edit-profile', '/claim', '/pos'];
+const HIDE_NAV     = ['/login', '/register', '/booking-success', '/forgot-password', '/edit-profile', '/claim', '/pos', '/admin', '/staff'];
 
 function AppShell() {
   const location = useLocation();
@@ -42,6 +44,8 @@ function AppShell() {
           <Route path="/booking-success" element={<BookingSuccessScreen />} />
           <Route path="/claim"           element={<ClaimBookingScreen />} />
           <Route path="/pos"             element={<PosScreen />} />
+          <Route path="/admin"           element={<AdminScreen />} />
+          <Route path="/staff"           element={<StaffGateScreen />} />
         </Routes>
       </main>
 
