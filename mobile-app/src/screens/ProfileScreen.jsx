@@ -56,10 +56,24 @@ export default function ProfileScreen() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [loyaltyBalance, setLoyaltyBalance] = useState(0);
 
-  /* Hidden staff entry: press-and-hold ~1.2s on the version line opens a POS/Admin chooser */
+  /* Hidden staff entry on the version line:
+     7 quick taps → POS. Press-and-hold ~1.2s → admin panel (separate gesture, no timing race with taps). */
+  const posTaps = useRef({ count: 0, timer: null });
+  const handleVersionTap = () => {
+    const t = posTaps.current;
+    clearTimeout(t.timer);
+    t.count += 1;
+    if (t.count >= 7) {
+      t.count = 0;
+      navigate('/pos');
+      return;
+    }
+    t.timer = setTimeout(() => { t.count = 0; }, 1500);
+  };
+
   const holdTimer = useRef(null);
   const startVersionHold = () => {
-    holdTimer.current = setTimeout(() => navigate('/staff'), 1200);
+    holdTimer.current = setTimeout(() => navigate('/admin'), 1200);
   };
   const cancelVersionHold = () => clearTimeout(holdTimer.current);
 
@@ -191,6 +205,7 @@ export default function ProfileScreen() {
       <p
         className="text-center text-xs mt-6 mb-2 select-none"
         style={{ color: 'var(--muted-2)' }}
+        onClick={handleVersionTap}
         onPointerDown={startVersionHold}
         onPointerUp={cancelVersionHold}
         onPointerLeave={cancelVersionHold}
