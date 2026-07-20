@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ShieldCheck, Loader2, LayoutDashboard, LogOut, User, KeyRound,
-  Wallet, CalendarDays, Sparkles, RefreshCw, Users,
+  Wallet, CalendarDays, RefreshCw, Users,
   Search, X, ChevronDown, Car, Check, Phone, MessageCircle,
   AlertTriangle, TrendingUp, Percent, Award, Building2, CreditCard,
+  Trash2, Plus,
 } from 'lucide-react';
 import { api, secureFetch } from '../lib/api';
 import { useToast } from '../hooks/useToast';
@@ -70,6 +71,36 @@ function isOverdue(b) {
 function waLink(phone) {
   const digits = (phone || '').replace(/\D/g, '');
   return `https://wa.me/20${digits.replace(/^0/, '')}`;
+}
+
+/* يطابق SLOT_TIMES في admin.js — حدّث هنا لو الـ backend اتغير */
+const SLOT_TIMES = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+
+function fmtTime12(t) {
+  const [h, m] = t.split(':').map(Number);
+  const period = h >= 12 ? 'م' : 'ص';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+function slotDateLabel(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  if (day.getTime() === today.getTime()) return 'اليوم';
+  if (day.getTime() === tomorrow.getTime()) return 'بكرة';
+  return day.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function groupSlotsByDate(slots) {
+  const groups = [];
+  const map = new Map();
+  for (const s of slots) {
+    if (!map.has(s.slot_date)) { map.set(s.slot_date, { date: s.slot_date, items: [] }); groups.push(map.get(s.slot_date)); }
+    map.get(s.slot_date).items.push(s);
+  }
+  return groups;
 }
 
 /* ══════════ Login gate ══════════ */
@@ -574,13 +605,121 @@ function ProfitsPanel({ bookings }) {
   );
 }
 
-/* ══════════ Featured cars panel (placeholder) ══════════ */
-function FeaturedCarsPanel() {
+/* ══════════ Appointments panel ══════════ */
+function SlotRow({ slot, onDelete }) {
+  const full = slot.booked_count >= slot.max_bookings;
+  const pct = slot.max_bookings > 0 ? Math.round((slot.booked_count / slot.max_bookings) * 100) : 0;
   return (
-    <div className="flex flex-col items-center text-center py-14 px-6">
-      <IconBadge icon={Sparkles} size="lg" tone="yellow" className="mb-4" />
-      <h2 className="text-base font-black mb-1.5" style={{ color: 'var(--white)' }}>عربيات مميزة</h2>
-      <p className="text-xs font-bold" style={{ color: 'var(--muted)' }}>قريباً — هيتم تحديد وظيفة القسم ده بعدين</p>
+    <div className="flex items-center gap-3">
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between text-xs mb-1">
+          <span className="font-bold" style={{ color: 'var(--white-2)' }}>{fmtTime12(slot.slot_time)}</span>
+          <span className="font-black" style={{ color: full ? 'var(--error)' : 'var(--success)' }}>{slot.booked_count}/{slot.max_bookings}</span>
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--panel-3)' }}>
+          <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: full ? 'var(--error)' : 'var(--gradient-gold)' }} />
+        </div>
+      </div>
+      <button type="button" onClick={() => onDelete(slot.id)}
+        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+        style={{ background: 'rgba(240,83,62,0.1)', border: '1px solid rgba(240,83,62,0.25)', color: 'var(--error)' }}>
+        <Trash2 size={12} />
+      </button>
+    </div>
+  );
+}
+
+function AppointmentsPanel({ slots, loading, onRefresh, onAddSlots, onDeleteSlot }) {
+  const [date, setDate] = useState('');
+  const [times, setTimes] = useState(new Set());
+  const [maxBookings, setMaxBookings] = useState(5);
+  const [submitting, setSubmitting] = useState(false);
+
+  const toggleTime = (t) => setTimes(prev => {
+    const next = new Set(prev);
+    if (next.has(t)) next.delete(t); else next.add(t);
+    return next;
+  });
+
+  const submit = async () => {
+    if (!date || times.size === 0 || submitting) return;
+    setSubmitting(true);
+    await onAddSlots(date, [...times], maxBookings);
+    setTimes(new Set());
+    setSubmitting(false);
+  };
+
+  const groups = useMemo(() => groupSlotsByDate(slots), [slots]);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Card className="p-4">
+        <p className="text-xs font-black mb-3" style={{ color: 'var(--white)' }}>إضافة مواعيد جديدة</p>
+        <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="mb-3" />
+        <div className="flex flex-wrap gap-2 mb-3">
+          {SLOT_TIMES.map(t => {
+            const active = times.has(t);
+            return (
+              <button key={t} type="button" onClick={() => toggleTime(t)}
+                className="text-xs font-bold px-3 py-2 rounded-xl active:scale-95 transition-transform"
+                style={{
+                  background: active ? 'var(--yellow-soft)' : 'var(--panel-3)',
+                  border: `1px solid ${active ? 'var(--yellow-line)' : 'var(--line-2)'}`,
+                  color: active ? 'var(--yellow)' : 'var(--muted)',
+                }}>
+                {fmtTime12(t)}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold" style={{ color: 'var(--muted)' }}>أقصى عدد حجوزات لكل ميعاد</span>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => setMaxBookings(m => Math.max(1, m - 1))}
+              className="w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white-2)' }}>−</button>
+            <span className="text-sm font-black w-5 text-center" style={{ color: 'var(--white)' }}>{maxBookings}</span>
+            <button type="button" onClick={() => setMaxBookings(m => Math.min(20, m + 1))}
+              className="w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white-2)' }}>+</button>
+          </div>
+        </div>
+        <Button variant="primary" size="lg" className="w-full" disabled={!date || times.size === 0 || submitting} onClick={submit}>
+          {submitting
+            ? <span className="inline-flex items-center gap-2"><Loader2 size={16} className="animate-spin" /> جاري الإضافة...</span>
+            : <span className="inline-flex items-center gap-2"><Plus size={16} /> إضافة {times.size || ''} موعد</span>}
+        </Button>
+      </Card>
+
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-black" style={{ color: 'var(--muted)' }}>كل المواعيد</p>
+        <button type="button" onClick={onRefresh}
+          className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--muted)' }}>
+          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+        </button>
+      </div>
+
+      {loading && slots.length === 0 ? (
+        <div className="flex justify-center py-10"><Loader2 size={20} className="animate-spin" style={{ color: 'var(--yellow)' }} /></div>
+      ) : groups.length === 0 ? (
+        <p className="text-center text-xs font-bold py-10" style={{ color: 'var(--muted)' }}>لا يوجد مواعيد بعد</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {groups.map(g => (
+            <Card key={g.date} className="p-4">
+              <p className="text-xs font-black mb-3" style={{ color: 'var(--white)' }}>{slotDateLabel(g.date)}</p>
+              <div className="flex flex-col gap-2.5">
+                {g.items.map((s, idx) => (
+                  <div key={s.id} style={idx > 0 ? { borderTop: '1px dashed var(--line-2)', paddingTop: '0.65rem' } : undefined}>
+                    <SlotRow slot={s} onDelete={onDeleteSlot} />
+                  </div>
+                ))}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -594,6 +733,8 @@ export default function AdminScreen() {
   const [tab, setTab] = useState('bookings');
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [slots, setSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   useEffect(() => {
     api.get('admin-login.php?action=check')
@@ -612,8 +753,17 @@ export default function AdminScreen() {
       .finally(() => setLoadingBookings(false));
   };
 
+  const loadSlots = () => {
+    setLoadingSlots(true);
+    api.get('slots.php?admin=1')
+      .then(r => r.json())
+      .then(d => setSlots(d.all_slots || []))
+      .catch(() => {})
+      .finally(() => setLoadingSlots(false));
+  };
+
   useEffect(() => {
-    if (unlocked) loadBookings();
+    if (unlocked) { loadBookings(); loadSlots(); }
   }, [unlocked]);
 
   const handleStatusChange = async (id, status) => {
@@ -670,12 +820,46 @@ export default function AdminScreen() {
     }
   };
 
+  const handleAddSlots = async (date, times, max_bookings) => {
+    try {
+      const res = await secureFetch('/api/slots.php', {
+        method: 'POST',
+        body: JSON.stringify({ date, times, max_bookings }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok) {
+        showToast(`تمت إضافة ${d.added} موعد ✓`, 'success');
+        loadSlots();
+      } else {
+        showToast(d.message || 'فشل إضافة المواعيد', 'error');
+      }
+    } catch {
+      showToast('مفيش اتصال بالسيرفر', 'error');
+    }
+  };
+
+  const handleDeleteSlot = async (id) => {
+    try {
+      const res = await secureFetch(`/api/slots.php?id=${id}`, { method: 'DELETE' });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok) {
+        setSlots(s => s.filter(x => x.id !== id));
+        showToast('اتحذف الميعاد ✓', 'success');
+      } else {
+        showToast(d.message || 'فشل حذف الميعاد', 'error');
+      }
+    } catch {
+      showToast('مفيش اتصال بالسيرفر', 'error');
+    }
+  };
+
   const logout = async () => {
     try {
       await secureFetch('/api/admin-login.php', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });
     } catch {}
     setUnlocked(false);
     setBookings([]);
+    setSlots([]);
   };
 
   if (!unlocked) {
@@ -707,7 +891,7 @@ export default function AdminScreen() {
           options={[
             { value: 'bookings', label: 'الحجوزات' },
             { value: 'profits', label: 'الأرباح' },
-            { value: 'featured', label: 'عربيات مميزة' },
+            { value: 'appointments', label: 'المواعيد' },
           ]}
         />
       </div>
@@ -717,7 +901,9 @@ export default function AdminScreen() {
           <BookingsPanel bookings={bookings} loading={loadingBookings} onRefresh={loadBookings} onStatusChange={handleStatusChange} onNotesSave={handleNotesSave} onPaymentStatusChange={handlePaymentStatusChange} />
         )}
         {tab === 'profits' && <ProfitsPanel bookings={bookings} />}
-        {tab === 'featured' && <FeaturedCarsPanel />}
+        {tab === 'appointments' && (
+          <AppointmentsPanel slots={slots} loading={loadingSlots} onRefresh={loadSlots} onAddSlots={handleAddSlots} onDeleteSlot={handleDeleteSlot} />
+        )}
       </div>
     </div>
   );
