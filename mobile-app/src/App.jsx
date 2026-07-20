@@ -3,6 +3,7 @@ import { AuthProvider } from './hooks/useAuth';
 import { ToastProvider } from './hooks/useToast';
 import Toast from './components/Toast';
 import OfflineToast from './components/OfflineToast';
+import InstallPrompt from './components/InstallPrompt';
 import BottomNav from './components/BottomNav';
 import HomeScreen from './screens/HomeScreen';
 import BookingScreen from './screens/BookingScreen';
@@ -29,6 +30,7 @@ function AppShell() {
       {/* Global overlays */}
       <OfflineToast />
       <Toast />
+      {!hideNav && <InstallPrompt />}
 
       <main className="flex-1 overflow-hidden">
         <Routes>
