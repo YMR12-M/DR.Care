@@ -1,12 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Clock, CheckCircle2, XCircle, Loader2, Car, Star, MapPin, ChevronDown } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle2, XCircle, Loader2, Car, Star, MapPin, ChevronDown, RefreshCw, CalendarClock, Ban } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { secureFetch, api } from '../lib/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import IconBadge from '../components/ui/IconBadge';
+
+const AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const AR_DAYS   = ['أحد','اتنين','تلات','أربع','خميس','جمعة','سبت'];
+
+function fmtSlotDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${AR_DAYS[d.getDay()]} ${d.getDate()} ${AR_MONTHS[d.getMonth()]}`;
+}
+
+function fmtSlotTime(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const ampm = h < 12 ? 'ص' : 'م';
+  const h12  = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+}
+
+const CANCELLABLE_STATUSES = ['new', 'confirmed'];
 
 const STATUS_MAP = {
   new:        { label: 'في الانتظار',   bg: 'rgba(255,210,31,0.12)', color: '#ffd21f', Icon: Clock },
@@ -154,7 +171,167 @@ function ReviewBlock({ booking, onReviewed }) {
   );
 }
 
-function BookingCard({ booking, index, onReviewed, defaultOpen = false }) {
+function ReschedulePicker({ booking, onDone, onClose }) {
+  const { showToast } = useToast();
+  const [allSlots, setAllSlots] = useState({});
+  const [loading, setLoading]   = useState(true);
+  const [date, setDate]         = useState('');
+  const [time, setTime]         = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/slots.php', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(d => setAllSlots(d.slots || {}))
+      .catch(() => setAllSlots({}))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const availDates = Object.keys(allSlots).sort().filter(d => (allSlots[d] || []).some(s => s.available > 0));
+  const availTimes = (allSlots[date] || []).filter(s => s.available > 0);
+
+  const confirm = async () => {
+    if (!date || !time || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await secureFetch('/api/customer-bookings.php', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: booking.id, action: 'reschedule', appointment: `${date}T${time}` }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok) {
+        showToast(d.message || 'اتعدّل الموعد ✓', 'success');
+        onDone(booking.id, `${date} ${time}:00`);
+      } else {
+        showToast(d.message || 'فشل تعديل الموعد', 'error');
+      }
+    } catch {
+      showToast('مفيش اتصال بالإنترنت', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="mt-3 rounded-xl p-3 fade-in" style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}>
+      {loading ? (
+        <div className="flex gap-2">{[1, 2, 3].map(i => <div key={i} className="h-9 w-20 rounded-lg skeleton" />)}</div>
+      ) : availDates.length === 0 ? (
+        <p className="text-xs font-bold text-center py-2" style={{ color: 'var(--muted)' }}>مفيش مواعيد متاحة دلوقتي</p>
+      ) : (
+        <>
+          <div className="flex gap-2 overflow-x-auto scroll-hide pb-1">
+            {availDates.map(d => {
+              const active = date === d;
+              return (
+                <button key={d} type="button" onClick={() => { setDate(d); setTime(''); }}
+                  className="flex-shrink-0 text-[11px] font-bold px-3 py-2 rounded-lg active:scale-95 transition-transform"
+                  style={{ background: active ? 'var(--yellow-soft)' : 'var(--panel-4)', border: `1px solid ${active ? 'var(--yellow-line)' : 'var(--line-2)'}`, color: active ? 'var(--yellow)' : 'var(--muted)' }}>
+                  {fmtSlotDate(d)}
+                </button>
+              );
+            })}
+          </div>
+          {date && (
+            <div className="flex flex-wrap gap-2 mt-2.5 fade-in">
+              {availTimes.map(s => {
+                const active = time === s.time;
+                return (
+                  <button key={s.time} type="button" onClick={() => setTime(s.time)}
+                    className="text-[11px] font-bold px-3 py-2 rounded-lg active:scale-95 transition-transform"
+                    style={{ background: active ? 'var(--yellow-soft)' : 'var(--panel-4)', border: `1px solid ${active ? 'var(--yellow-line)' : 'var(--line-2)'}`, color: active ? 'var(--yellow)' : 'var(--muted)' }}>
+                    {fmtSlotTime(s.time)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <div className="flex gap-2 mt-3">
+            <button type="button" onClick={onClose}
+              className="flex-1 text-xs font-bold py-2 rounded-xl active:scale-95 transition-transform"
+              style={{ background: 'var(--panel-4)', border: '1px solid var(--line-2)', color: 'var(--muted)' }}>
+              إلغاء
+            </button>
+            <Button variant="primary" size="md" className="flex-1" disabled={!date || !time || submitting} onClick={confirm} style={{ padding: '0.5rem' }}>
+              {submitting ? '...' : 'تأكيد الموعد الجديد'}
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ManageBookingActions({ booking, onCancelled, onRescheduled }) {
+  const { showToast } = useToast();
+  const [mode, setMode] = useState(null); // null | 'confirm-cancel' | 'reschedule'
+  const [cancelling, setCancelling] = useState(false);
+
+  if (!CANCELLABLE_STATUSES.includes(booking.status)) return null;
+
+  const cancel = async () => {
+    setCancelling(true);
+    try {
+      const res = await secureFetch('/api/customer-bookings.php', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: booking.id, action: 'cancel' }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok) {
+        showToast(d.message || 'اتلغى الحجز', 'success');
+        onCancelled(booking.id);
+      } else {
+        showToast(d.message || 'فشل إلغاء الحجز', 'error');
+      }
+    } catch {
+      showToast('مفيش اتصال بالإنترنت', 'error');
+    } finally {
+      setCancelling(false);
+      setMode(null);
+    }
+  };
+
+  if (mode === 'reschedule') {
+    return <ReschedulePicker booking={booking} onDone={onRescheduled} onClose={() => setMode(null)} />;
+  }
+
+  return (
+    <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--line-2)' }}>
+      {mode === 'confirm-cancel' ? (
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs font-bold" style={{ color: 'var(--error)' }}>متأكد من إلغاء الحجز؟</span>
+          <div className="flex gap-2 flex-shrink-0">
+            <button type="button" onClick={() => setMode(null)}
+              className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--muted)' }}>
+              رجوع
+            </button>
+            <button type="button" onClick={cancel} disabled={cancelling}
+              className="text-xs font-black px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
+              style={{ background: 'rgba(240,83,62,0.12)', border: '1px solid var(--error)', color: 'var(--error)' }}>
+              {cancelling ? '...' : 'اتأكد وألغي'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <button type="button" onClick={() => setMode('reschedule')}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform"
+            style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--white-2)' }}>
+            <CalendarClock size={13} /> تعديل الموعد
+          </button>
+          <button type="button" onClick={() => setMode('confirm-cancel')}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform"
+            style={{ background: 'rgba(240,83,62,0.08)', border: '1px solid rgba(240,83,62,0.25)', color: 'var(--error)' }}>
+            <Ban size={13} /> إلغاء الحجز
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BookingCard({ booking, index, onReviewed, onCancelled, onRescheduled, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   const s = STATUS_MAP[booking.status] || { label: booking.status, bg: 'var(--faint)', color: 'var(--muted)', Icon: Clock };
   const shortDate = booking.appointment
@@ -216,6 +393,7 @@ function BookingCard({ booking, index, onReviewed, defaultOpen = false }) {
           {booking.status === 'completed' && (
             <ReviewBlock booking={booking} onReviewed={onReviewed} />
           )}
+          <ManageBookingActions booking={booking} onCancelled={onCancelled} onRescheduled={onRescheduled} />
         </div>
       )}
     </Card>
@@ -261,14 +439,28 @@ export default function BookingsScreen() {
     ));
   };
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user)       { setLoading(false); return; }
+  const markCancelled = (bookingId) => {
+    setBookings(prev => prev.map(b => (b.id === bookingId ? { ...b, status: 'cancelled' } : b)));
+  };
+
+  const markRescheduled = (bookingId, appointment) => {
+    setBookings(prev => prev.map(b => (b.id === bookingId ? { ...b, appointment } : b)));
+  };
+
+  const load = () => {
+    setLoading(true);
     secureFetch('/api/customer-bookings.php')
       .then(r => r.json())
       .then(d => setBookings(d.bookings || []))
       .catch(() => {})
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user)       { setLoading(false); return; }
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   if (!authLoading && !user) {
@@ -290,11 +482,18 @@ export default function BookingsScreen() {
         className="sticky top-0 z-40"
         style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
       >
-        <div className="px-5 pt-4 pb-2 flex items-baseline justify-between">
+        <div className="px-5 pt-4 pb-2 flex items-center justify-between">
           <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>حجوزاتي</h1>
-          {!loading && (
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>{visible.length} من {bookings.length} حجز</p>
-          )}
+          <div className="flex items-center gap-2">
+            {!loading && (
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>{visible.length} من {bookings.length} حجز</p>
+            )}
+            <button type="button" onClick={load}
+              className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform flex-shrink-0"
+              style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--muted)' }}>
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            </button>
+          </div>
         </div>
         {/* Filter chips */}
         {!loading && bookings.length > 0 && (
@@ -344,6 +543,8 @@ export default function BookingsScreen() {
               booking={b}
               index={i}
               onReviewed={markReviewed}
+              onCancelled={markCancelled}
+              onRescheduled={markRescheduled}
               defaultOpen={b.status === 'in_service'}
             />
           ))
