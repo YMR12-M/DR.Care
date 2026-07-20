@@ -199,9 +199,6 @@ export default function ProfileScreen() {
         className="text-center text-xs mt-6 mb-2 select-none"
         style={{ color: 'var(--muted-2)' }}
         onClick={handleVersionTap}
-        onPointerDown={startVersionHold}
-        onPointerUp={cancelVersionHold}
-        onPointerLeave={cancelVersionHold}
       >
         DR.Care v2.0 — مغسلة عربيات مصرية
       </p>
