@@ -56,19 +56,12 @@ export default function ProfileScreen() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [loyaltyBalance, setLoyaltyBalance] = useState(0);
 
-  /* Hidden staff entry: 7 quick taps on the version line opens a POS/Admin chooser */
-  const posTaps = useRef({ count: 0, timer: null });
-  const handleVersionTap = () => {
-    const t = posTaps.current;
-    clearTimeout(t.timer);
-    t.count += 1;
-    if (t.count >= 7) {
-      t.count = 0;
-      navigate('/staff');
-      return;
-    }
-    t.timer = setTimeout(() => { t.count = 0; }, 1500);
+  /* Hidden staff entry: press-and-hold ~1.2s on the version line opens a POS/Admin chooser */
+  const holdTimer = useRef(null);
+  const startVersionHold = () => {
+    holdTimer.current = setTimeout(() => navigate('/staff'), 1200);
   };
+  const cancelVersionHold = () => clearTimeout(holdTimer.current);
 
   useEffect(() => {
     if (!user) return;
@@ -198,7 +191,9 @@ export default function ProfileScreen() {
       <p
         className="text-center text-xs mt-6 mb-2 select-none"
         style={{ color: 'var(--muted-2)' }}
-        onClick={handleVersionTap}
+        onPointerDown={startVersionHold}
+        onPointerUp={cancelVersionHold}
+        onPointerLeave={cancelVersionHold}
       >
         DR.Care v2.0 — مغسلة عربيات مصرية
       </p>
