@@ -4,9 +4,9 @@ import { Droplets, Sparkles, Zap, Car, Settings, Shield, FlaskConical, LayoutGri
    shared between HomeScreen and BookingScreen so both stay in sync automatically. */
 export const PACKAGE_VISUALS = {
   'inside-out': { icon: Sparkles,      color: 'var(--yellow)',     desc: 'تنظيف كامل داخلي وخارجي',      popular: true },
-  outside:      { icon: Droplets,      color: 'var(--cat-blue)',   desc: 'تنظيف خارجي شامل للسيارة' },
-  deep:         { icon: Zap,           color: 'var(--cat-purple)', desc: 'غسيل متخصص عميق للغاية' },
-  rims:         { icon: Car,           color: 'var(--cat-green)',  desc: 'تلميع وتنظيف الجنوط بالكامل' },
+  outside:      { icon: Droplets,      color: 'var(--cat-blue)',   desc: 'تنظيف خارجي شامل للسيارة',      popular: true },
+  deep:         { icon: Zap,           color: 'var(--cat-purple)', desc: 'غسيل متخصص عميق للغاية',         popular: true },
+  rims:         { icon: Car,           color: 'var(--cat-green)',  desc: 'تلميع وتنظيف الجنوط بالكامل',    popular: true },
   engine:       { icon: Settings,      color: 'var(--cat-orange)', desc: 'تنظيف حجرة المحرك بدقة' },
   blanket:      { icon: Shield,        color: 'var(--cat-pink)',   desc: 'غسيل بطاطين وتفصيل' },
   cover:        { icon: Layers,        color: 'var(--cat-teal)',   desc: 'تغيير وتنظيف غطاء السيارة' },
