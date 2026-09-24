@@ -18,7 +18,7 @@ $price = null;
 
 /* ── Try Java first ── */
 $javaCmd    = getEnvValue('DRCARE_JAVA_CMD', 'java');
-$classesDir = __DIR__ . '/../java/src';
+$classesDir = __DIR__ . '/../tools/java/src';
 $javaClass  = 'com.drcare.PricingCalculator';
 
 $pkg_esc     = escapeshellarg($pkg);

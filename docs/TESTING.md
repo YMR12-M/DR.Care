@@ -16,10 +16,10 @@
 
 ```bash
 composer test              # PHPUnit فقط (Unit + Integration)
-bash scripts/run-tests.sh  # كل طبقات الاختبار (نفس ما يشغّله CI بالضبط)
+bash tools/scripts/run-tests.sh  # كل طبقات الاختبار (نفس ما يشغّله CI بالضبط)
 ```
 
-`scripts/run-tests.sh` بالترتيب: PHP lint (`php -l` لكل ملف في `api/`) → `composer install` عند الحاجة → PHPUnit → اختبارات Java (تُتخطى محلياً لو Java غير مثبت) → اختبارات Python → `npm run lint` (ESLint على الموقع الرئيسي في الجذر — **ليس** `mobile-app/`، الذي له `oxlint` منفصل تماماً وغير مربوط بهذا السكريبت).
+`tools/scripts/run-tests.sh` بالترتيب: PHP lint (`php -l` لكل ملف في `api/`) → `composer install` عند الحاجة → PHPUnit → اختبارات Java (تُتخطى محلياً لو Java غير مثبت) → اختبارات Python → `npm run lint` (ESLint على الموقع الرئيسي في الجذر — **ليس** `mobile-app/`، الذي له `oxlint` منفصل تماماً وغير مربوط بهذا السكريبت).
 
 ## PHP — `tests/Unit/` و`tests/Integration/`
 
@@ -39,15 +39,15 @@ bash scripts/run-tests.sh  # كل طبقات الاختبار (نفس ما يش�
 
 ## Python — `tests/test_export_bookings.py`
 
-يختبر `export_bookings.py` (تصدير CSV). يعمل عبر `python3 -m unittest discover -s tests -p 'test_*.py'`.
+يختبر `tools/python/export_bookings.py` (تصدير CSV). يعمل عبر `python3 -m unittest discover -s tests -p 'test_*.py'`.
 
 ## CI — `.github/workflows/ci.yml`
 
-يعمل على كل push/PR إلى `main`/`master`. يهيّئ PHP 8.1 + Java 17 + Python 3.11 + Node 18، ثم يشغّل `scripts/run-tests.sh` بالكامل (نفس الأمر المحلي بالضبط — لا تكرار منطق منفصل بين محلي وCI).
+يعمل على كل push/PR إلى `main`/`master`. يهيّئ PHP 8.1 + Java 17 + Python 3.11 + Node 18، ثم يشغّل `tools/scripts/run-tests.sh` بالكامل (نفس الأمر المحلي بالضبط — لا تكرار منطق منفصل بين محلي وCI).
 
 ### ⚠️ فجوة حقيقية: `mobile-app/` غير مُشمَّل في CI إطلاقاً
 
-لا خطوة في `ci.yml` ولا في `scripts/run-tests.sh` تعمل `cd mobile-app && npm install/build/lint`. هذا يعني:
+لا خطوة في `ci.yml` ولا في `tools/scripts/run-tests.sh` تعمل `cd mobile-app && npm install/build/lint`. هذا يعني:
 - الأخطاء الموثّقة بالتفصيل في `MOBILE_APP.md` (الفرع المُثبَّت، الكوبون، تعطل شاشة المواعيد) **لم يكن ممكناً اكتشافها آلياً** — لا build يفشل، لا lint يُنبّه، لا اختبار يُشغَّل.
 - حتى `npm run lint` (oxlint) الخاص بـ `mobile-app/` نفسه لا يُشغَّل في أي مكان آلياً حالياً.
 

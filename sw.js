@@ -1,16 +1,16 @@
 // DR.Care Service Worker v2.2
-const CACHE_NAME = 'drcare-v8';
+const CACHE_NAME = 'drcare-v9';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/mobile.html',
-  '/styles.css',
-  '/mobile.css',
-  '/script.js',
-  '/mobile.js',
-  '/idb.js',
+  '/assets/css/styles.css',
+  '/assets/css/mobile.css',
+  '/assets/js/script.js',
+  '/assets/js/mobile.js',
+  '/assets/js/idb.js',
   '/admin.html',
-  '/admin.js',
+  '/assets/js/admin.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

@@ -36,5 +36,5 @@ jobs:
 
       - name: Run full test suite
         run: |
-          chmod +x scripts/run-tests.sh tests/test_pricing_java.sh
-          bash scripts/run-tests.sh
+          chmod +x tools/scripts/run-tests.sh tests/test_pricing_java.sh
+          bash tools/scripts/run-tests.sh

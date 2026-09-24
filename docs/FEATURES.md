@@ -152,7 +152,7 @@
 | `mobile.html` | صفحة حجز/رئيسية مبسطة للشاشات الصغيرة |
 | `mobile-bookings.html` | حجوزات العميل (نسخة موبايل) |
 | `mobile-profile.html` | الملف الشخصي (نسخة موبايل) |
-| `mobile.css` / `mobile.js` | أنماط ومنطق منفصل مع `fallbackConfig` مطابق |
+| `assets/css/mobile.css` / `assets/js/mobile.js` | أنماط ومنطق منفصل مع `fallbackConfig` مطابق |
 
 **السلوك:** نفس APIs والتحققات؛ تسجيل خروج GET قد يوجّه لـ `mobile-bookings.html` (legacy في `customer-login.php`).
 
@@ -506,7 +506,7 @@ GET /api/pos.php?action=today&token=...
 GET /api/pricing.php?package=outside&car_type=suv
 ```
 
-1. يحاول Java: `java -cp java/src com.drcare.PricingCalculator outside suv`
+1. يحاول Java: `java -cp tools/java/src com.drcare.PricingCalculator outside suv`
 2. عند الفشل (قيمة غير رقمية) → حساب PHP من config
 3. Response: `{ price, label, source: "java"|"php" }`
 
@@ -620,9 +620,9 @@ POST /api/reviews.php
 
 **أصول مُخزَّنة عند التثبيت:**
 
-`/`, `index.html`, `admin.html`, `styles.css`, `script.js`, `admin.js`, `manifest.json`, `assets/dr-care-hero.jpg`, خط Cairo
+`/`, `index.html`, `admin.html`, `assets/css/styles.css`, `assets/js/script.js`, `assets/js/admin.js`, `manifest.json`, `assets/img/dr-care-hero.jpg`, خط Cairo
 
-### 12.3 IndexedDB (`idb.js`)
+### 12.3 IndexedDB (`assets/js/idb.js`)
 
 - DB: `drcare-sync` v1
 - Store: `outbox` — `{ payload, created_at }`
@@ -806,28 +806,28 @@ session.use_strict_mode = 1
 
 ## 17. أدوات CLI
 
-### 17.1 `export_bookings.py`
+### 17.1 `tools/python/export_bookings.py`
 
 ```bash
-python3 export_bookings.py --out bookings.csv
+python3 tools/python/export_bookings.py --out bookings.csv
 ```
 
 **أعمدة CSV:** id, name, email, phone, package_name, car_type_name, branch, total_price, created_at, status, appointment, plate_number, notes
 
-### 17.2 `python/generate_invoice.py`
+### 17.2 `tools/python/generate_invoice.py`
 
 ```bash
-python3 python/generate_invoice.py 42 --out invoice_42.txt
+python3 tools/python/generate_invoice.py 42 --out invoice_42.txt
 ```
 
 - فاتورة نصية عربية
 - يعيد حساب السعر من `package_code` + `car_type_code` (قد يختلف عن `total_price` المحفوظ إن تغيّرت الأسعار لاحقاً)
 
-### 17.3 `build-java.sh`
+### 17.3 `tools/scripts/build-java.sh`
 
-- يجمّع إلى `java/classes/`
+- يجمّع إلى `tools/java/classes/`
 
-### 17.4 `gen_icons.py`
+### 17.4 `tools/python/gen_icons.py`
 
 - توليد أيقونات PWA 192/512
 
@@ -874,7 +874,7 @@ npm run format  # Prettier
 | `api/reviews.php` | تقييمات |
 | `api/pos.php` | فرع |
 | `sw.js` + `idb.js` | offline |
-| `export_bookings.py` | تقارير CSV |
+| `tools/python/export_bookings.py` | تقارير CSV |
 
 ---
 

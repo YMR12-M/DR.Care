@@ -13,7 +13,7 @@
 - `api/packages.php` — `GET` عام (بدون تسجيل دخول): يرجّع الباقات النشطة من جدول `packages` + باقي القيم من `config.php` في نفس شكل الـJSON القديم. `GET ?admin=1` (يتطلب أدمن): كل الباقات (نشطة ومعطّلة) بالـ`id`. `POST`/`PATCH`/`DELETE` (أدمن + CSRF): إنشاء/تعديل/تعطيل باقة — راجع قسم "إدارة الأسعار من لوحة الإدارة" أدناه.
 - `api/bookings.php` / `api/pos.php` — يحسبان السعر عند إنشاء الحجز: الباقة تُقرأ الآن من جدول `packages` (`SELECT * FROM packages WHERE code=:code AND is_active=1`)، ونوع العربية لسه من `config.php`. نفس منطق الـ400 عند عدم التطابق كما كان.
 - `api/pricing.php` — endpoint منفصل لحساب سعر باقة+نوع عربية بمعزل عن إنشاء حجز فعلي؛ فرع PHP fallback بتاعه اتحول برضه لقراءة جدول `packages`.
-- `java/src/com/drcare/PricingCalculator.java` — حاسبة أسعار بلغة Java، يحاول `api/pricing.php` استدعاءها أولاً كـ "مصدر أساسي" قبل العودة لـ PHP.
+- `tools/java/src/com/drcare/PricingCalculator.java` — حاسبة أسعار بلغة Java، يحاول `api/pricing.php` استدعاءها أولاً كـ "مصدر أساسي" قبل العودة لـ PHP.
 
 ## جدول الأسعار (القيم الأولية اللي اتعمل بيها seed — قابلة للتعديل من اللوحة دلوقتي)
 

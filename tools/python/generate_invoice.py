@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 from datetime import datetime
 
-DB_PATH = Path(__file__).resolve().parents[1] / 'data' / 'drcare.db'
+DB_PATH = Path(__file__).resolve().parents[2] / 'data' / 'drcare.db'
 
 INVOICE_TEMPLATE = '''DR.Care - فاتورة خدمة
 رقم الفاتورة: {id}

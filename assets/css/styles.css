@@ -474,7 +474,7 @@ body::before {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: url("assets/dr-care-hero.jpg") center / cover no-repeat;
+  background: url("../img/dr-care-hero.jpg") center / cover no-repeat;
   transform: scale(1.05);
   animation: hero-drift 20s ease-in-out infinite alternate;
   will-change: transform;
@@ -2029,7 +2029,7 @@ select {
   position: absolute;
   inset: 0;
   background: linear-gradient(120deg, rgba(2,2,2,0.96) 40%, rgba(2,2,2,0.7) 100%),
-              url("assets/dr-care-hero.jpg") center / cover no-repeat;
+              url("../img/dr-care-hero.jpg") center / cover no-repeat;
 }
 
 .admin-hero-inner {

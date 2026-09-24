@@ -17,6 +17,9 @@ composer-setup.php
 
 offline-cache/
 
+# Java build output
+/tools/java/classes/
+
 # Node / frontend dependencies
 node_modules/
 mobile-app/node_modules/
@@ -44,4 +47,3 @@ composer.phar
 # Python cache
 __pycache__/
 *.pyc
-

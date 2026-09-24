@@ -25,7 +25,8 @@ COPY --from=mobile-build /build/dist /var/www/html/app
 RUN mkdir -p /var/www/html/data \
     && chown -R www-data:www-data /var/www/html/data \
     && chmod 755 /var/www/html/data \
-    && rm -f /var/www/html/.env
+    && rm -f /var/www/html/.env \
+    && rm -rf /var/www/html/mobile-app
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

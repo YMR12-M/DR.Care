@@ -3,3 +3,6 @@ vendor/
 .phpunit.cache/
 data/
 offline-cache/
+mobile-app/node_modules/
+mobile-app/dist/
+tools/

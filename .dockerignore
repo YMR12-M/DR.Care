@@ -1,0 +1,45 @@
+# Build context exclusions for the production image.
+# The runtime is php:8.2-apache serving the repo root — anything listed here is
+# either dev-only, rebuilt inside the image, or supplied by the mounted disk.
+
+# Version control & CI
+.git
+.gitignore
+.gitattributes
+.github
+
+# Secrets & local dev environment
+.env
+.env.local
+dev/
+
+# Runtime data — Render mounts a persistent disk at /var/www/html/data,
+# so a baked-in copy is both dead weight and a secret-leak risk.
+data/
+
+# Dependencies (reinstalled by the mobile-build stage / not needed at runtime)
+node_modules
+mobile-app/node_modules
+mobile-app/dist
+vendor/
+
+# Dev tooling, tests and docs — never served in production
+tests/
+tools/
+docs/
+.phpunit.cache/
+phpunit.xml
+composer.json
+composer.lock
+package.json
+package-lock.json
+.eslintrc.json
+.eslintignore
+.prettierrc
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+*.log
+*.swp
+__pycache__/

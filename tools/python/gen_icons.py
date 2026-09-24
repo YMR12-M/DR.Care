@@ -121,7 +121,7 @@ def make_icon(size):
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == '__main__':
-    base      = os.path.dirname(os.path.abspath(__file__))
+    base      = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     icons_dir = os.path.join(base, 'icons')
     os.makedirs(icons_dir, exist_ok=True)
 

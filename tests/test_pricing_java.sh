@@ -5,14 +5,14 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 printf '\n=== Java PricingCalculator ===\n'
-mkdir -p java/classes
-javac -d java/classes java/src/com/drcare/PricingCalculator.java
+mkdir -p tools/java/classes
+javac -d tools/java/classes tools/java/src/com/drcare/PricingCalculator.java
 
 run_java() {
   pkg="$1"
   car="$2"
   expected="$3"
-  actual="$(java -cp java/classes com.drcare.PricingCalculator "$pkg" "$car")"
+  actual="$(java -cp tools/java/classes com.drcare.PricingCalculator "$pkg" "$car")"
   if [ "$actual" != "$expected" ]; then
     printf 'FAIL: %s %s => got %s expected %s\n' "$pkg" "$car" "$actual" "$expected"
     exit 1

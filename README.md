@@ -81,7 +81,7 @@
 | الواجهة | HTML5، CSS3 (تصميم داكن + ذهبي)، JavaScript (Vanilla) |
 | الخادم | PHP 8.1+ مع PDO |
 | قاعدة البيانات | SQLite (`data/drcare.db`) |
-| PWA | `manifest.json` + `sw.js` + IndexedDB (`idb.js`) |
+| PWA | `manifest.json` + `sw.js` + IndexedDB (`assets/js/idb.js`) |
 | أدوات | Node (ESLint/Prettier)، Java 17 (تسعير)، Python 3 (تصدير/فواتير) |
 | CI | GitHub Actions |
 
@@ -98,7 +98,7 @@
 - **يتطلب تسجيل دخول العميل** قبل إرسال الحجز (مع CSRF)
 - عرض آخر 20 تقييم على الصفحة الرئيسية
 - بانر تثبيت PWA + اختصارات في `manifest.json`
-- نسخة موبايل مخصصة: `mobile.html` + `mobile.css` + `mobile.js`
+- نسخة موبايل مخصصة: `mobile.html` + `assets/css/mobile.css` + `assets/js/mobile.js`
 
 ### نظام العملاء
 
@@ -223,72 +223,117 @@ npm run format
 
 ## هيكل المشروع
 
+> **قاعدة الترتيب:** جذر المشروع = جذر الويب (الـ`Dockerfile` بينسخه كله لـ`/var/www/html`).
+> فكل صفحة `.html` في الجذر هي **رابط عام** ولازم تفضل مكانها. أي حاجة مش
+> بتتخدم للمتصفح (اختبارات، أدوات، توثيق، شهادات تطوير) بقت خارج مسار العرض،
+> والملفات الثابتة اتجمّعت كلها تحت `assets/`.
+
 ```
 DR.Care/
-├── .env.example                 # قالب متغيرات البيئة
-├── .eslintrc.json               # إعداد ESLint
-├── .prettierrc                  # إعداد Prettier
-├── .github/workflows/ci.yml     # خط أنابيب CI
 │
-├── index.html                   # الصفحة الرئيسية + الحجز
-├── index-2.html                 # نسخة تجريبية/بديلة للواجهة
-├── mobile.html                  # واجهة موبايل مخصصة
-├── mobile.css / mobile.js
-├── booking-tracker.html         # تتبع حجز بدون حساب
-├── styles.css                   # أنماط عامة
-├── script.js                    # منطق الموقع الرئيسي
-├── idb.js                       # IndexedDB للطابور دون اتصال
-├── manifest.json                # بيانات PWA
-├── sw.js                        # Service Worker
+├── ⚙️  إعدادات الجذر
+│   ├── .env.example             # قالب متغيرات البيئة
+│   ├── .eslintrc.json           # إعداد ESLint
+│   ├── .prettierrc              # إعداد Prettier
+│   ├── .dockerignore            # يمنع نسخ ملفات التطوير لصورة الإنتاج
+│   ├── .htaccess                # Apache: HTTPS + حجب الملفات الحساسة
+│   ├── Dockerfile               # بناء صورة الإنتاج (مرحلتين)
+│   ├── render.yaml              # إعداد النشر على Render
+│   ├── phpunit.xml              # إعداد PHPUnit
+│   ├── composer.json            # تبعيات PHP (تطوير فقط)
+│   ├── package.json             # سكربتات lint / test
+│   └── .github/workflows/ci.yml # خط أنابيب CI
 │
-├── login.html                   # دخول المسؤول
-├── admin.html / admin.js        # لوحة الإدارة
+├── 🌐 الصفحات (روابط عامة — لازم تفضل في الجذر)
+│   ├── index.html               # الصفحة الرئيسية + الحجز
+│   ├── index-2.html             # نسخة تجريبية/بديلة للواجهة
+│   ├── mobile.html              # واجهة موبايل مخصصة
+│   ├── mobile-booking.html      # حجز من الموبايل
+│   ├── mobile-bookings.html     # حجوزات الموبايل
+│   ├── mobile-profile.html      # ملف الموبايل الشخصي
+│   ├── booking-tracker.html     # تتبع حجز بدون حساب
+│   ├── booking-success.html     # تأكيد الحجز
+│   ├── claim-booking.html       # ربط حجز ضيف بحساب
+│   ├── login.html               # دخول المسؤول
+│   ├── admin.html               # لوحة الإدارة
+│   ├── customer-login.html      # تسجيل/دخول العميل
+│   ├── customer-bookings.html   # حجوزات العميل
+│   ├── customer-profile.html    # الملف الشخصي
+│   ├── forgot-password.html     # طلب إعادة تعيين كلمة المرور
+│   ├── reset-password.html      # إعادة تعيين كلمة المرور
+│   ├── verify-email.html        # تأكيد البريد
+│   ├── referral.html            # صفحة الإحالة
+│   ├── gallery.html             # معرض الصور
+│   ├── faq.html                 # أسئلة شائعة
+│   ├── manifest.json            # بيانات PWA (لازم تفضل في الجذر)
+│   └── sw.js                    # Service Worker (نطاقه `/` — لازم يفضل في الجذر)
 │
-├── customer-login.html          # تسجيل/دخول العميل
-├── customer-bookings.html       # حجوزات العميل
-├── customer-profile.html        # الملف الشخصي
+├── 📦 assets/                   # كل الملفات الثابتة المشتركة
+│   ├── css/
+│   │   ├── styles.css           # أنماط الموقع العامة
+│   │   └── mobile.css           # أنماط واجهة الموبايل
+│   ├── js/
+│   │   ├── script.js            # منطق الموقع الرئيسي
+│   │   ├── admin.js             # منطق لوحة الإدارة
+│   │   ├── mobile.js            # منطق واجهة الموبايل
+│   │   ├── idb.js               # IndexedDB للطابور دون اتصال
+│   │   └── transitions.js       # انتقالات الصفحات
+│   └── img/
+│       ├── logo.jpg
+│       └── dr-care-hero.jpg
 │
-├── CarWash-POS/                 # نقطة بيع الفرع
+├── 🎨 icons/                    # أيقونات PWA (192/512 — مسارها مثبّت في manifest)
+│
+├── 🔌 api/                      # REST-like JSON API (PHP 8.1+، بدون تبعيات)
+│   ├── bootstrap.php            # DB، جلسات، بريد، أمان
+│   ├── config.php               # أنواع العربيات، فروع، دفع
+│   ├── BookingStateMachine.php  # انتقالات حالة الحجز
+│   ├── bookings.php · packages.php · pricing.php · slots.php
+│   ├── coupons.php · reviews.php · loyalty.php · referral.php
+│   ├── customer-login.php · customer-bookings.php · customer-profile.php
+│   ├── admin-login.php · admin-init.php · customers.php · staff.php
+│   ├── staff-payroll.php · expenses.php · pos.php · backup.php
+│   ├── push-subscribe.php · push-send.php · anniversary-notify.php
+│   ├── password-reset.php · claim-booking.php · whatsapp-broadcast.php
+│   └── csrf.php · health.php · test-email.php
+│
+├── 🖥️  CarWash-POS/              # نقطة بيع الفرع (واجهة مستقلة بأصولها الخاصة)
 │   ├── index.html
 │   ├── script.js
 │   └── styles.css
 │
-├── api/                         # REST-like JSON API
-│   ├── bootstrap.php            # DB، جلسات، بريد، أمان
-│   ├── config.php               # باقات، فروع، دفع
-│   ├── bookings.php
-│   ├── packages.php
-│   ├── pricing.php
-│   ├── coupons.php
-│   ├── reviews.php
-│   ├── customer-login.php
-│   ├── customer-bookings.php
-│   ├── customer-profile.php
-│   ├── admin-login.php
-│   ├── admin-init.php
-│   ├── pos.php
-│   ├── csrf.php
-│   ├── health.php
-│   ├── push-subscribe.php
-│   ├── push-send.php
-│   └── test-email.php
+├── 📱 mobile-app/               # تطبيق React 19 + Vite (يُبنى إلى `/app/`)
+│   ├── src/                     # screens · components · hooks · lib
+│   ├── public/                  # manifest · sw · icons · .htaccess
+│   └── vite.config.js
 │
-├── data/
-│   ├── drcare.db                # SQLite (يُنشأ تلقائياً — مُستثنى من Git)
+├── 💾 data/                     # (مُستثنى من Git ومن صورة Docker)
+│   ├── drcare.db                # SQLite — يُنشأ تلقائياً
+│   ├── backups/                 # نسخ احتياطية
 │   └── vapid_private.pem        # مفتاح VAPID للـ Push
 │
-├── java/src/com/drcare/
-│   └── PricingCalculator.java
-├── python/
-│   └── generate_invoice.py
-├── export_bookings.py           # تصدير CSV
-├── build-java.sh
-├── gen_icons.py                 # توليد أيقونات PWA
+├── 🛠️  tools/                    # أدوات مساعدة — لا تُخدَم للمتصفح
+│   ├── java/src/com/drcare/PricingCalculator.java
+│   ├── python/
+│   │   ├── export_bookings.py   # تصدير الحجوزات CSV
+│   │   ├── generate_invoice.py  # توليد فاتورة نصية
+│   │   └── gen_icons.py         # توليد أيقونات PWA في `icons/`
+│   ├── scripts/
+│   │   ├── run-tests.sh         # تشغيل كل الاختبارات
+│   │   └── build-java.sh        # ترجمة مصادر الجافا
+│   └── composer.phar            # مُثبِّت Composer المحلي (مُستثنى من Git)
 │
-├── assets/                      # صور ووسائط
-├── icons/                       # أيقونات PWA (192/512)
+├── 🧪 tests/                    # PHPUnit + Python + Java
+│   ├── Unit/ · Integration/ · Support/
+│   ├── bootstrap.php
+│   ├── test_export_bookings.py
+│   └── test_pricing_java.sh
 │
-├── docs/                        # كل ملفات التوثيق (Markdown)
+├── 🔐 dev/                      # تطوير محلي فقط (مُستثنى من Git ومن صورة Docker)
+│   ├── Caddyfile                # بروكسي HTTPS محلي
+│   └── *.pem / *.crt            # شهادات mkcert للتجربة على الشبكة المحلية
+│
+├── 📚 docs/                     # كل ملفات التوثيق (Markdown)
 │   ├── README.md                # فهرس كل ملفات التوثيق
 │   ├── FEATURES.md              # دليل شامل لكل المميزات
 │   ├── BOOKING_WORKFLOW.md      # نظام Workflow الحجز + مخططات mermaid
@@ -300,11 +345,22 @@ DR.Care/
 │   ├── PRICING_SYSTEM.md        # توثيق نظام التسعير
 │   ├── NOTIFICATIONS_SYSTEM.md  # توثيق البريد/واتساب/Push
 │   ├── LOYALTY_REFERRAL_SYSTEM.md # توثيق نقاط الولاء والإحالة
-│   ├── MOBILE_APP.md            # توثيق تطبيق React الجديد (⚠️ حجز مكسور)
+│   ├── MOBILE_APP.md            # توثيق تطبيق React
 │   ├── TESTING.md               # توثيق الاختبارات وCI
 │   └── ROADMAP.md               # خطة عمل الفجوات المكتشفة
+│
 └── README.md                    # هذا الملف
 ```
+
+### ليه الترتيب كده؟
+
+| القرار | السبب |
+|--------|-------|
+| صفحات `.html` فضلت في الجذر | كل صفحة = رابط عام (`/index.html`)، ونقلها يكسر الروابط والـSEO والمفضلة |
+| `sw.js` و`manifest.json` في الجذر | الـService Worker نطاقه `/`، ولو اتنقل مش هيقدر يتحكم في كل الصفحات |
+| `icons/` في الجذر | مساره مثبّت في `manifest.json` و`mobile-app` بمسار مطلق `/icons/...` |
+| CSS/JS تحت `assets/` | كانوا ٧ ملفات مبعثرة في الجذر — دلوقتي مجمّعين حسب النوع |
+| `tools/` و`tests/` و`dev/` | مش بتتخدم للمتصفح، فاتشالت من صورة الإنتاج عبر `.dockerignore` |
 
 ---
 
@@ -628,8 +684,8 @@ curl "http://127.0.0.1:8000/api/pricing.php?package=full&car_type=suv"
 ### Java (CLI)
 
 ```bash
-./build-java.sh
-java -cp java/classes com.drcare.PricingCalculator full suv
+./tools/scripts/build-java.sh
+java -cp tools/java/classes com.drcare.PricingCalculator full suv
 # Output: 340
 ```
 
@@ -704,11 +760,11 @@ DRCARE_JAVAC_CMD=javac
 
 1. افتح الموقع عبر HTTPS (أو localhost)
 2. من Chrome: «تثبيت التطبيق» أو بانر التثبيت في الصفحة
-3. الأيقونات: `icons/icon-192.png`, `icons/icon-512.png` (يمكن توليدها بـ `gen_icons.py`)
+3. الأيقونات: `icons/icon-192.png`, `icons/icon-512.png` (يمكن توليدها بـ `tools/python/gen_icons.py`)
 
 ### Service Worker
 
-- **تثبيت:** يخزن `index.html`, `styles.css`, `script.js`, `manifest.json`, وغيرها
+- **تثبيت:** يخزن `index.html`, `assets/css/styles.css`, `assets/js/script.js`, `manifest.json`, وغيرها
 - **API:** لا يُخزَّن — رسالة JSON عند عدم الاتصال
 - **Push:** معالج `push` في `sw.js` لعرض الإشعارات
 
@@ -800,33 +856,33 @@ MAILER_SMTP_PASSWORD=app-password-from-google
 ### تصدير الحجوزات (CSV)
 
 ```bash
-python3 export_bookings.py
-python3 export_bookings.py --out /path/to/bookings.csv
+python3 tools/python/export_bookings.py
+python3 tools/python/export_bookings.py --out /path/to/bookings.csv
 ```
 
 ### فاتورة نصية (Python)
 
 ```bash
-python3 python/generate_invoice.py --id 42
+python3 tools/python/generate_invoice.py --id 42
 ```
 
 ### تجميع Java
 
 ```bash
-./build-java.sh
+./tools/scripts/build-java.sh
 ```
 
 ### أيقونات PWA
 
 ```bash
-python3 gen_icons.py
+python3 tools/python/gen_icons.py
 ```
 
 ---
 
 ## CI/CD
 
-ملف: `.github/workflows/ci.yml` — يشغّل **`scripts/run-tests.sh`** بالكامل.
+ملف: `.github/workflows/ci.yml` — يشغّل **`tools/scripts/run-tests.sh`** بالكامل.
 
 | الخطوة | الوصف |
 |--------|-------|
@@ -834,12 +890,12 @@ python3 gen_icons.py
 | PHPUnit | **25** اختبار تكامل (API، auth، حجز، كوبونات، POS، تقييمات) |
 | Java | حاسبة الأسعار |
 | Python | `tests/test_export_bookings.py` |
-| ESLint | `script.js`, `admin.js`, `mobile.js`, … |
+| ESLint | `assets/js/script.js`, `assets/js/admin.js`, `assets/js/mobile.js`, … |
 
 ### تشغيل الاختبارات محلياً
 
 ```bash
-bash scripts/run-tests.sh
+bash tools/scripts/run-tests.sh
 # أو
 npm test
 ```

@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(cd "$(dirname "$0")" && pwd)"
-SRC="$ROOT/java/src"
-CLASSES="$ROOT/java/classes"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+SRC="$ROOT/tools/java/src"
+CLASSES="$ROOT/tools/java/classes"
 
 printf 'Compiling Java sources...\n'
 mkdir -p "$CLASSES"

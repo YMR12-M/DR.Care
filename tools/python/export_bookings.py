@@ -7,7 +7,7 @@ import csv
 import argparse
 from pathlib import Path
 
-DB = Path(__file__).resolve().parent / 'data' / 'drcare.db'
+DB = Path(__file__).resolve().parents[2] / 'data' / 'drcare.db'
 
 def export(out_path: Path, db_path: Path | None = None):
     db = db_path or DB
