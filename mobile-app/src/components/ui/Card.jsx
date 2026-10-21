@@ -1,25 +1,14 @@
-/* ملاحظة: الظل وحده مش كفاية للإحساس بالارتفاع على خلفية سودة تقريباً (--black) —
-   على شاشة حقيقية (خصوصاً OLED) الظل الأسود على خلفية سودة بيبقى غير مرئي تقريباً.
-   الحدّ (border) هو الضمان الوحيد للفصل البصري بين الكارت والخلفية بغض النظر عن الإضاءة. */
+/* Panels are painted steel plates, not floating glass: flat fill, 2px edge, hard shadow at most. */
 const VARIANT_STYLE = {
-  flat:     { background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' },
-  elevated: { background: 'var(--panel-2)', boxShadow: 'var(--shadow-elevated)', border: '1px solid var(--line-2)' },
-  yellow:   { background: 'var(--yellow-soft)', boxShadow: 'var(--shadow-yellow-glow)', border: '1px solid var(--yellow-line)' },
-  premium:  {
-    background: 'linear-gradient(165deg, var(--panel-3) 0%, var(--panel) 70%)',
-    boxShadow: 'var(--shadow-premium)', border: '1px solid var(--line-2)',
-  },
+  flat:     { background: 'var(--panel-2)', border: '2px solid var(--line-2)' },
+  elevated: { background: 'var(--panel-2)', border: '2px solid var(--steel)', boxShadow: '0 4px 0 rgba(0,0,0,0.45)' },
+  yellow:   { background: 'var(--yellow-soft)', border: '2px solid var(--yellow-line)' },
+  premium:  { background: '#0a0b0d', border: '2px solid var(--steel)', boxShadow: '0 4px 0 rgba(0,0,0,0.45)' },
 };
-
-const VARIANT_CLASS = { premium: 'gold-rim' };
 
 export default function Card({ as: Tag = 'div', variant = 'flat', className = '', style, children, ...props }) {
   return (
-    <Tag
-      className={`rounded-2xl ${VARIANT_CLASS[variant] || ''} ${className}`}
-      style={{ ...VARIANT_STYLE[variant], ...style }}
-      {...props}
-    >
+    <Tag className={className} style={{ borderRadius: 10, ...VARIANT_STYLE[variant], ...style }} {...props}>
       {children}
     </Tag>
   );

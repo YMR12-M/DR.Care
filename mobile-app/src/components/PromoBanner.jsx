@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 function getSecsUntilMidnight() {
   const now = new Date();
@@ -15,6 +15,14 @@ function formatCountdown(secs) {
   return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
 }
 
+const MESSAGES = [
+  'احجز اليوم — أول 5 حجوزات يومياً لهم أسبقية التنفيذ الفوري',
+  'كاش أو Instapay',
+  'قليوب — شارع العروبة · يومياً 12م – 10م',
+];
+
+/* The promo line is now an LED board over the wash-bay door: dot-matrix text scrolling the
+   way Arabic tickers do (towards the right), with the daily countdown pinned at the start. */
 export default function PromoBanner() {
   const [closed, setClosed] = useState(() => {
     try { return sessionStorage.getItem('dr_m_promo_closed') === '1'; } catch { return false; }
@@ -29,42 +37,33 @@ export default function PromoBanner() {
 
   const close = () => {
     setClosed(true);
-    try { sessionStorage.setItem('dr_m_promo_closed', '1'); } catch {}
+    try { sessionStorage.setItem('dr_m_promo_closed', '1'); } catch { /* storage unavailable */ }
   };
 
   if (closed) return null;
 
   return (
-    <div
-      className="relative flex items-center justify-between gap-2 px-4 py-2.5 text-xs font-bold"
-      style={{
-        background: 'linear-gradient(90deg, var(--yellow) 0%, var(--yellow-2) 100%)',
-        color: '#0a0800',
-      }}
-    >
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        <Zap size={15} fill="#0a0800" strokeWidth={0} className="flex-shrink-0" />
-        <span className="truncate leading-tight">
-          احجز اليوم — أول 5 حجوزات يومياً لهم أسبقية التنفيذ الفوري
-        </span>
-      </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span
-          className="font-black tabular-nums text-[11px] rounded-md px-1.5 py-0.5"
-          style={{ background: 'rgba(0,0,0,0.15)', letterSpacing: '0.04em' }}
-        >
+    <div role="note" aria-label="عرض اليوم">
+      <div className="led-board flex items-center" style={{ height: 38 }}>
+        <span className="led num flex-shrink-0 px-3 relative z-10" style={{ fontSize: 22, background: '#000' }} dir="ltr" aria-label="الوقت المتبقي">
           {formatCountdown(secs)}
         </span>
+        <div className="flex-1 min-w-0 overflow-hidden relative" aria-hidden="true">
+          <div className="inline-flex" style={{ gap: 44, paddingInline: 22, animation: 'marquee 28s linear infinite', willChange: 'transform' }}>
+            {[...MESSAGES, ...MESSAGES].map((m, i) => (
+              <span key={i} className="led whitespace-nowrap" style={{ fontSize: 22 }}>{m}</span>
+            ))}
+          </div>
+        </div>
         <button
-          onClick={close}
-          className="w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 active:scale-90 transition-transform"
-          style={{ background: 'rgba(0,0,0,0.15)', color: '#0a0800' }}
-          type="button"
-          aria-label="إغلاق"
+          type="button" onClick={close} aria-label="إغلاق"
+          className="flex-shrink-0 w-10 h-full flex items-center justify-center relative z-10 active:opacity-60"
+          style={{ background: '#000', color: 'var(--yellow)' }}
         >
-          <X size={12} strokeWidth={3} />
+          <X size={15} strokeWidth={3} />
         </button>
       </div>
+      <div className="hazard hazard--sm" />
     </div>
   );
 }

@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Gift, Star, CheckCircle2, Copy, Check, RefreshCw, TrendingUp, TrendingDown, History } from 'lucide-react';
+import { Check, Copy, RefreshCw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { secureFetch } from '../lib/api';
-import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import IconBadge from '../components/ui/IconBadge';
 import SegmentedControl from '../components/ui/SegmentedControl';
+import SectionHeader from '../components/ui/SectionHeader';
+import WashLine from '../components/brand/WashLine';
+import EmptyState from '../components/brand/EmptyState';
+import { Mixed } from '../lib/bidi';
 
 async function copyText(text) {
   try {
@@ -30,90 +32,112 @@ function fmtHistoryDate(str) {
   if (!str) return '';
   const d = new Date(str);
   if (Number.isNaN(d.getTime())) return str;
-  return d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+const rewardValue = r => (r.type === 'percent' ? `${r.value}%` : `${r.value} ج`);
+
+/* Where on the reward road is this balance? Fractional station index (the car can sit between stops). */
+function roadStage(balance, thresholds) {
+  const stops = [0, ...thresholds];
+  if (balance >= stops[stops.length - 1]) return stops.length - 1;
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (balance < stops[i + 1]) return i + (balance - stops[i]) / (stops[i + 1] - stops[i]);
+  }
+  return 0;
 }
 
 /* ══════════ نقاطي tab ══════════ */
 function PointsTab({ data }) {
-  const pct = data?.next ? Math.min(100, Math.round((data.balance / data.next.points) * 100)) : 100;
+  const balance = data?.balance ?? 0;
+  const rewards = data?.rewards || [];
+  const thresholds = rewards.map(r => r.points);
+  const labels = [
+    <span key="s" className="block"><span className="block font-display text-[15px] leading-none" style={{ color: 'var(--muted-2)' }}>0</span></span>,
+    ...rewards.map(r => (
+      <span key={r.id} className="block">
+        <span className="block font-display text-[15px] leading-none" style={{ color: 'var(--white)' }}>{r.points}</span>
+        <span className="block text-[10.5px] font-bold mt-0.5" style={{ color: 'var(--yellow)' }}>{rewardValue(r)}</span>
+      </span>
+    )),
+  ];
 
   return (
-    <div className="flex flex-col gap-5 fade-in">
-      <Card variant="premium" className="p-5 text-center relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-15 pointer-events-none" style={{ background: 'var(--yellow)' }} />
-        <p className="text-xs font-bold mb-1 relative" style={{ color: 'var(--muted)' }}>رصيدك الحالي</p>
-        <p className="text-4xl font-black relative" style={{ color: 'var(--yellow)' }}>{data?.balance ?? 0}</p>
-        <p className="text-xs font-bold relative" style={{ color: 'var(--muted)' }}>نقطة</p>
-
-        {data?.next && (
-          <div className="mt-4 relative">
-            <div className="flex justify-between text-[11px] font-bold mb-1.5">
-              <span style={{ color: 'var(--muted)' }}>باقي {Math.max(0, data.next.points - data.balance)} نقطة لـ «{data.next.label}»</span>
-              <span style={{ color: 'var(--yellow)' }}>{pct}%</span>
-            </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--panel-3)' }}>
-              <div className="h-2 rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: 'var(--gradient-gold)' }} />
-            </div>
+    <div className="flex flex-col gap-7 fade-in">
+      <section className="board p-5">
+        <p className="text-[12px] font-bold mb-2" style={{ color: 'var(--muted)' }}>رصيدك الحالي</p>
+        <div className="flex items-end justify-between gap-3">
+          <div className="led-board inline-flex items-baseline gap-2 px-4 py-2" style={{ borderRadius: 8 }}>
+            <span className="led num relative z-[1]" style={{ fontSize: 72 }}>{balance}</span>
+            <span className="font-display relative z-[1] text-xl" style={{ color: 'var(--yellow)' }}>نقطة</span>
           </div>
+        </div>
+        {data?.next ? (
+          <p className="text-[13px] font-semibold mt-3.5" style={{ color: 'var(--white-2)' }}>
+            باقي <span className="num font-bold" style={{ color: 'var(--yellow)' }}>{Math.max(0, data.next.points - balance)}</span> نقطة على «{data.next.label}»
+          </p>
+        ) : (
+          <p className="text-[13px] font-semibold mt-3.5" style={{ color: 'var(--success)' }}>وصلت لآخر مكافأة — شغل عالي!</p>
         )}
-      </Card>
+      </section>
 
-      <div>
-        <p className="text-xs font-black mb-3 inline-flex items-center gap-1.5" style={{ color: 'var(--muted)' }}>
-          <History size={13} /> سجل النقاط
-        </p>
+      {rewards.length > 0 && (
+        <section>
+          <SectionHeader title="طريق المكافآت" eyebrow="كل محطة كوبون خصم" />
+          <div style={{ background: 'var(--panel-2)', border: '2px solid var(--line-2)', borderRadius: 10 }} className="px-2 pt-1 pb-0.5">
+            <WashLine stage={roadStage(balance, thresholds)} labels={labels} finish={false} ariaLabel={`رصيدك ${balance} نقطة`} />
+          </div>
+        </section>
+      )}
+
+      <section>
+        <SectionHeader title="سجل النقاط" />
         {(data?.history || []).length === 0 ? (
-          <div className="flex flex-col items-center text-center py-10">
-            <IconBadge icon={Star} size="md" tone="panel" className="mb-3" />
-            <p className="text-sm font-bold" style={{ color: 'var(--muted)' }}>لسه معملتش نقاط</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--muted-2)' }}>كل حجز بيديك نقاط تقدر تستبدلها بعدين</p>
+          <div className="py-8 text-center">
+            <p className="font-display text-xl mb-1" style={{ color: 'var(--white-2)' }}>لسه معملتش نقاط</p>
+            <p className="text-xs" style={{ color: 'var(--muted-2)' }}>كل غسلة بتخلص بتديك نقاط تستبدلها بخصم</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2.5">
+          <div className="receipt">
+            <p className="ticket__k text-center mb-1" style={{ letterSpacing: '0.2em' }}>— DR.CARE · كشف النقاط —</p>
             {data.history.map((h, i) => {
               const positive = h.points > 0;
               return (
-                <Card key={i} className="p-4 flex items-center gap-3">
-                  <IconBadge icon={positive ? TrendingUp : TrendingDown} size="sm" tone={positive ? 'yellow' : 'panel'} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate" style={{ color: 'var(--white-2)' }}>{h.note || h.package_name || h.source}</p>
-                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted-2)' }}>{fmtHistoryDate(h.created_at)}</p>
-                  </div>
-                  <span className="text-sm font-black flex-shrink-0" style={{ color: positive ? 'var(--success)' : 'var(--error)' }}>
+                <div key={i} className="receipt__row">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13.5px] font-semibold leading-snug"><Mixed>{h.note || h.package_name || h.source}</Mixed></span>
+                    <span className="block text-[11px] mt-0.5" style={{ color: 'var(--paper-mute)' }}>{fmtHistoryDate(h.created_at)}</span>
+                  </span>
+                  <span className="font-display text-[1.45rem] leading-none flex-shrink-0 num" style={{ color: positive ? '#157a43' : '#c23a2e' }} dir="ltr">
                     {positive ? `+${h.points}` : h.points}
                   </span>
-                </Card>
+                </div>
               );
             })}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
 
 /* ══════════ كوبونات الخصم tab ══════════ */
 function RewardsTab({ data, redeeming, confirmId, onRequestConfirm, onCancelConfirm, onRedeem, result, copied, onCopy }) {
+  const balance = data?.balance ?? 0;
   return (
     <div className="flex flex-col gap-5 fade-in">
       {result && (
-        <div className="rounded-2xl p-4 text-center fade-in"
-          style={{ background: result.ok ? 'rgba(111,207,71,0.1)' : 'rgba(240,83,62,0.1)', border: `1px solid ${result.ok ? 'var(--success)' : 'var(--error)'}` }}>
+        <div className="p-4 text-center fade-in" style={{ background: 'var(--panel-2)', border: `2px solid ${result.ok ? 'var(--success)' : 'var(--error)'}`, borderRadius: 10 }} role="status">
           {result.ok ? (
             <>
-              <p className="inline-flex items-center gap-1.5 text-sm font-black" style={{ color: 'var(--success)' }}>
-                <CheckCircle2 size={15} /> تم استبدال «{result.label}»
-              </p>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <p className="text-lg font-black tracking-wider" dir="ltr" style={{ color: 'var(--white)' }}>{result.code}</p>
-                <button type="button" onClick={onCopy}
-                  className="inline-flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-full active:scale-95 transition-transform"
-                  style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', color: 'var(--yellow)' }}>
-                  {copied ? <Check size={13} strokeWidth={3} /> : <Copy size={13} />}
-                  {copied ? 'اتنسخ' : 'نسخ الكود'}
-                </button>
+              <p className="font-display text-[1.35rem] leading-none" style={{ color: 'var(--success)' }}>تم استبدال «{result.label}»</p>
+              <div className="led-board flex items-center justify-center py-2.5 mt-3" style={{ borderRadius: 8 }}>
+                <span className="led relative z-[1]" style={{ fontSize: 40, letterSpacing: '0.06em' }} dir="ltr">{result.code}</span>
               </div>
-              <p className="text-xs mt-1.5" style={{ color: 'var(--muted)' }}>استخدم الكود ده عند حجزك الجاي</p>
+              <Button size="md" onClick={onCopy} className="mt-3 w-full">
+                {copied ? <><Check size={17} strokeWidth={3.2} /> اتنسخ</> : <><Copy size={17} /> انسخ الكود</>}
+              </Button>
+              <p className="text-xs mt-2.5" style={{ color: 'var(--muted)' }}>استخدم الكود ده عند حجزك الجاي</p>
             </>
           ) : (
             <p className="text-sm font-bold" style={{ color: 'var(--error)' }}>{result.text}</p>
@@ -121,44 +145,46 @@ function RewardsTab({ data, redeeming, confirmId, onRequestConfirm, onCancelConf
         </div>
       )}
 
-      <div>
-        <p className="text-xs font-black mb-3" style={{ color: 'var(--muted)' }}>المكافآت المتاحة</p>
-        <div className="flex flex-col gap-3">
-          {(data?.rewards || []).map(r => {
-            const confirming = confirmId === r.id;
-            return (
-              <Card key={r.id} className="p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <IconBadge icon={Gift} size="sm" tone={r.available ? 'yellow' : 'panel'} />
-                    <div className="min-w-0">
-                      <p className="text-sm font-black truncate" style={{ color: 'var(--white)' }}>{r.label}</p>
-                      <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{r.desc} — {r.points} نقطة</p>
-                    </div>
-                  </div>
-                  {!confirming ? (
-                    <Button variant="primary" size="md" disabled={!r.available || redeeming === r.id}
-                      onClick={() => onRequestConfirm(r.id)} className="flex-shrink-0" style={{ padding: '0.5rem 1rem' }}>
-                      استبدال
-                    </Button>
-                  ) : (
-                    <div className="flex gap-1.5 flex-shrink-0">
-                      <button type="button" onClick={onCancelConfirm}
-                        className="text-xs font-bold px-2.5 py-2 rounded-xl active:scale-95 transition-transform"
-                        style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--muted)' }}>
-                        إلغاء
-                      </button>
-                      <Button variant="primary" size="md" disabled={redeeming === r.id}
-                        onClick={() => onRedeem(r.id)} style={{ padding: '0.5rem 1rem' }}>
-                        {redeeming === r.id ? '...' : 'تأكيد؟'}
-                      </Button>
-                    </div>
-                  )}
+      <div className="flex flex-col gap-3.5">
+        {(data?.rewards || []).map(r => {
+          const confirming = confirmId === r.id;
+          const can = r.available;
+          return (
+            <article key={r.id} className={`coupon ${can ? '' : 'coupon--locked'}`}>
+              <div className="coupon__main flex items-center">
+                <div className="min-w-0">
+                  <p className="ticket__k" style={{ letterSpacing: '0.12em' }}>كوبون خصم</p>
+                  <p className="font-display text-[3.1rem] leading-[0.95] num">{rewardValue(r)}</p>
+                  <p className="text-[12.5px] font-semibold mt-1" style={{ color: 'var(--paper-mute)' }}>{r.desc}</p>
                 </div>
-              </Card>
-            );
-          })}
-        </div>
+              </div>
+              <div className="coupon__stub">
+                <span className="ticket__k" style={{ marginBottom: 0 }}>التكلفة</span>
+                <span className="font-display text-[1.7rem] leading-none num">{r.points}</span>
+                <span className="text-[10.5px] font-bold -mt-1">نقطة</span>
+                {!can ? (
+                  <span className="text-[10.5px] font-bold leading-tight mt-1" style={{ color: '#3a372e' }}>ناقصك <span className="num">{r.points - balance}</span></span>
+                ) : !confirming ? (
+                  <button
+                    type="button" disabled={redeeming === r.id} onClick={() => onRequestConfirm(r.id)}
+                    className="font-display text-[1.05rem] px-3 py-1.5 mt-1 active:translate-y-0.5 transition-transform"
+                    style={{ background: 'var(--on-yellow)', color: 'var(--yellow)', borderRadius: 6 }}
+                  >
+                    استبدل
+                  </button>
+                ) : (
+                  <div className="flex flex-col gap-1 mt-1 w-full">
+                    <button type="button" disabled={redeeming === r.id} onClick={() => onRedeem(r.id)}
+                      className="font-display text-[1rem] py-1.5 active:translate-y-0.5" style={{ background: 'var(--on-yellow)', color: 'var(--yellow)', borderRadius: 6 }}>
+                      {redeeming === r.id ? '...' : 'أكّد؟'}
+                    </button>
+                    <button type="button" onClick={onCancelConfirm} className="text-[11px] font-bold py-1" style={{ color: '#3a372e' }}>إلغاء</button>
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   );
@@ -182,7 +208,7 @@ export default function CouponsScreen() {
     const ok = await copyText(result.code);
     if (ok) {
       setCopied(true);
-      showToast('تم نسخ الكود ✓', 'success');
+      showToast('تم نسخ الكود', 'success');
       setTimeout(() => setCopied(false), 2000);
     } else {
       showToast('تعذر النسخ — انسخ الكود يدوياً', 'error');
@@ -216,8 +242,8 @@ export default function CouponsScreen() {
       });
       const d = await res.json();
       if (d.ok) {
-        setResult({ ok: true, code: d.coupon_code, label: d.reward?.label });
-        showToast('تم الاستبدال بنجاح ✓', 'success');
+        setResult({ ok: true, code: d.coupon_code ?? d.code, label: d.reward?.label ?? d.label });
+        showToast('تم الاستبدال', 'success');
         load();
       } else {
         setResult({ ok: false, text: d.message });
@@ -232,48 +258,32 @@ export default function CouponsScreen() {
 
   if (!authLoading && !user) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: 'var(--black)' }}>
-        <IconBadge icon={Gift} size="lg" tone="yellow" className="mb-4" />
-        <h2 className="text-lg font-black mb-2" style={{ color: 'var(--white)' }}>نقاط الولاء والكوبونات</h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>سجل دخولك عشان تشوف رصيدك ومكافآتك</p>
-        <Button variant="primary" size="lg" onClick={() => navigate('/login')} style={{ padding: '0.75rem 2rem' }}>
-          تسجيل الدخول
-        </Button>
+      <div className="h-full flex flex-col items-center justify-center px-8 text-center main-content" style={{ background: 'var(--black)' }}>
+        <EmptyState title="نقاطك هنا" text="سجّل دخولك عشان تشوف رصيدك وكوبونات الخصم" action="تسجيل الدخول" onAction={() => navigate('/login')} />
       </div>
     );
   }
 
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
-      <header
-        className="sticky top-0 z-40 px-5 py-4"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
-      >
+      <header className="sticky top-0 z-40 px-4 pt-4 pb-3" style={{ background: 'var(--black)', borderBottom: '2px solid var(--line-2)', paddingTop: 'calc(1rem + var(--safe-top))' }}>
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-lg font-black" style={{ color: 'var(--white)' }}>نقاطي وكوبوناتي</h1>
-          <button type="button" onClick={load}
-            className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
-            style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)', color: 'var(--muted)' }}>
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+          <h1 className="font-display text-[2rem] leading-none">نقاطي وكوبوناتي</h1>
+          <button type="button" onClick={load} aria-label="تحديث"
+            className="w-9 h-9 flex items-center justify-center active:translate-y-0.5 transition-transform"
+            style={{ background: 'var(--panel-3)', borderRadius: 7, color: 'var(--white-2)' }}>
+            <RefreshCw size={16} strokeWidth={2.4} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
         <SegmentedControl
-          value={tab}
-          onChange={setTab}
-          options={[
-            { value: 'points',  label: 'نقاطي' },
-            { value: 'rewards', label: 'كوبونات الخصم' },
-          ]}
+          value={tab} onChange={setTab}
+          options={[{ value: 'points', label: 'نقاطي' }, { value: 'rewards', label: 'كوبونات الخصم' }]}
         />
       </header>
 
-      <div className="p-5">
+      <div className="p-4 pt-5">
         {loading ? (
-          <div className="flex flex-col gap-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-20 rounded-2xl skeleton" style={{ border: '1px solid var(--line-2)' }} />
-            ))}
-          </div>
+          <div className="flex flex-col gap-4">{[1, 2, 3].map(i => <div key={i} className="h-24 skeleton" style={{ borderRadius: 10 }} />)}</div>
         ) : tab === 'points' ? (
           <PointsTab data={data} />
         ) : (

@@ -1,7 +1,6 @@
 import { useRef, useState, useLayoutEffect } from 'react';
 
-/* Animated selection pill that slides between items instead of each item
-   toggling its own background — used for the price calculator's car-type picker. */
+/* Selection marker that slides between items (used by pickers with a few options). */
 export default function SlidingPill({ items, active, onChange, renderItem, trackStyle = {} }) {
   const refs = useRef({});
   const [pill, setPill] = useState({ left: 0, width: 0, top: 0, height: 0 });
@@ -14,8 +13,8 @@ export default function SlidingPill({ items, active, onChange, renderItem, track
   return (
     <div className="relative flex items-center" style={trackStyle}>
       <div
-        className="pill-slide absolute rounded-xl"
-        style={{ left: pill.left, width: pill.width, top: pill.top, height: pill.height, background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)' }}
+        className="pill-slide absolute"
+        style={{ left: pill.left, width: pill.width, top: pill.top, height: pill.height, background: 'var(--yellow)', borderRadius: 6 }}
       />
       {items.map(it => (
         <button

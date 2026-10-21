@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Mail, Lock, Eye, EyeOff, User, Phone, Gift, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Mail, Lock, Eye, EyeOff, User, Phone, Gift } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { secureFetch } from '../lib/api';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import SegmentedControl from '../components/ui/SegmentedControl';
+import NeonEmblem from '../components/brand/NeonEmblem';
 
 const TABS = [
   { value: 'login',    label: 'تسجيل دخول' },
@@ -50,8 +51,8 @@ function LoginForm({ onSwitch }) {
 
   return (
     <>
-      <h1 className="text-2xl font-black mb-1.5 fade-in" style={{ color: 'var(--white)' }}>أهلاً بيك تاني 👋</h1>
-      <p className="text-sm mb-8 fade-in" style={{ color: 'var(--muted)' }}>ادخل بياناتك وابدأ</p>
+      <h1 className="font-display text-[2.2rem] leading-none mb-2 fade-in">أهلاً بيك تاني</h1>
+      <p className="text-sm mb-7 fade-in" style={{ color: 'var(--muted)' }}>ادخل بياناتك وكمّل من حيث وقفت</p>
 
       <form onSubmit={submit} className="flex flex-col gap-4 fade-in fade-in-1">
         <Input
@@ -65,14 +66,14 @@ function LoginForm({ onSwitch }) {
         />
 
         {error && (
-          <div className="rounded-xl p-3 text-sm font-bold text-center"
-            style={{ background: 'rgba(240,83,62,0.1)', color: 'var(--error)' }}>
+          <div role="alert" className="p-3 text-sm font-bold text-center"
+            style={{ border: '2px solid var(--error)', borderRadius: 8, color: 'var(--error)' }}>
             {error}
           </div>
         )}
 
         <Button type="submit" variant="primary" size="lg" disabled={loading} className="w-full mt-2">
-          <span className="inline-flex items-center gap-2">{loading ? 'جاري الدخول...' : 'دخول'} <ChevronRight size={18} /></span>
+          {loading ? 'جاري الدخول...' : <>دخول <ArrowLeft size={20} strokeWidth={3} /></>}
         </Button>
 
         <button type="button" onClick={() => navigate('/forgot-password')}
@@ -141,26 +142,21 @@ function RegisterForm({ onSwitch }) {
 
   if (done) {
     return (
-      <div className="flex flex-col items-center text-center mt-6 fade-in">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-          style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}>
-          <CheckCircle2 size={30} style={{ color: 'var(--yellow)' }} />
-        </div>
-        <h2 className="text-lg font-black mb-2" style={{ color: 'var(--white)' }}>تم إنشاء الحساب بنجاح!</h2>
-        <p className="text-sm mb-8" style={{ color: 'var(--muted)' }}>
-          تحقق من بريدك الإلكتروني لتفعيل حسابك، ثم سجّل دخولك
+      <div className="flex flex-col items-center text-center mt-4 fade-in">
+        <NeonEmblem size={100} animate />
+        <h2 className="font-display text-[2rem] leading-none mt-5 mb-2">الحساب اتعمل</h2>
+        <p className="text-sm mb-8 leading-relaxed" style={{ color: 'var(--muted)' }}>
+          بص على بريدك الإلكتروني وفعّل حسابك، وبعدها سجّل دخولك
         </p>
-        <Button variant="primary" size="lg" onClick={() => onSwitch('login')} className="w-full">
-          تسجيل الدخول
-        </Button>
+        <Button size="lg" onClick={() => onSwitch('login')} className="w-full">تسجيل الدخول</Button>
       </div>
     );
   }
 
   return (
     <>
-      <h1 className="text-2xl font-black mb-1.5 fade-in" style={{ color: 'var(--white)' }}>أهلاً بيك 👋</h1>
-      <p className="text-sm mb-8 fade-in" style={{ color: 'var(--muted)' }}>انضم لعائلة DR.Care</p>
+      <h1 className="font-display text-[2.2rem] leading-none mb-2 fade-in">أهلاً بيك في DR.Care</h1>
+      <p className="text-sm mb-7 fade-in" style={{ color: 'var(--muted)' }}>حساب واحد لحجوزاتك ونقاطك</p>
 
       <form onSubmit={submit} className="flex flex-col gap-4 fade-in fade-in-1">
         <Input type="text" placeholder="الاسم الكامل" value={form.name} onChange={set('name')} icon={User} />
@@ -174,8 +170,8 @@ function RegisterForm({ onSwitch }) {
         <Input type="text" dir="ltr" placeholder="كود الإحالة (اختياري)" value={form.referral_code} onChange={set('referral_code')} icon={Gift} />
 
         {error && (
-          <div className="rounded-xl p-3 text-sm font-bold text-center"
-            style={{ background: 'rgba(240,83,62,0.1)', color: 'var(--error)' }}>
+          <div role="alert" className="p-3 text-sm font-bold text-center"
+            style={{ border: '2px solid var(--error)', borderRadius: 8, color: 'var(--error)' }}>
             {error}
           </div>
         )}
@@ -208,19 +204,18 @@ export default function AuthScreen() {
 
   return (
     <div className="h-full overflow-y-auto scroll-hide flex flex-col" style={{ background: 'var(--black)' }}>
-      <header className="relative flex items-center justify-center pt-8 pb-4 flex-shrink-0">
+      <header className="relative flex items-center justify-center pt-8 pb-5 flex-shrink-0" style={{ paddingTop: 'calc(2rem + var(--safe-top))' }}>
         <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="absolute w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-transform"
-          style={{ right: '1.25rem', background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+          type="button" onClick={() => navigate(-1)} aria-label="رجوع"
+          className="absolute w-10 h-10 flex items-center justify-center active:translate-y-0.5 transition-transform"
+          style={{ right: '1.25rem', top: 'calc(1.5rem + var(--safe-top))', background: 'var(--panel-3)', borderRadius: 8, color: 'var(--white-2)' }}
         >
-          <ChevronRight size={18} style={{ color: 'var(--muted)' }} />
+          <ArrowRight size={20} strokeWidth={2.6} />
         </button>
-        <h1 className="text-xl font-black text-gradient-yellow">DR.Care</h1>
+        <NeonEmblem size={78} animate />
       </header>
 
-      <div className="px-6 flex-1 flex flex-col">
+      <div className="px-5 pb-10 flex-1 flex flex-col">
         <SegmentedControl options={TABS} value={tab} onChange={switchTab} className="mb-8 fade-in" />
 
         {tab === 'login' ? <LoginForm onSwitch={switchTab} /> : <RegisterForm onSwitch={switchTab} />}

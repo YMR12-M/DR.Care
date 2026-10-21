@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { WifiOff, Wifi } from 'lucide-react';
 
 export default function OfflineToast() {
   const [status, setStatus] = useState(null); // null | 'offline' | 'online'
@@ -25,26 +26,18 @@ export default function OfflineToast() {
 
   return (
     <div
+      role="status"
       className="fixed top-0 left-0 right-0 z-[9998] flex items-center justify-center gap-2 py-2 px-4 text-sm font-bold text-center"
       style={{
-        background: isOffline ? 'rgba(240,83,62,0.95)' : 'rgba(111,207,71,0.95)',
-        color: '#fff',
-        backdropFilter: 'blur(12px)',
+        background: isOffline ? 'var(--error)' : 'var(--success)',
+        color: 'var(--on-yellow)',
         paddingTop: 'calc(8px + env(safe-area-inset-top, 0px))',
+        borderBottom: '3px solid var(--on-yellow)',
         animation: 'slideDown 0.25s ease',
       }}
     >
-      {isOffline ? (
-        <>
-          <span>📵</span>
-          <span>وضع عدم الاتصال</span>
-        </>
-      ) : (
-        <>
-          <span>✓</span>
-          <span>تم استعادة الاتصال</span>
-        </>
-      )}
+      {isOffline ? <WifiOff size={16} strokeWidth={2.6} /> : <Wifi size={16} strokeWidth={2.6} />}
+      <span>{isOffline ? 'مفيش اتصال بالإنترنت' : 'النت رجع'}</span>
     </div>
   );
 }

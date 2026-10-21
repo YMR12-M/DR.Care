@@ -2,7 +2,7 @@
 // Runtime (stale-while-revalidate) caching instead of a static precache list —
 // Vite content-hashes build filenames per build, so a hardcoded asset list would
 // go stale on every deploy. API calls and cross-origin requests pass straight through.
-const CACHE_NAME = 'drcare-app-v2';
+const CACHE_NAME = 'drcare-app-v3';
 const SCOPE_PATH = '/app/';
 
 self.addEventListener('install', (event) => {

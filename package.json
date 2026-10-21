@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "lint": "eslint assets/js/script.js assets/js/admin.js assets/js/mobile.js assets/js/idb.js assets/js/transitions.js sw.js CarWash-POS/script.js --max-warnings 10",
+    "lint": "eslint assets/js/script.js assets/js/admin.js assets/js/mobile.js assets/js/idb.js assets/js/transitions.js assets/js/brand.js sw.js CarWash-POS/script.js --max-warnings 10",
     "format": "prettier --write .",
     "test": "bash tools/scripts/run-tests.sh",
     "test:php": "composer test:php",

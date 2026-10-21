@@ -1,27 +1,26 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, CalendarPlus, ClipboardList, CircleUser } from 'lucide-react';
+import { GarageGlyph, TicketGlyph, ReceiptGlyph, WheelGlyph } from './brand/NavGlyphs';
 
 const tabs = [
-  { path: '/',         label: 'الرئيسية', Icon: Home },
-  { path: '/book',     label: 'احجز',     Icon: CalendarPlus },
-  { path: '/bookings', label: 'حجوزاتي',  Icon: ClipboardList },
-  { path: '/profile',  label: 'حسابي',    Icon: CircleUser },
+  { path: '/',         label: 'الرئيسية', Glyph: GarageGlyph },
+  { path: '/book',     label: 'احجز',     Glyph: TicketGlyph },
+  { path: '/bookings', label: 'حجوزاتي',  Glyph: ReceiptGlyph },
+  { path: '/profile',  label: 'حسابي',    Glyph: WheelGlyph },
 ];
 
+/* Docked rail, always labelled. The active tab lights up as a yellow sign plate. */
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
   return (
     <nav
-      className="fixed left-0 right-0 z-50 flex justify-center px-4"
-      style={{ bottom: 'calc(14px + var(--safe-bottom))' }}
+      aria-label="التنقل الرئيسي"
+      className="fixed left-0 right-0 bottom-0 z-50"
+      style={{ background: 'var(--black)', borderTop: '2px solid var(--line-2)', paddingBottom: 'var(--safe-bottom)' }}
     >
-      <div
-        className="glass flex items-center gap-1.5 px-2.5 py-2.5 rounded-full"
-        style={{ boxShadow: 'var(--shadow-premium)' }}
-      >
-        {tabs.map(({ path, label, Icon }) => {
+      <div className="flex">
+        {tabs.map(({ path, label, Glyph }) => {
           const isActive = path === '/'
             ? location.pathname === '/'
             : location.pathname === path || location.pathname.startsWith(path + '/');
@@ -29,18 +28,23 @@ export default function BottomNav() {
           return (
             <button
               key={path}
-              onClick={() => navigate(path)}
-              className="flex items-center justify-center gap-2 rounded-full transition-all duration-300 active:scale-95"
-              style={{
-                color: isActive ? '#0a0800' : 'var(--muted)',
-                background: isActive ? 'var(--gradient-gold)' : 'transparent',
-                boxShadow: isActive ? '0 4px 16px rgba(255,210,31,0.35), inset 0 1px 0 rgba(255,255,255,0.35)' : 'none',
-                padding: isActive ? '0.85rem 1.4rem' : '0.85rem 0.9rem',
-              }}
               type="button"
+              onClick={() => navigate(path)}
+              aria-current={isActive ? 'page' : undefined}
+              className="flex-1 flex flex-col items-center gap-1 pt-2 pb-2 active:opacity-70"
+              style={{ color: isActive ? 'var(--white)' : 'var(--muted-2)' }}
             >
-              <Icon size={24} strokeWidth={isActive ? 2.6 : 2.1} fill={isActive ? '#0a0800' : 'none'} fillOpacity={isActive ? 0.12 : 0} />
-              {isActive && <span className="text-[13px] font-black leading-none whitespace-nowrap">{label}</span>}
+              <span
+                className="flex items-center justify-center transition-colors duration-100"
+                style={{
+                  width: 50, height: 30, borderRadius: 7,
+                  background: isActive ? 'var(--yellow)' : 'transparent',
+                  color: isActive ? 'var(--on-yellow)' : 'currentColor',
+                }}
+              >
+                <Glyph size={24} />
+              </span>
+              <span className="text-[11px] font-bold leading-none">{label}</span>
             </button>
           );
         })}

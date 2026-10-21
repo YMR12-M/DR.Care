@@ -83,7 +83,7 @@ mobile-app/
 ## نظام التصميم
 
 - كل الـ design tokens في `src/index.css:3-27` كـ CSS custom properties (`--black`, `--yellow*`, `--white*`, `--muted*`, `--success`, `--error`, `--line*`) — **لا يوجد `tailwind.config.js`**؛ Tailwind v4 يُستورد فقط عبر `@import "tailwindcss";` والتخصيص كله عبر `style={{...}}` inline بالمتغيرات، وليس كلاسات ألوان Tailwind.
-- خط Cairo (عربي) + `dir="rtl"` على مستوى الصفحة.
+- خطوط Lalezar (عناوين) + IBM Plex Sans Arabic (نص) + Handjet (LED) + `dir="rtl"` على مستوى الصفحة — راجع [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md).
 
 ## الترتيب المتبقي نحو الهدف الاستراتيجي (استبدال الموقع بـ PWA حقيقية)
 

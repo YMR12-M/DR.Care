@@ -1,8 +1,9 @@
 export default function SegmentedControl({ options, value, onChange, className = '' }) {
   return (
     <div
-      className={`relative flex rounded-full p-1 ${className}`}
-      style={{ background: 'var(--panel-3)', border: '1px solid var(--line-2)' }}
+      className={`relative flex p-[3px] ${className}`}
+      style={{ background: 'var(--panel-2)', border: '2px solid var(--line-2)', borderRadius: 9 }}
+      role="tablist"
     >
       {options.map(opt => {
         const active = opt.value === value;
@@ -10,12 +11,14 @@ export default function SegmentedControl({ options, value, onChange, className =
           <button
             key={opt.value}
             type="button"
+            role="tab"
+            aria-selected={active}
             onClick={() => onChange(opt.value)}
-            className="flex-1 rounded-full py-2.5 text-sm font-black transition-all duration-200 active:scale-95"
+            className="flex-1 py-2.5 text-[0.95rem] font-bold active:scale-[0.98] transition-colors duration-100"
             style={{
-              background: active ? 'var(--gradient-gold)' : 'transparent',
-              color: active ? '#0a0800' : 'var(--muted)',
-              boxShadow: active ? '0 2px 12px rgba(255,210,31,0.3), inset 0 1px 0 rgba(255,255,255,0.35)' : 'none',
+              borderRadius: 6,
+              background: active ? 'var(--yellow)' : 'transparent',
+              color: active ? 'var(--on-yellow)' : 'var(--muted)',
             }}
           >
             {opt.label}

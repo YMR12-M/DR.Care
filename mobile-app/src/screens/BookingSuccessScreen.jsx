@@ -1,8 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { CheckCircle2, ClipboardList, Home } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Button from '../components/ui/Button';
+import NeonEmblem from '../components/brand/NeonEmblem';
+import Plate from '../components/brand/Plate';
+import Ticket, { TicketField } from '../components/brand/Ticket';
+import { Mixed } from '../lib/bidi';
 
+/* The booking comes out of the machine as a paper ticket and gets a rubber stamp. */
 export default function BookingSuccessScreen() {
   const navigate    = useNavigate();
   const { state }   = useLocation();
@@ -11,35 +16,57 @@ export default function BookingSuccessScreen() {
   useEffect(() => { if (!booking) navigate('/'); }, [booking, navigate]);
   if (!booking) return null;
 
-  return (
-    <div className="relative h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: 'var(--black)' }}>
-      {/* glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl opacity-15 pointer-events-none"
-        style={{ background: 'var(--yellow)' }}/>
+  const total = booking.total ?? booking.totalLabel;
 
-      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 relative fade-in"
-        style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}>
-        <CheckCircle2 size={38} style={{ color: 'var(--yellow)' }} strokeWidth={2} />
-      </div>
-      <h1 className="text-2xl font-black mb-2 relative fade-in fade-in-1" style={{ color: 'var(--white)' }}>تم الحجز بنجاح!</h1>
-      <p className="text-sm mb-6 leading-relaxed relative fade-in fade-in-2" style={{ color: 'var(--muted)' }}>
-        شكراً ليك! هنتواصل معاك قريباً لتأكيد الموعد
+  return (
+    <div className="h-full overflow-y-auto scroll-hide flex flex-col items-center px-5 pt-10 pb-10 text-center" style={{ background: 'var(--black)', paddingTop: 'calc(2.5rem + var(--safe-top))' }}>
+      <NeonEmblem size={86} animate />
+      <h1 className="font-display text-[2.7rem] leading-none mt-5 fade-in">الحجز اتسجّل</h1>
+      <p className="text-sm mt-2.5 mb-7 leading-relaxed fade-in fade-in-1" style={{ color: 'var(--muted)' }}>
+        اتفضّل تذكرتك — هنأكد معاك الميعاد قريب
       </p>
 
-      {booking.id && (
-        <div className="rounded-2xl p-5 w-full mb-6 text-right relative fade-in fade-in-3"
-          style={{ background: 'var(--panel-2)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}>
-          <p className="text-xs mb-1" style={{ color: 'var(--muted)' }}>رقم الحجز</p>
-          <p className="text-xl font-black" style={{ color: 'var(--yellow)' }}>#{booking.id}</p>
-        </div>
-      )}
+      <div className="relative w-full text-right">
+        <Ticket
+          print seed={booking.id}
+          stub={
+            <div className="flex items-center justify-between gap-3">
+              {booking.plate ? <Plate value={booking.plate} size="sm" /> : <span className="ticket__k">احتفظ بالرقم ده</span>}
+              <span className="font-display text-[1.5rem] leading-none" dir="ltr">#{booking.id}</span>
+            </div>
+          }
+        >
+          <p className="ticket__k" style={{ letterSpacing: '0.12em' }}>DR.CARE · تذكرة غسيل</p>
+          <div className="mt-2 mb-1">
+            <div className="ticket__k">رقم الحجز</div>
+            <div className="font-display text-[3.4rem] leading-none" dir="ltr" style={{ textAlign: 'right' }}>#{booking.id}</div>
+          </div>
+          <div className="ticket__rule" />
+          <div className="ticket__grid grid grid-cols-2 gap-x-4 gap-y-3">
+            {booking.packageName && <TicketField label="الغسلة"><Mixed>{booking.packageName}</Mixed></TicketField>}
+            {booking.carName && <TicketField label="العربية">{booking.carName}</TicketField>}
+            {booking.when && <TicketField label="الميعاد">{booking.when}</TicketField>}
+            {total ? <TicketField label="الإجمالي">{typeof total === 'number' ? `${total} ج` : total}</TicketField> : null}
+          </div>
+        </Ticket>
 
-      <Button variant="primary" size="lg" onClick={() => navigate('/bookings')} className="w-full mb-3 relative fade-in fade-in-4">
-        <span className="inline-flex items-center gap-2"><ClipboardList size={17}/> تابع حجوزاتي</span>
-      </Button>
-      <Button variant="secondary" size="lg" onClick={() => navigate('/')} className="w-full relative fade-in fade-in-5">
-        <span className="inline-flex items-center gap-2"><Home size={17}/> الرئيسية</span>
-      </Button>
+        <span
+          aria-hidden="true"
+          className="absolute font-display pointer-events-none"
+          style={{
+            top: 16, left: 14, padding: '2px 12px 0', fontSize: '1.7rem', lineHeight: 1.25,
+            color: 'var(--plate)', border: '3px solid var(--plate)', borderRadius: 6, opacity: 0.88,
+            mixBlendMode: 'multiply', animation: 'stampIn 0.45s 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) both', transform: 'rotate(-6deg)',
+          }}
+        >
+          اتحجز
+        </span>
+      </div>
+
+      <div className="w-full flex flex-col gap-3 mt-8 fade-in fade-in-4">
+        <Button size="lg" onClick={() => navigate('/bookings')} className="w-full">تابع حجوزاتي <ArrowLeft size={22} strokeWidth={3} /></Button>
+        <Button variant="secondary" size="lg" onClick={() => navigate('/')} className="w-full">الرئيسية</Button>
+      </div>
     </div>
   );
 }

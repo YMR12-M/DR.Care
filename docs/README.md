@@ -4,6 +4,7 @@
 
 | الملف | المحتوى |
 |-------|---------|
+| **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)** | **نظام التصميم «خط الغسيل»** — المبادئ، الألوان، الخطوط، المكوّنات، وأماكن الملفات |
 | **[FEATURES.md](./FEATURES.md)** | **الدليل الشامل** — كل ميزة، كل endpoint، وكل جدول قاعدة بيانات بالتفصيل |
 | [BOOKING_WORKFLOW.md](./BOOKING_WORKFLOW.md) | دورة حياة الحجز (State Machine)، مخططات mermaid للبنية والتدفقات |
 | [CUSTOMER_SYSTEM.md](./CUSTOMER_SYSTEM.md) | تسجيل/دخول العميل، تفعيل البريد، استعادة كلمة المرور، الملف الشخصي |

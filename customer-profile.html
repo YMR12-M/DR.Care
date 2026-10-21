@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ffd21f">
+  <meta name="theme-color" content="#0d0f12">
   <title>DR.Care | حسابي</title>
   <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css?v=9">
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Handjet:ELGR,ELSH,wght@1,2,600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css?v=10">
+  <link rel="stylesheet" href="assets/css/brand.css?v=1">
   <script>
     if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && window.innerWidth <= 900) {
       window.location.replace('mobile-profile.html');
@@ -448,7 +449,7 @@
         </div>
 
         <div class="cp-user-info">
-          <p class="cp-kicker">My Account</p>
+          <p class="cp-kicker">حسابي</p>
           <strong id="profileName">جاري التحميل...</strong>
           <div class="cp-meta">
             <div class="cp-meta-item">
@@ -629,12 +630,12 @@
                     <div class="loy-tier-badge__ring">
                       <span class="loy-tier-badge__icon" id="cpTierEmoji">🥉</span>
                     </div>
-                    <p class="loy-tier-badge__name" id="cpTierName">Bronze</p>
+                    <p class="loy-tier-badge__name" id="cpTierName">برونزي</p>
                     <p class="loy-tier-badge__label">مستواك الحالي</p>
                   </div>
                   <!-- Points block centered -->
                   <div class="loy-pts-block" style="text-align:center">
-                    <p class="loy-eyebrow">Loyalty Points</p>
+                    <p class="loy-eyebrow">نقاط الولاء</p>
                     <div class="loy-pts-row" style="justify-content:center">
                       <span class="loy-pts-num" id="cpPointsBalance">—</span>
                       <span class="loy-pts-word">نقطة</span>
@@ -650,17 +651,17 @@
                       <div class="loy-ms" id="loyMs0">
                         <div class="loy-ms__dot"></div>
                         <div class="loy-ms__emoji">🥉</div>
-                        <div class="loy-ms__name">Bronze</div>
+                        <div class="loy-ms__name">برونزي</div>
                       </div>
                       <div class="loy-ms" id="loyMs1">
                         <div class="loy-ms__dot"></div>
                         <div class="loy-ms__emoji">🥈</div>
-                        <div class="loy-ms__name">Silver</div>
+                        <div class="loy-ms__name">فضي</div>
                       </div>
                       <div class="loy-ms" id="loyMs2">
                         <div class="loy-ms__dot"></div>
                         <div class="loy-ms__emoji">🏆</div>
-                        <div class="loy-ms__name">Gold</div>
+                        <div class="loy-ms__name">ذهبي</div>
                       </div>
                     </div>
                   </div>
@@ -729,7 +730,7 @@
           <!-- Quick links -->
           <div class="cp-stat-card">
             <div class="cp-stat-row" style="background:var(--panel-2)">
-              <label style="font-family:var(--font-en);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)">Quick Links</label>
+              <label style="font-family:var(--font-en);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)">روابط سريعة</label>
             </div>
             <div class="cp-stat-row" style="padding:0">
               <a href="customer-bookings.html" style="display:flex;align-items:center;gap:10px;padding:14px 18px;width:100%;color:var(--muted);font-size:.85rem;font-weight:700;transition:color var(--transition)">
@@ -977,9 +978,9 @@
 
     /* ── Loyalty / Rewards ── */
     const CP_TIERS = [
-      { min:0,  max:2,  name:'Bronze', emoji:'🥉' },
-      { min:3,  max:9,  name:'Silver', emoji:'🥈' },
-      { min:10, max:Infinity, name:'Gold', emoji:'🏆' },
+      { min:0,  max:2,  name:'برونزي', emoji:'🥉' },
+      { min:3,  max:9,  name:'فضي', emoji:'🥈' },
+      { min:10, max:Infinity, name:'ذهبي', emoji:'🏆' },
     ];
     const CP_REWARD_ICONS = { r25:'🎫', r50:'🎟️', r100:'🏷️', r200:'💳' };
     let cpRewardsLoaded = false;

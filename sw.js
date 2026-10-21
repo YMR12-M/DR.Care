@@ -1,12 +1,15 @@
-// DR.Care Service Worker v2.2
-const CACHE_NAME = 'drcare-v9';
+// DR.Care Service Worker v2.3
+const CACHE_NAME = 'drcare-v10';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/mobile.html',
   '/assets/css/styles.css',
+  '/assets/css/brand.css',
+  '/assets/css/home.css',
   '/assets/css/mobile.css',
   '/assets/js/script.js',
+  '/assets/js/brand.js',
   '/assets/js/mobile.js',
   '/assets/js/idb.js',
   '/admin.html',
@@ -14,7 +17,8 @@ const STATIC_ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap'
+  '/assets/img/brand/sprite.svg',
+  'https://fonts.googleapis.com/css2?family=Lalezar&family=Handjet:ELGR,ELSH,wght@1,2,600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap'
 ];
 
 // IndexedDB helper (worker context)

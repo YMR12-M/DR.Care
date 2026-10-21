@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { Download, X, Share } from 'lucide-react';
 
 const DISMISS_KEY = 'dr_install_dismissed_at';
 const DISMISS_DAYS = 14;
@@ -66,37 +66,30 @@ export default function InstallPrompt() {
 
   return (
     <div
-      className="fixed left-4 right-4 z-[9997] rounded-2xl p-4 flex items-center gap-3 fade-in"
+      className="fixed left-3 right-3 z-[9997] flex items-stretch fade-in overflow-hidden"
       style={{
-        bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))',
-        background: 'linear-gradient(165deg, var(--panel-3) 0%, var(--panel) 100%)',
-        border: '1px solid var(--yellow-line)',
-        boxShadow: 'var(--shadow-premium)',
+        bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+        background: 'var(--yellow)', color: 'var(--on-yellow)', borderRadius: 10, boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
       }}
     >
-      <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ background: 'var(--gradient-gold-soft)', border: '1px solid var(--yellow-line)' }}
-      >
-        <Download size={20} style={{ color: 'var(--yellow)' }} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-black" style={{ color: 'var(--white)' }}>نزّل تطبيق DR.Care</p>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-          {iosHint ? 'دوس على مشاركة ⬆️ ثم "إضافة إلى الشاشة الرئيسية"' : 'وصول أسرع من شاشتك الرئيسية'}
-        </p>
+      <div className="flex-1 min-w-0 flex items-center gap-3 p-3.5">
+        <span className="flex items-center justify-center flex-shrink-0" style={{ width: 40, height: 40, borderRadius: 8, background: 'var(--on-yellow)', color: 'var(--yellow)' }}>
+          {iosHint ? <Share size={19} strokeWidth={2.6} /> : <Download size={19} strokeWidth={2.6} />}
+        </span>
+        <div className="min-w-0">
+          <p className="font-display text-[1.15rem] leading-none">نزّل تطبيق DR.Care</p>
+          <p className="text-xs font-bold mt-1 leading-snug" style={{ opacity: 0.8 }}>
+            {iosHint ? 'دوس على «مشاركة» ثم «إضافة إلى الشاشة الرئيسية»' : 'يفتح أسرع من شاشتك الرئيسية'}
+          </p>
+        </div>
       </div>
       {!iosHint && (
-        <button type="button" onClick={install}
-          className="text-xs font-black px-3.5 py-2 rounded-xl flex-shrink-0 active:scale-95 transition-transform"
-          style={{ background: 'var(--gradient-gold)', color: '#0a0800' }}>
-          تنزيل
+        <button type="button" onClick={install} className="flex-shrink-0 px-4 font-display text-lg active:opacity-70" style={{ background: 'var(--on-yellow)', color: 'var(--yellow)' }}>
+          نزّل
         </button>
       )}
-      <button type="button" onClick={dismiss} aria-label="إغلاق"
-        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
-        style={{ background: 'var(--panel-4)', color: 'var(--muted)' }}>
-        <X size={13} />
+      <button type="button" onClick={dismiss} aria-label="إغلاق" className="flex-shrink-0 w-10 flex items-center justify-center active:opacity-60">
+        <X size={16} strokeWidth={3} />
       </button>
     </div>
   );

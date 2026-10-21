@@ -50,7 +50,7 @@ let appConfig = { ...fallbackConfig };
 
 // ─── Utils ─────────────────────────────────────────
 const formatPrice = (value) =>
-  `${Number(value).toLocaleString('ar-EG')} جنيه`;
+  `${Number(value).toLocaleString('ar-EG-u-nu-latn')} جنيه`;
 
 const setMessage = (message, type) => {
   if (!formMessage) return;
@@ -288,12 +288,13 @@ const updateEstimate = () => {
   const subtotal = Number(pkg?.price ?? 0) + Number(car?.extra ?? 0);
   const discount = appliedCoupon ? appliedCoupon.discount : 0;
   const total    = Math.max(0, subtotal - discount);
-  const newText  = pkg?.code === 'carpet' ? '15 ج / متر'
-                 : (pkg?.price === 0)    ? 'حسب الشغل'
-                 : formatPrice(total);
+  /* LED board: digits in the LED face, the currency + words in the painted face (see .estimate in home.css) */
+  const newText  = pkg?.code === 'carpet' ? '15<small>ج / متر</small>'
+                 : (pkg?.price === 0)    ? '<span class="estimate-text">حسب الشغل</span>'
+                 : `${Number(total).toLocaleString('ar-EG-u-nu-latn')}<small>جنيه</small>`;
 
-  if (estimateValue.textContent !== newText) {
-    estimateValue.textContent = newText;
+  if (estimateValue.innerHTML !== newText) {
+    estimateValue.innerHTML = newText;
     estimateValue.classList.remove('bump');
     void estimateValue.offsetWidth;
     estimateValue.classList.add('bump');
@@ -364,6 +365,9 @@ const populateForm = () => {
   renderSelect(paymentMethod, appConfig.paymentMethods, (m) => m, (m) => m, appConfig.paymentMethods[0]);
   const numEl = document.getElementById('instapayNumberDisplay');
   if (numEl) numEl.textContent = appConfig.instapayNumber;
+  /* keep the menu board's prices in step with what the wizard will actually charge */
+  window.__drcareConfig = appConfig;
+  if (typeof window.drcareSyncMenu === 'function') window.drcareSyncMenu(appConfig);
   updateEstimate();
   /* Sync car type cards after config loads */
   requestAnimationFrame(() => {
@@ -506,7 +510,7 @@ const apptFallback = document.getElementById('apptFallback');
 
 const formatSlotDate = (dateStr) => {
   const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return d.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 const formatSlotTime = (timeStr) => {
@@ -533,9 +537,9 @@ const populateSlotDates = () => {
 
     if (!dateGrid) return;
     const d = new Date(date + 'T00:00:00');
-    const dayName  = d.toLocaleDateString('ar-EG', { weekday: 'short' });
+    const dayName  = d.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'short' });
     const dayNum   = d.getDate();
-    const monthLbl = d.toLocaleDateString('ar-EG', { month: 'short' });
+    const monthLbl = d.toLocaleDateString('ar-EG-u-nu-latn', { month: 'short' });
     const count    = _availableSlots[date].filter(s => s.available > 0).length;
 
     const btn = document.createElement('button');
@@ -861,7 +865,7 @@ const loadReviews = async () => {
     }
 
     /* ── Cards ── */
-    const fmtDate = (v) => v ? new Date(v).toLocaleDateString('ar-EG', { year:'numeric', month:'long' }) : '';
+    const fmtDate = (v) => v ? new Date(v).toLocaleDateString('ar-EG-u-nu-latn', { year:'numeric', month:'long' }) : '';
     grid.innerHTML = reviews.map(r => `
       <article class="review-card reveal">
         <div class="review-card__stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
@@ -1244,7 +1248,7 @@ document.addEventListener('click', (e) => {
       if (valEl) {
         const appt = upcoming.appointment ? new Date(upcoming.appointment) : null;
         valEl.textContent = appt
-          ? appt.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+          ? appt.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
           : (upcoming.package_name || 'حجز قادم');
       }
       widget.style.display = 'flex';

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="DR.Care مغسلة عربيات مصرية احترافية — حجز أونلاين، أسعار واضحة، متابعة للطلب.">
-  <meta name="theme-color" content="#ffd21f">
+  <meta name="theme-color" content="#0d0f12">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="DR.Care">
   <meta property="og:title" content="DR.Care | مغسلة عربيات مصرية">
@@ -23,21 +23,32 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css?v=9">
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Handjet:ELGR,ELSH,wght@1,2,600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css?v=10">
+  <link rel="stylesheet" href="assets/css/brand.css?v=1">
+  <link rel="stylesheet" href="assets/css/home.css?v=1">
 </head>
 <body>
 
   <!-- Skip Link (keyboard accessibility) -->
   <a class="skip-link" href="#booking">انتقل للحجز</a>
 
-  <!-- Promo Banner -->
-  <div class="promo-banner" id="promoBanner" role="note" aria-label="عرض خاص">
-    <span class="promo-banner__badge">عرض الصيف</span>
-    احجز Deep Cleaning الآن واحصل على خصم 15% — ينتهي العرض بعد
-    <span class="promo-banner__timer" id="promoTimer" aria-live="off">--:--:--</span>
+  <!-- LED board over the wash-bay door -->
+  <div class="promo-banner" id="promoBanner" role="note" aria-label="عرض اليوم">
+    <span class="promo-banner__timer" id="promoTimer" dir="ltr" aria-label="الوقت المتبقي للعرض">--:--:--</span>
+    <div class="promo-banner__ticker" aria-hidden="true">
+      <div class="promo-banner__track">
+        <span>عرض الصيف — احجز Deep Cleaning واحصل على خصم 15%</span>
+        <span>كاش أو Instapay</span>
+        <span>قليوب — شارع العروبة · يومياً 12م – 10م</span>
+        <span>عرض الصيف — احجز Deep Cleaning واحصل على خصم 15%</span>
+        <span>كاش أو Instapay</span>
+        <span>قليوب — شارع العروبة · يومياً 12م – 10م</span>
+      </div>
+    </div>
     <button class="promo-banner__close" id="promoBannerClose" type="button" aria-label="إغلاق">✕</button>
   </div>
+  <div class="hazard hazard--sm promo-hazard" aria-hidden="true"></div>
 
   <!-- Scroll Progress Bar -->
   <div id="scrollProgress" aria-hidden="true"></div>
@@ -105,444 +116,325 @@
 
   <main>
 
-    <!-- ══════════════ HERO ══════════════ -->
-    <section class="hero" id="home" aria-labelledby="heroTitle">
-      <div class="hero-mesh" aria-hidden="true">
-        <div class="hero-mesh__orb hero-mesh__orb--1"></div>
-        <div class="hero-mesh__orb hero-mesh__orb--2"></div>
-        <div class="hero-mesh__orb hero-mesh__orb--3"></div>
-        <div class="hero-mesh__grid"></div>
-      </div>
-
-      <!-- Water bead particles — قطرات ماء على العربية بعد الغسيل -->
-      <div class="hero-drops" aria-hidden="true">
-        <span class="drop" style="--dur:5.0s;--dly:-1.0s;width:8px;height:8px;top:12%;left:8%"></span>
-        <span class="drop" style="--dur:7.5s;--dly:-3.2s;width:5px;height:5px;top:28%;left:20%"></span>
-        <span class="drop" style="--dur:6.0s;--dly:-2.0s;width:12px;height:12px;top:18%;left:35%"></span>
-        <span class="drop" style="--dur:9.0s;--dly:-5.5s;width:4px;height:4px;top:55%;left:7%"></span>
-        <span class="drop" style="--dur:5.5s;--dly:-0.5s;width:7px;height:7px;top:42%;left:44%"></span>
-        <span class="drop" style="--dur:8.0s;--dly:-6.0s;width:6px;height:6px;top:68%;left:27%"></span>
-        <span class="drop" style="--dur:6.5s;--dly:-1.5s;width:10px;height:10px;top:22%;left:54%"></span>
-        <span class="drop" style="--dur:7.0s;--dly:-4.5s;width:5px;height:5px;top:75%;left:16%"></span>
-        <span class="drop" style="--dur:4.5s;--dly:-2.5s;width:14px;height:14px;top:8%;left:67%"></span>
-        <span class="drop" style="--dur:10.0s;--dly:-7.0s;width:6px;height:6px;top:35%;left:71%"></span>
-        <span class="drop" style="--dur:5.2s;--dly:-3.5s;width:4px;height:4px;top:60%;left:59%"></span>
-        <span class="drop" style="--dur:8.5s;--dly:-4.8s;width:9px;height:9px;top:48%;left:84%"></span>
-      </div>
-
-      <!-- Light sweep — ضوء الشمس على بنية نظيفة -->
-      <div class="hero-shine-beam" aria-hidden="true"></div>
-
-      <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-overlay" aria-hidden="true"></div>
-      <div class="hero-overlay-bottom" aria-hidden="true"></div>
-
-      <div class="container hero-inner">
-        <div class="hero-copy">
-          <p class="eyebrow">Car wash · Detailing · Egyptian care</p>
-          <h1 id="heroTitle">
-            DR<span class="hero-dot">.</span>Care
-          </h1>
-          <p class="hero-lead">تجربة عناية بالعربية معمولة للسوق المصري: حجز أونلاين، أسعار واضحة، متابعة لحظية، وجودة تشطيب تليق بعربيتك.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#booking">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-              احجز غسلة
-            </a>
-            <a class="btn btn-ghost" href="#packages">اختار باقتك</a>
+    <!-- ══════════════ HERO — the wash bay ══════════════ -->
+    <section class="bay" id="home" aria-labelledby="heroTitle">
+      <div class="bay__wall" aria-hidden="true"></div>
+      <div class="container bay__grid">
+        <div class="bay__copy">
+          <div class="open-sign" data-open-sign role="status"><b data-open-word>مفتوح</b><small data-open-sub>لحد 10 بالليل</small></div>
+          <h1 id="heroTitle" class="bay__title">خلّي اللمعة <em>علينا.</em></h1>
+          <p class="bay__lead">احجز من موبايلك واختار ميعادك، وتابع عربيتك لحظة بلحظة. الأسعار واضحة قبل ما تبدأ — كاش أو Instapay.</p>
+          <div class="bay__actions">
+            <a class="btn btn-primary btn-lg" href="#booking">احجز غسلتك <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></a>
+            <a class="btn btn-ghost btn-lg" href="#packages">شوف الأسعار</a>
           </div>
+
           <!-- Next Appointment Widget — shown when logged in -->
           <div class="next-appt-widget" id="nextApptWidget" style="display:none" aria-live="polite">
-            <div class="next-appt-widget__icon" aria-hidden="true">📅</div>
+            <div class="next-appt-widget__icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h20a1 1 0 0 1 1 1v4a2.5 2.5 0 0 0 0 5v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2.5 2.5 0 0 0 0-5V8a1 1 0 0 1 1-1Z"/><path d="M10 9v2.5M10 15v2.5"/></svg></div>
             <div class="next-appt-widget__body">
               <span class="next-appt-widget__title">موعدك القادم</span>
               <span class="next-appt-widget__value" id="nextApptValue">—</span>
             </div>
-            <a href="customer-bookings.html" class="next-appt-widget__link">عرض التفاصيل ←</a>
+            <a href="customer-bookings.html" class="next-appt-widget__link">عرض التفاصيل</a>
           </div>
 
-          <div class="hero-trust">
-            <div class="hero-trust__item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              أسعار ثابتة بدون مفاجآت
-            </div>
-            <div class="hero-trust__item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              متابعة الطلب لحظياً
-            </div>
-            <div class="hero-trust__item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              حجز أونلاين 24/7
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-panel" aria-label="أرقام تشغيلية">
-          <div class="hero-panel-grid">
-            <div class="hero-stat">
-              <strong data-counter="25">25</strong>
+          <div class="led-panel" aria-label="أرقام تشغيلية">
+            <div class="led-panel__cell">
+              <strong class="led" data-counter="25">25</strong>
               <span>دقيقة للغسلة السريعة</span>
             </div>
-            <div class="hero-stat">
-              <strong data-counter="4.9" data-decimal="1">4.9</strong>
-              <span>تقييم تجربة العملاء</span>
+            <div class="led-panel__cell">
+              <strong class="led" data-counter="4.9" data-decimal="1">4.9</strong>
+              <span>تقييم العملاء</span>
             </div>
-            <div class="hero-stat">
-              <strong>1</strong>
+            <div class="led-panel__cell">
+              <strong class="led">1</strong>
               <span>فرع في قليوب</span>
             </div>
           </div>
-          <div class="hero-panel-footer">
-            <span>متاح في قليوب — شارع العروبة</span>
-          </div>
+        </div>
+
+        <div class="bay__stage">
+          <div class="bay__emblem neon-on"><svg class="emblem" viewBox="-8 -8 316 316" role="img" aria-label="DR.Care" focusable="false">
+<path class="tube tube-y" stroke-width="6" d="M135 3 H4 V296 H46 M96 296 H297 V3 H152"/>
+<path class="tube tube-y" stroke-width="5" d="M124 30 H172 M148 3 V30"/>
+<g class="tube tube-c neon-flow" stroke-width="5"><path d="M132 42 L70 122"/><path d="M140 42 L108 118"/><path d="M148 42 L150 112"/><path d="M156 42 L192 118"/><path d="M164 42 L230 122"/></g>
+<g class="neon-dot"><circle cx="38" cy="66" r="8"/><circle cx="66" cy="92" r="7"/><circle cx="226" cy="52" r="8"/><circle cx="270" cy="46" r="7"/><circle cx="252" cy="98" r="7"/><circle cx="212" cy="74" r="6"/></g>
+<g class="tube tube-p" stroke-width="6"><path d="M70 178 L92 128 Q96 120 106 120 H194 Q204 120 208 128 L230 178"/><path d="M98 170 L112 138 H188 L202 170"/><path stroke-width="4" d="M118 166 L176 140 M136 168 L194 144"/><rect x="40" y="178" width="220" height="88" rx="22"/><path stroke-width="5" d="M60 204 H100 L94 226 H62 Z M240 204 H200 L206 226 H238 Z"/><path stroke-width="5" d="M96 246 H204 M110 258 H190"/><path stroke-width="5" d="M48 266 V284 H84 V266 M216 266 V284 H252 V266"/></g>
+</svg></div>
+          <svg class="bay__scene" viewBox="0 0 390 236" role="img" aria-label="سيارة بتتغسل بالرغوة تحت رشاشات المياه" preserveAspectRatio="xMidYMax meet">
+<rect x="22" y="22" width="346" height="7" rx="3" fill="#3a3f48"/><rect x="22" y="22" width="346" height="2" rx="1" fill="#555c68"/>
+<rect x="57" y="29" width="10" height="8" rx="2" fill="#9aa1ac"/><rect x="116" y="29" width="10" height="8" rx="2" fill="#9aa1ac"/><rect x="175" y="29" width="10" height="8" rx="2" fill="#9aa1ac"/><rect x="234" y="29" width="10" height="8" rx="2" fill="#9aa1ac"/><rect x="293" y="29" width="10" height="8" rx="2" fill="#9aa1ac"/><rect x="345" y="29" width="10" height="8" rx="2" fill="#9aa1ac"/>
+<g stroke="#46c9e7" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".9"><g><path class="hs-jet" d="M59 40 L46 124" style="animation-delay:0.00s"/><path class="hs-jet" d="M62 40 L62 118" style="animation-delay:0.20s"/><path class="hs-jet" d="M65 40 L78 124" style="animation-delay:0.40s"/></g><g><path class="hs-jet" d="M118 40 L105 124" style="animation-delay:0.17s"/><path class="hs-jet" d="M121 40 L121 118" style="animation-delay:0.31s"/><path class="hs-jet" d="M124 40 L137 124" style="animation-delay:0.63s"/></g><g><path class="hs-jet" d="M177 40 L164 124" style="animation-delay:0.34s"/><path class="hs-jet" d="M180 40 L180 118" style="animation-delay:0.42s"/><path class="hs-jet" d="M183 40 L196 124" style="animation-delay:0.86s"/></g><g><path class="hs-jet" d="M236 40 L223 124" style="animation-delay:0.51s"/><path class="hs-jet" d="M239 40 L239 118" style="animation-delay:0.53s"/><path class="hs-jet" d="M242 40 L255 124" style="animation-delay:1.09s"/></g><g><path class="hs-jet" d="M295 40 L282 124" style="animation-delay:0.68s"/><path class="hs-jet" d="M298 40 L298 118" style="animation-delay:0.64s"/><path class="hs-jet" d="M301 40 L314 124" style="animation-delay:1.32s"/></g><g><path class="hs-jet" d="M347 40 L334 124" style="animation-delay:0.85s"/><path class="hs-jet" d="M350 40 L350 118" style="animation-delay:0.75s"/><path class="hs-jet" d="M353 40 L366 124" style="animation-delay:1.55s"/></g></g>
+<g transform="translate(43.3 101.35) scale(1.95)">
+<path fill="#3a414b" d="M6 52 V44 Q6 38 14 36 L38 32 L54 15 Q57 12 62 12 H100 Q106 12 110 16 L124 32 L146 35 Q154 37 154 44 V52 Q154 56 150 56 H10 Q6 56 6 52 Z"/>
+<path fill="#2b3037" d="M6 46 H154 V52 Q154 56 150 56 H10 Q6 56 6 52 Z"/>
+<path fill="none" stroke="#566070" stroke-width="1" d="M14 37 L38 33 L54 16 M110 17 L124 33 L146 36"/>
+<path fill="#12151a" d="M48 31 L60 16 H78 V31 Z M84 31 V16 H100 Q103 16 105 18 L116 31 Z"/>
+<path fill="#46c9e7" opacity=".16" d="M52 31 L62 18 H67 L57 31 Z M88 31 V18 H92 V31 Z"/>
+<path stroke="#232830" stroke-width="1" d="M81 31 V52 M120 34 V52"/>
+<rect x="73" y="36" width="6" height="1.8" rx=".9" fill="#7c8592"/><rect x="95" y="36" width="6" height="1.8" rx=".9" fill="#7c8592"/>
+<path fill="#fff4c4" d="M7 41 Q7 38 11 37.4 L20 36.4 L18 41.4 Z"/><path fill="#ff5a4d" d="M152 40 Q153 38.5 151 37.5 L146 36.6 L146.8 41.4 Z"/>
+<circle cx="38" cy="56" r="14.5" fill="#0d0f12"/><circle cx="122" cy="56" r="14.5" fill="#0d0f12"/>
+</g>
+<g transform="translate(117.4 210.6)"><circle r="21.5" fill="#15181c" stroke="#30353d" stroke-width="1.6"/><circle r="17" fill="#23272e"/><g class="hs-spin"><circle r="11" fill="#7f8895"/><circle r="11" fill="none" stroke="#2a2e35" stroke-width="1.2"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(0)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(72)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(144)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(216)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(288)"/><circle r="3" fill="#2f343c"/></g></g><g transform="translate(281.2 210.6)"><circle r="21.5" fill="#15181c" stroke="#30353d" stroke-width="1.6"/><circle r="17" fill="#23272e"/><g class="hs-spin"><circle r="11" fill="#7f8895"/><circle r="11" fill="none" stroke="#2a2e35" stroke-width="1.2"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(0)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(72)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(144)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(216)"/><rect x="-1.4" y="-10" width="2.8" height="8" rx="1.2" fill="#2f343c" transform="rotate(288)"/><circle r="3" fill="#2f343c"/></g></g>
+<g fill="#f3f0e6"><rect x="88.4" y="168.6" width="6" height="9.7" rx="3.0"/><rect x="119.7" y="164.8" width="5" height="13.9" rx="2.5"/><rect x="271.2" y="149.1" width="6.9" height="10.7" rx="3.5"/><rect x="295.8" y="166.7" width="4" height="17.2" rx="2.0"/><rect x="320.0" y="172.6" width="6.3" height="12.9" rx="3.1"/><rect x="79.0" y="170.6" width="4.2" height="7.5" rx="2.1"/><rect x="159.1" y="127.7" width="4.8" height="8.6" rx="2.4"/><circle cx="72.6" cy="171.1" r="4.2"/><circle cx="82.9" cy="170.7" r="5.9"/><circle cx="91" cy="169.5" r="7.6"/><circle cx="101.1" cy="167" r="6.5"/><circle cx="106.9" cy="164.1" r="6.6"/><circle cx="115" cy="165.5" r="8.3"/><circle cx="122.3" cy="157.9" r="5.3"/><circle cx="127.8" cy="152.2" r="8.5"/><circle cx="137.1" cy="141.5" r="8.8"/><circle cx="142.3" cy="136.4" r="4.1"/><circle cx="146.3" cy="130.7" r="4"/><circle cx="154.8" cy="125.4" r="6"/><circle cx="165.2" cy="125.9" r="7.4"/><circle cx="172.5" cy="125.7" r="4.5"/><circle cx="179.3" cy="126.7" r="7.1"/><circle cx="192.6" cy="124" r="8.5"/><circle cx="199.6" cy="125" r="8.5"/><circle cx="211.8" cy="123.9" r="8.4"/><circle cx="220.4" cy="124.9" r="8.8"/><circle cx="229.1" cy="125.7" r="3.9"/><circle cx="238.2" cy="123.5" r="6.7"/><circle cx="244.6" cy="125.1" r="8"/><circle cx="253" cy="130.2" r="6.7"/><circle cx="258.4" cy="130.7" r="4"/><circle cx="266" cy="141.3" r="3.9"/><circle cx="270.9" cy="147.1" r="8.9"/><circle cx="277.8" cy="154" r="8"/><circle cx="280.8" cy="158.9" r="8.9"/><circle cx="286.3" cy="163.3" r="5.9"/><circle cx="301.9" cy="164.6" r="7.6"/><circle cx="310.1" cy="167.2" r="7.6"/><circle cx="315.7" cy="166.9" r="6.8"/><circle cx="322.9" cy="169.1" r="6.7"/><circle cx="331" cy="171.9" r="5.1"/><circle cx="116.2" cy="154.9" r="2.1"/><circle cx="105.6" cy="152.4" r="2.2"/><circle cx="120.1" cy="150.8" r="4.3"/><circle cx="164.4" cy="113.3" r="4.3"/><circle cx="281.5" cy="147.4" r="3.3"/><circle cx="222.6" cy="115.5" r="4.5"/><circle cx="92.5" cy="155.3" r="4.6"/><circle cx="275.6" cy="146" r="4.9"/><circle cx="135.5" cy="133.8" r="4.7"/><circle cx="180.1" cy="115.3" r="3.4"/><circle cx="156.9" cy="118.8" r="4.8"/><circle cx="231.1" cy="112.4" r="3.6"/><circle cx="187.9" cy="111.5" r="3.8"/><circle cx="249.5" cy="116.7" r="3.3"/><circle cx="241.3" cy="117" r="2.9"/><circle cx="99.1" cy="155.8" r="5.1"/><circle cx="149.2" cy="124.3" r="4.3"/><circle cx="319.5" cy="155.8" r="5.1"/><circle cx="135.2" cy="141.2" r="3.7"/><circle cx="174.1" cy="113.2" r="4"/><circle cx="267.5" cy="132.5" r="2.9"/><circle cx="288.8" cy="158.9" r="4.3"/><circle cx="194.9" cy="115.3" r="4.8"/><circle cx="322.4" cy="164.2" r="2.9"/><circle cx="211.7" cy="111.7" r="4.7"/><circle cx="217.8" cy="118" r="3.6"/></g>
+<g fill="#fff" opacity=".55"><circle cx="71.5" cy="169.8" r="1.2"/><circle cx="81.4" cy="168.9" r="1.7"/><circle cx="89.1" cy="167.2" r="2.1"/><circle cx="99.5" cy="165.1" r="1.8"/><circle cx="105.3" cy="162.1" r="1.8"/><circle cx="112.9" cy="163.0" r="2.3"/><circle cx="121.0" cy="156.3" r="1.5"/><circle cx="125.7" cy="149.6" r="2.4"/><circle cx="134.9" cy="138.9" r="2.5"/><circle cx="141.3" cy="135.2" r="1.1"/><circle cx="145.3" cy="129.5" r="1.1"/><circle cx="153.3" cy="123.6" r="1.7"/><circle cx="163.3" cy="123.7" r="2.1"/><circle cx="171.4" cy="124.4" r="1.3"/><circle cx="177.5" cy="124.6" r="2.0"/><circle cx="190.5" cy="121.5" r="2.4"/><circle cx="197.5" cy="122.5" r="2.4"/><circle cx="209.7" cy="121.4" r="2.4"/></g>
+<g fill="none" stroke="#f3f0e6" stroke-width="1.4" opacity=".8"><circle class="hs-bub" cx="219" cy="139" r="6" style="animation-delay:2.9s;animation-duration:3.2s"/><circle class="hs-bub" cx="181" cy="218" r="2.4" style="animation-delay:0.3s;animation-duration:4.1s"/><circle class="hs-bub" cx="273" cy="186" r="3.4" style="animation-delay:2s;animation-duration:3.3s"/><circle class="hs-bub" cx="190" cy="158" r="4.7" style="animation-delay:0.7s;animation-duration:5.3s"/><circle class="hs-bub" cx="142" cy="186" r="6.2" style="animation-delay:0.1s;animation-duration:3.5s"/><circle class="hs-bub" cx="254" cy="208" r="3.4" style="animation-delay:3.4s;animation-duration:4.9s"/><circle class="hs-bub" cx="147" cy="120" r="2.5" style="animation-delay:4s;animation-duration:5.1s"/><circle class="hs-bub" cx="130" cy="167" r="2.4" style="animation-delay:2.1s;animation-duration:4.3s"/><circle class="hs-bub" cx="270" cy="128" r="5.7" style="animation-delay:0.7s;animation-duration:3.7s"/><circle class="hs-bub" cx="115" cy="207" r="2.2" style="animation-delay:0.1s;animation-duration:5.8s"/><circle class="hs-bub" cx="309" cy="163" r="4.9" style="animation-delay:2.8s;animation-duration:3.5s"/><circle class="hs-bub" cx="200" cy="118" r="5" style="animation-delay:2.9s;animation-duration:5.5s"/><circle class="hs-bub" cx="79" cy="173" r="3.9" style="animation-delay:0.2s;animation-duration:5.8s"/><circle class="hs-bub" cx="134" cy="127" r="3.4" style="animation-delay:1.4s;animation-duration:5.4s"/></g>
+</svg>
         </div>
       </div>
-
-      <!-- Scroll indicator -->
-      <div class="hero-scroll" aria-hidden="true">
-        <div class="hero-scroll__line"></div>
-      </div>
+      <div class="bay__floor" aria-hidden="true"><i class="hazard"></i></div>
     </section>
 
     <!-- ══════════════ INFO STRIP ══════════════ -->
-    <div class="info-strip" aria-label="معلومات الفروع">
+    <div class="info-strip" aria-label="معلومات الفرع">
       <div class="container strip-grid">
         <div class="strip-item">
-          <div class="strip-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          </div>
-          <div class="strip-text">
-            <strong>فرع قليوب</strong>
-            <small>شارع العروبة</small>
-          </div>
+          <small>العنوان</small>
+          <strong>فرع قليوب — شارع العروبة</strong>
         </div>
         <div class="strip-item">
-          <div class="strip-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div class="strip-text">
-            <strong>يومياً 12م – 10م</strong>
-            <small>استقبال الطلبات 24/7 أونلاين</small>
-          </div>
+          <small>مواعيد الشغل</small>
+          <strong>يومياً 12م – 10م</strong>
+          <span class="strip-note">والحجز أونلاين 24/7</span>
         </div>
         <div class="strip-item">
-          <div class="strip-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          </div>
-          <div class="strip-text">
-            <strong>0103 795 7593</strong>
-            <small>الخط الساخن للاستفسار</small>
-          </div>
+          <small>الخط الساخن</small>
+          <strong class="strip-phone"><a href="tel:01037957593" dir="ltr">0103 795 7593</a></strong>
         </div>
       </div>
     </div>
 
-    <!-- ══════════════ SERVICES ══════════════ -->
-    <section class="section services-section" id="services" aria-labelledby="servicesTitle">
+    <!-- ══════════════ SERVICES — the wash line ══════════════ -->
+    <section class="section line-section" id="services" aria-labelledby="servicesTitle">
       <div class="container">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Our Services</p>
-          <h2 id="servicesTitle">من غسلة يومية لتفاصيل كاملة</h2>
-          <p class="section-copy">الخدمة متقسمة بطريقة سهلة للعميل وسهلة للتشغيل، عشان كل عربية تاخد وقتها الصح.</p>
-        </div>
+        <header class="sec-head reveal">
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
+          <div>
+            <h2 id="servicesTitle">4 محطات لحد ما تلمع</h2>
+            <p class="section-copy">الغسلة الكاملة بتعدّي على أربع محطات — وتقدر تختار اللي عربيتك محتاجاه بس.</p>
+          </div>
+        </header>
 
-        <div class="services-grid">
-          <article class="service-card reveal" style="transition-delay:.05s">
-            <div class="service-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-                <path d="M8 12s1.5 2 4 2 4-2 4-2"/>
-                <path d="M9 9h.01M15 9h.01"/>
-                <path d="M7 7l2 2M17 7l-2 2"/>
-              </svg>
-            </div>
-            <h3>غسيل فوم خارجي</h3>
-            <p>فوم نشط، ضغط مياه محسوب، وتنشيف مايكروفايبر يحافظ على الدهان من أي خدش.</p>
-          </article>
-          <article class="service-card reveal" style="transition-delay:.10s">
-            <div class="service-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                <rect x="3" y="3" width="18" height="18" rx="3"/>
-                <path d="M3 9h18M9 21V9"/>
-                <circle cx="15" cy="15" r="2"/>
-              </svg>
-            </div>
-            <h3>تنظيف داخلي وتعقيم</h3>
-            <p>شفط، تابلوه، فرش، أرضيات، وتعقيم للنقط المستخدمة يومياً بأعلى معايير النظافة.</p>
-          </article>
-          <article class="service-card reveal" style="transition-delay:.15s">
-            <div class="service-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                <path d="M12 3l1.9 5.87L20 9l-4.73 4.6 1.17 6.4L12 17.27 7.56 20 8.73 13.6 4 9l6.1-.13z"/>
-              </svg>
-            </div>
-            <h3>واكس وتلميع حماية</h3>
-            <p>لمعة عميقة وحماية احترافية من التراب، الشمس، ومياه الطرق المصرية.</p>
-          </article>
-          <article class="service-card reveal" style="transition-delay:.20s">
-            <div class="service-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                <circle cx="12" cy="12" r="9"/>
-                <circle cx="12" cy="12" r="3"/>
-                <line x1="12" y1="3" x2="12" y2="5"/>
-                <line x1="12" y1="19" x2="12" y2="21"/>
-                <line x1="3" y1="12" x2="5" y2="12"/>
-                <line x1="19" y1="12" x2="21" y2="12"/>
-              </svg>
-            </div>
-            <h3>جنوط وكاوتش</h3>
-            <p>تنظيف مخصص للجنوط وتلميع كاوتش بتشطيب واضح ولافت من أول نظرة.</p>
-          </article>
+        <div class="line" data-line>
+          <div class="line__rail" aria-hidden="true">
+            <div class="line__tape hazard hazard--belt"></div>
+            <svg class="line__car" viewBox="0 0 160 70" aria-hidden="true" focusable="false"><use href="assets/img/brand/sprite.svg#car-sedan"/></svg>
+          </div>
+          <ol class="line__stops">
+            <li class="station reveal" style="transition-delay:.05s">
+              <span class="station__no" aria-hidden="true">1</span>
+              <h3>غسيل فوم خارجي</h3>
+              <p>فوم نشط، ضغط مياه محسوب، وتنشيف مايكروفايبر يحافظ على الدهان من أي خدش.</p>
+            </li>
+            <li class="station reveal" style="transition-delay:.10s">
+              <span class="station__no" aria-hidden="true">2</span>
+              <h3>تنظيف داخلي وتعقيم</h3>
+              <p>شفط، تابلوه، فرش، أرضيات، وتعقيم للنقط المستخدمة يومياً بأعلى معايير النظافة.</p>
+            </li>
+            <li class="station reveal" style="transition-delay:.15s">
+              <span class="station__no" aria-hidden="true">3</span>
+              <h3>واكس وتلميع حماية</h3>
+              <p>لمعة عميقة وحماية احترافية من التراب، الشمس، ومياه الطرق المصرية.</p>
+            </li>
+            <li class="station reveal" style="transition-delay:.20s">
+              <span class="station__no" aria-hidden="true">4</span>
+              <h3>جنوط وكاوتش</h3>
+              <p>تنظيف مخصص للجنوط وتلميع كاوتش بتشطيب واضح ولافت من أول نظرة.</p>
+            </li>
+          </ol>
         </div>
       </div>
     </section>
 
-    <!-- ══════════════ PACKAGES ══════════════ -->
-    <section class="section packages-section" id="packages" aria-labelledby="packagesTitle">
+    <!-- ══════════════ PACKAGES — the menu board ══════════════ -->
+    <section class="section menu-section" id="packages" aria-labelledby="packagesTitle">
       <div class="container">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Packages & Pricing</p>
-          <h2 id="packagesTitle">خدماتنا وأسعارها</h2>
-          <p class="section-copy">أسعار واضحة بدون مفاجآت — اختار الخدمة واحجز في ثواني.</p>
-        </div>
-
-        <div class="packages-grid" id="packagesGrid">
-
-          <!-- ── خدمات السيارات ── -->
-          <div class="pkg-cat reveal">
-            <div class="pkg-cat__head">
-              <span class="pkg-cat__icon" aria-hidden="true">🚗</span>
-              <span class="pkg-cat__title">خدمات غسيل السيارات</span>
-            </div>
-            <div class="pkg-cat__cards">
-
-              <article class="package-card package-card-featured" data-package-card="inside-out">
-                <div class="package-featured-badge">الأكثر طلباً</div>
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">✨</span>
-                  <p class="package-label">Inside & Outside</p>
-                </div>
-                <h3>غسيل داخلي وخارجي</h3>
-                <div class="package-price"><strong>150</strong><span>جنيه</span></div>
-                <div class="pkg-features">
-                  <span>✓ غسيل خارجي كامل</span>
-                  <span>✓ تنظيف داخلي</span>
-                  <span>✓ تنشيف مايكروفايبر</span>
-                </div>
-                <button class="package-action package-action--featured" type="button" data-select-package="inside-out">اختيار</button>
-              </article>
-
-              <article class="package-card" data-package-card="outside">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">💧</span>
-                  <p class="package-label">Outside Only</p>
-                </div>
-                <h3>غسيل خارجي فقط</h3>
-                <div class="package-price"><strong>100</strong><span>جنيه</span></div>
-                <div class="pkg-features">
-                  <span>✓ غسيل خارجي</span>
-                  <span>✓ تنشيف مايكروفايبر</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="outside">اختيار</button>
-              </article>
-
-              <article class="package-card" data-package-card="deep">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">🏆</span>
-                  <p class="package-label">Deep Cleaning</p>
-                </div>
-                <h3>غسيل متخصص</h3>
-                <div class="package-price"><strong>250</strong><span>جنيه</span></div>
-                <div class="pkg-features">
-                  <span>✓ تنظيف عميق داخلي وخارجي</span>
-                  <span>✓ معدات متخصصة</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="deep">اختيار</button>
-              </article>
-
-              <article class="package-card" data-package-card="cover">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">🛡️</span>
-                  <p class="package-label">Car Cover</p>
-                </div>
-                <h3>غسيل غطاء السيارة</h3>
-                <div class="package-price"><strong>50</strong><span>جنيه</span></div>
-                <div class="pkg-features">
-                  <span>✓ غسيل وتنشيف الغطاء</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="cover">اختيار</button>
-              </article>
-
-              <article class="package-card" data-package-card="rims">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">⚙️</span>
-                  <p class="package-label">Rims & Tires</p>
-                </div>
-                <h3>غسيل وتنظيف جنوط</h3>
-                <div class="package-price"><strong>100</strong><span>جنيه</span></div>
-                <div class="pkg-features">
-                  <span>✓ تنظيف الجنوط والإطارات</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="rims">اختيار</button>
-              </article>
-
-              <article class="package-card" data-package-card="engine">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">🔧</span>
-                  <p class="package-label">Engine Wash</p>
-                </div>
-                <h3>غسيل موتور السيارة</h3>
-                <div class="package-price"><strong>100</strong><span>جنيه</span></div>
-                <div class="pkg-features">
-                  <span>✓ تنظيف حجرة المحرك</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="engine">اختيار</button>
-              </article>
-
-              <article class="package-card" data-package-card="chemical">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">🧪</span>
-                  <p class="package-label">Chemical Wash</p>
-                </div>
-                <h3>الغسيل الكيماوي</h3>
-                <div class="package-price"><strong style="font-size:1.2rem">حسب</strong><span>الشغل</span></div>
-                <div class="pkg-features">
-                  <span>✓ مواد كيماوية متخصصة</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="chemical">طلب تقييم</button>
-              </article>
-
-            </div>
+        <header class="sec-head reveal">
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
+          <div>
+            <h2 id="packagesTitle">قايمة الأسعار</h2>
+            <p class="section-copy">أسعار واضحة بدون مفاجآت — اختار الغسلة واحجز في ثواني.</p>
           </div>
+        </header>
 
-          <!-- ── سجاد وبطاطين ── -->
-          <div class="pkg-cat reveal">
-            <div class="pkg-cat__head">
-              <span class="pkg-cat__icon" aria-hidden="true">🧺</span>
-              <span class="pkg-cat__title">غسيل سجاد وبطاطين</span>
-              <span class="pkg-cat__sub">شامل التنظيف والتغليف</span>
-            </div>
-            <div class="pkg-cat__cards pkg-cat__cards--2">
+        <div class="menu-boards reveal" id="packagesGrid">
+          <section class="menu-board" aria-labelledby="menuCars">
+            <h3 class="menu-board__title" id="menuCars">غسيل السيارات</h3>
+            <ol class="menu-list">
+            <li class="menu-item menu-item--featured" data-package-card="inside-out">
+              <span class="menu-item__no" aria-hidden="true">1</span>
+              <div class="menu-item__main">
+                <h4>غسيل داخلي وخارجي <span class="menu-tag">الأكثر طلباً</span></h4>
+                <p class="menu-item__feat">غسيل خارجي كامل · تنظيف داخلي · تنشيف مايكروفايبر</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>150</strong><span>جنيه</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="inside-out">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="outside">
+              <span class="menu-item__no" aria-hidden="true">2</span>
+              <div class="menu-item__main">
+                <h4>غسيل خارجي فقط</h4>
+                <p class="menu-item__feat">غسيل خارجي · تنشيف مايكروفايبر</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>100</strong><span>جنيه</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="outside">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="deep">
+              <span class="menu-item__no" aria-hidden="true">3</span>
+              <div class="menu-item__main">
+                <h4>غسيل متخصص <span class="menu-latin" dir="ltr">Deep Cleaning</span></h4>
+                <p class="menu-item__feat">تنظيف عميق داخلي وخارجي · معدات متخصصة</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>250</strong><span>جنيه</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="deep">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="cover">
+              <span class="menu-item__no" aria-hidden="true">4</span>
+              <div class="menu-item__main">
+                <h4>غسيل غطاء السيارة</h4>
+                <p class="menu-item__feat">غسيل وتنشيف الغطاء</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>50</strong><span>جنيه</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="cover">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="rims">
+              <span class="menu-item__no" aria-hidden="true">5</span>
+              <div class="menu-item__main">
+                <h4>غسيل وتنظيف جنوط</h4>
+                <p class="menu-item__feat">تنظيف الجنوط والإطارات</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>100</strong><span>جنيه</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="rims">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="engine">
+              <span class="menu-item__no" aria-hidden="true">6</span>
+              <div class="menu-item__main">
+                <h4>غسيل موتور السيارة</h4>
+                <p class="menu-item__feat">تنظيف حجرة المحرك</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>100</strong><span>جنيه</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="engine">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="chemical">
+              <span class="menu-item__no" aria-hidden="true">7</span>
+              <div class="menu-item__main">
+                <h4>الغسيل الكيماوي</h4>
+                <p class="menu-item__feat">مواد كيماوية متخصصة</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong class="menu-item__ask">حسب الشغل</strong></span>
+              <button class="menu-item__btn" type="button" data-select-package="chemical">طلب تقييم</button>
+            </li>
+            </ol>
+          </section>
 
-              <article class="package-card" data-package-card="carpet">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">🟫</span>
-                  <p class="package-label">Carpet Wash</p>
-                </div>
-                <h3>غسيل سجاد</h3>
-                <p>تنظيف وتغليف السجاد — السعر حسب المساحة.</p>
-                <div class="package-price"><strong>15</strong><span>جنيه / متر</span></div>
-                <div class="pkg-features">
-                  <span>✓ تنظيف عميق</span>
-                  <span>✓ تغليف بعد التنظيف</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="carpet">اختيار</button>
-              </article>
+          <div class="menu-side">
+            <section class="menu-board" aria-labelledby="menuHome">
+              <h3 class="menu-board__title" id="menuHome">سجاد وبطاطين <small>شامل التنظيف والتغليف</small></h3>
+              <ol class="menu-list">
+            <li class="menu-item" data-package-card="carpet">
+              <span class="menu-item__no" aria-hidden="true">8</span>
+              <div class="menu-item__main">
+                <h4>غسيل سجاد</h4>
+                <p class="menu-item__feat">تنظيف عميق · تغليف بعد التنظيف</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>15</strong><span>جنيه / متر</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="carpet">اختيار</button>
+            </li>
+            <li class="menu-item" data-package-card="blanket">
+              <span class="menu-item__no" aria-hidden="true">9</span>
+              <div class="menu-item__main">
+                <h4>غسيل بطاطين</h4>
+                <p class="menu-item__feat">تنظيف شامل · تغليف بعد التنظيف</p>
+              </div>
+              <span class="menu-item__leader" aria-hidden="true"></span>
+              <span class="menu-item__price"><strong>80</strong><span>جنيه / قطعة</span></span>
+              <button class="menu-item__btn" type="button" data-select-package="blanket">اختيار</button>
+            </li>
+              </ol>
+            </section>
 
-              <article class="package-card" data-package-card="blanket">
-                <div class="pkg-card-top">
-                  <span class="pkg-icon-wrap" aria-hidden="true">🛏️</span>
-                  <p class="package-label">Blanket Wash</p>
-                </div>
-                <h3>غسيل بطاطين</h3>
-                <p>تنظيف وتغليف البطاطين — للقطعة الواحدة.</p>
-                <div class="package-price"><strong>80</strong><span>جنيه / قطعة</span></div>
-                <div class="pkg-features">
-                  <span>✓ تنظيف شامل</span>
-                  <span>✓ تغليف بعد التنظيف</span>
-                </div>
-                <button class="package-action" type="button" data-select-package="blanket">اختيار</button>
-              </article>
-
-            </div>
+            <aside class="menu-note" aria-label="ملحوظة على الأسعار">
+              <span class="menu-note__tag">ملحوظة</span>
+              <p>سعر الغسلة بيزيد حسب نوع العربية:</p>
+              <p class="menu-note__extras" id="carExtrasNote">SUV +60 · فان +90 · نقل خفيف +120</p>
+              <p class="menu-note__pay">الدفع كاش أو Instapay</p>
+            </aside>
           </div>
-
         </div>
-
       </div>
     </section>
 
     <!-- ══════════════ WHY US ══════════════ -->
     <section class="section why-section" id="why" aria-labelledby="whyTitle">
       <div class="container">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Why DR.Care</p>
-          <h2 id="whyTitle">احتراف عالمي بروح مصرية واضحة</h2>
-          <p class="section-copy">العميل المصري عايز سرعة، أمانة، سعر واضح، ومعاملة محترمة. التجربة هنا مبنية على التفاصيل دي.</p>
-        </div>
+        <header class="sec-head reveal">
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
+          <div>
+            <h2 id="whyTitle">ليه DR.Care؟</h2>
+            <p class="section-copy">العميل المصري عايز سرعة، أمانة، سعر واضح، ومعاملة محترمة. التجربة هنا مبنية على التفاصيل دي.</p>
+          </div>
+        </header>
 
-        <div class="why-layout">
-          <div class="why-badge reveal reveal-scale">
-            <div class="why-badge__inner">
-              <span class="why-badge__label">صُنع في قليوب</span>
-              <strong class="why-badge__name">DR.Care</strong>
-              <span class="why-badge__sub">Qaliub · Cairo</span>
-              <div class="why-badge__floater">صُنع في قليوب ✦</div>
-            </div>
+        <div class="why-wall">
+          <div class="why-plate reveal reveal-scale" aria-label="صُنع في قليوب">
+            <span class="plate plate--xl"><span class="plate__country">صُنع في قليوب</span><span class="plate__row" dir="ltr"><span class="plate__letters" dir="ltr">DR</span><i class="plate__sep"></i><span class="plate__digits" dir="ltr">CARE</span></span></span>
           </div>
 
-          <div class="why-content reveal reveal-right" style="transition-delay:.1s">
-            <div class="why-grid">
-              <div class="why-card">
-                <div class="why-card__icon">⏱</div>
-                <h4>سرعة في التنفيذ</h4>
-                <p>غسلة سريعة في 25 دقيقة، Full Care في ساعة — بدون انتظار مبالغ فيه.</p>
-              </div>
-              <div class="why-card">
-                <div class="why-card__icon">💰</div>
-                <h4>سعر واضح قبل الشغل</h4>
-                <p>السعر التقريبي بيتحسب أونلاين — مفيش مفاجآت بعد الخلاص.</p>
-              </div>
-              <div class="why-card">
-                <div class="why-card__icon">📱</div>
-                <h4>متابعة لحظية</h4>
-                <p>حالة الطلب بتتحدث في الوقت الفعلي من لحظة الاستلام للتسليم.</p>
-              </div>
-              <div class="why-card">
-                <div class="why-card__icon">🌟</div>
-                <h4>معاملة محترمة</h4>
-                <p>قهوة وشاي في الانتظار، ومتابعة رضا العميل بعد الخدمة.</p>
-              </div>
-            </div>
-            <div class="culture-tags">
-              <span>قهوة وشاي في الانتظار</span>
-              <span>لغة قريبة من العميل</span>
-              <span>سعر واضح قبل الشغل</span>
-              <span>متابعة بعد الخدمة</span>
-            </div>
+          <div class="signs">
+            <article class="sign reveal" style="transition-delay:.05s">
+              <span class="sign__no" aria-hidden="true">01</span>
+              <h3>سرعة في التنفيذ</h3>
+              <p>غسلة سريعة في 25 دقيقة، Full Care في ساعة — بدون انتظار مبالغ فيه.</p>
+            </article>
+            <article class="sign reveal" style="transition-delay:.10s">
+              <span class="sign__no" aria-hidden="true">02</span>
+              <h3>سعر واضح قبل الشغل</h3>
+              <p>السعر التقريبي بيتحسب أونلاين — مفيش مفاجآت بعد الخلاص.</p>
+            </article>
+            <article class="sign reveal" style="transition-delay:.15s">
+              <span class="sign__no" aria-hidden="true">03</span>
+              <h3>متابعة لحظية</h3>
+              <p>حالة الطلب بتتحدث في الوقت الفعلي من لحظة الاستلام للتسليم.</p>
+            </article>
+            <article class="sign reveal" style="transition-delay:.20s">
+              <span class="sign__no" aria-hidden="true">04</span>
+              <h3>معاملة محترمة</h3>
+              <p>قهوة وشاي في الانتظار، ومتابعة رضا العميل بعد الخدمة.</p>
+            </article>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ══════════════ PROCESS ══════════════ -->
-    <section class="section process-section" aria-labelledby="processTitle">
+    <!-- ══════════════ PROCESS — from booking to handover ══════════════ -->
+    <section class="section belt-section" aria-labelledby="processTitle">
       <div class="container">
-        <div class="section-heading reveal">
-          <p class="section-kicker">How It Works</p>
-          <h2 id="processTitle">من الحجز للتسليم في 4 خطوات</h2>
-        </div>
-        <div class="process-grid">
-          <article class="process-card reveal" style="transition-delay:.05s">
-            <div class="process-num" aria-hidden="true">01</div>
-            <h3>احجز أونلاين</h3>
-            <p>اختار الباقة، الفرع، والميعاد المناسب في دقيقتين.</p>
-          </article>
-          <article class="process-card reveal" style="transition-delay:.10s">
-            <div class="process-num" aria-hidden="true">02</div>
-            <h3>تأكيد فوري</h3>
-            <p>الطلب بيدخل لوحة الإدارة بحالة "جديد" فور الإرسال.</p>
-          </article>
-          <article class="process-card reveal" style="transition-delay:.15s">
-            <div class="process-num" aria-hidden="true">03</div>
-            <h3>تنفيذ الخدمة</h3>
-            <p>الفريق بيغير حالة الطلب أثناء التشغيل وأنت مطمن.</p>
-          </article>
-          <article class="process-card reveal" style="transition-delay:.20s">
-            <div class="process-num" aria-hidden="true">04</div>
-            <h3>تسليم ومتابعة</h3>
-            <p>تأكيد نهائي ومراجعة رضا العميل بعد التسليم مباشرة.</p>
-          </article>
+        <header class="sec-head reveal">
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
+          <div><h2 id="processTitle">من الحجز للتسليم في 4 خطوات</h2></div>
+        </header>
+        <div class="belt">
+          <div class="belt__road" aria-hidden="true">
+            <div class="belt__tape hazard hazard--belt"></div>
+            <svg class="belt__car" viewBox="0 0 160 70" aria-hidden="true" focusable="false"><use href="assets/img/brand/sprite.svg#car-sedan"/></svg>
+          </div>
+          <ol class="belt__stops">
+            <li class="reveal" style="transition-delay:.05s"><span class="belt__no" aria-hidden="true">1</span><h3>احجز أونلاين</h3><p>اختار الباقة، الفرع، والميعاد المناسب في دقيقتين.</p></li>
+            <li class="reveal" style="transition-delay:.10s"><span class="belt__no" aria-hidden="true">2</span><h3>تأكيد فوري</h3><p>الطلب بيدخل لوحة الإدارة بحالة "جديد" فور الإرسال.</p></li>
+            <li class="reveal" style="transition-delay:.15s"><span class="belt__no" aria-hidden="true">3</span><h3>تنفيذ الخدمة</h3><p>الفريق بيغير حالة الطلب أثناء التشغيل وأنت مطمن.</p></li>
+            <li class="reveal" style="transition-delay:.20s"><span class="belt__no" aria-hidden="true">4</span><h3>تسليم ومتابعة</h3><p>تأكيد نهائي ومراجعة رضا العميل بعد التسليم مباشرة.</p></li>
+          </ol>
         </div>
       </div>
     </section>
@@ -550,11 +442,13 @@
     <!-- ══════════════ BRANCHES MAP ══════════════ -->
     <section class="section branches-section" id="branches" aria-labelledby="branchesTitle">
       <div class="container">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Our Branches</p>
-          <h2 id="branchesTitle">فروعنا على الخريطة</h2>
-          <p class="section-copy">فرعنا في قسم قليوب — شارع العروبة.</p>
-        </div>
+        <header class="sec-head reveal">
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
+          <div>
+            <h2 id="branchesTitle">فرعنا على الخريطة</h2>
+            <p class="section-copy">فرعنا في قسم قليوب — شارع العروبة.</p>
+          </div>
+        </header>
         <div class="branches-layout reveal reveal-left">
           <div class="branches-list">
             <div class="branch-card active" data-branch-desktop="0">
@@ -578,11 +472,13 @@
     <!-- ══════════════ REVIEWS ══════════════ -->
     <section class="section reviews-section" id="reviews" aria-labelledby="reviewsTitle">
       <div class="container">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Customer Reviews</p>
-          <h2 id="reviewsTitle">ماذا قال عملاؤنا</h2>
-          <p class="section-copy">تقييمات حقيقية من عملاء جربوا الخدمة وشاركوا تجربتهم.</p>
-        </div>
+        <header class="sec-head reveal">
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
+          <div>
+            <h2 id="reviewsTitle">كلام عملائنا</h2>
+            <p class="section-copy">تقييمات حقيقية من عملاء جربوا الخدمة وشاركوا تجربتهم.</p>
+          </div>
+        </header>
 
         <!-- Rating summary bar -->
         <div class="reviews-summary reveal" id="reviewsSummary" style="display:none">
@@ -609,15 +505,12 @@
     <section class="section booking-section" id="booking" aria-labelledby="bookingTitle">
       <div class="container booking-layout">
         <div class="booking-copy reveal">
-          <p class="section-kicker">Book Now</p>
+          <span class="sec-head__bar hazard" aria-hidden="true"></span>
           <h2 id="bookingTitle">احجز دورك في DR.Care</h2>
           <p class="section-copy">آخر خطوة وأبسطها — اختار طريقة الدفع المناسبة وأنهِ حجزك في ثوانٍ.</p>
           <div class="booking-note">
-            <strong>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              جاهز للسوق
-            </strong>
-            <span>تحقق من رقم الموبايل، حساب سعر تلقائي، اختيار فرع، وطريقة دفع.</span>
+            <strong>إزاي بتحجز؟</strong>
+            <span>اختار عربيتك والغسلة، حدد ميعادك، وأكّد ببياناتك — والسعر بيتحسب لوحده.</span>
           </div>
           <div class="booking-features">
             <div class="booking-feat">
@@ -662,22 +555,22 @@
             <!-- Visual car type selector -->
             <div class="car-type-grid" id="carTypeGrid" role="group" aria-label="نوع العربية">
               <button type="button" class="car-type-card" data-car="sedan" aria-pressed="false">
-                <span class="car-type-card__emoji">🚗</span>
+                <svg class="car-type-card__art" viewBox="0 0 160 70" aria-hidden="true" focusable="false"><use href="assets/img/brand/sprite.svg#car-sedan"/></svg>
                 <span class="car-type-card__name">سيدان</span>
                 <span class="car-type-card__extra" id="carExtra-sedan">سعر أساسي</span>
               </button>
               <button type="button" class="car-type-card" data-car="suv" aria-pressed="false">
-                <span class="car-type-card__emoji">🚙</span>
+                <svg class="car-type-card__art" viewBox="0 0 160 70" aria-hidden="true" focusable="false"><use href="assets/img/brand/sprite.svg#car-suv"/></svg>
                 <span class="car-type-card__name">SUV</span>
                 <span class="car-type-card__extra" id="carExtra-suv">+ إضافة</span>
               </button>
               <button type="button" class="car-type-card" data-car="van" aria-pressed="false">
-                <span class="car-type-card__emoji">🚐</span>
+                <svg class="car-type-card__art" viewBox="0 0 160 70" aria-hidden="true" focusable="false"><use href="assets/img/brand/sprite.svg#car-van"/></svg>
                 <span class="car-type-card__name">فان</span>
                 <span class="car-type-card__extra" id="carExtra-van">+ إضافة</span>
               </button>
               <button type="button" class="car-type-card" data-car="pickup" aria-pressed="false">
-                <span class="car-type-card__emoji">🛻</span>
+                <svg class="car-type-card__art" viewBox="0 0 160 70" aria-hidden="true" focusable="false"><use href="assets/img/brand/sprite.svg#car-pickup"/></svg>
                 <span class="car-type-card__name">نقل خفيف</span>
                 <span class="car-type-card__extra" id="carExtra-pickup">+ إضافة</span>
               </button>
@@ -689,7 +582,7 @@
 
             <!-- Smart recommendation -->
             <div class="pkg-recommend" id="pkgRecommend">
-              <strong>💡 مقترح لـ <span id="pkgRecommendCar"></span></strong>
+              <strong>مقترح لـ <span id="pkgRecommendCar"></span></strong>
               <span id="pkgRecommendText"></span>
             </div>
 
@@ -706,7 +599,7 @@
             </div>
 
             <div class="bf-nav">
-              <button type="button" class="btn btn-primary" id="bfNext1" style="flex:1;min-height:52px;font-size:1rem">
+              <button type="button" class="btn btn-primary" id="bfNext1" style="flex:1;min-height:56px">
                 التالي: الموعد
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
@@ -734,7 +627,7 @@
               <label for="apptTime" id="apptTimeLabel" style="display:none"></label>
 
               <div class="form-info-note" id="apptFallback">
-                📅 سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
+                سيتم تحديد موعدك من قِبل الإدارة والتواصل معك لتأكيده
               </div>
             </div>
 
@@ -743,7 +636,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                 رجوع
               </button>
-              <button type="button" class="btn btn-primary" id="bfNext2" style="flex:1;min-height:52px;font-size:1rem">
+              <button type="button" class="btn btn-primary" id="bfNext2" style="flex:1;min-height:56px">
                 التالي: بياناتك
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
@@ -817,10 +710,13 @@
               </div>
             </div>
 
-            <label for="plateNumber">
-              رقم اللوحة (اختياري)
-              <input type="text" id="plateNumber" name="plateNumber" placeholder="مثلاً: أ ب ج 1234" autocapitalize="characters">
-            </label>
+            <div class="plate-field">
+              <label for="plateNumber">رقم اللوحة (اختياري)</label>
+              <div class="plate plate--lg plate--field">
+                <span class="plate__country" aria-hidden="true">مصر</span>
+                <input type="text" id="plateNumber" name="plateNumber" placeholder="أ ب ج 1234" autocapitalize="characters" autocomplete="off" maxlength="20">
+              </div>
+            </div>
             <label for="notes">
               ملاحظات
               <textarea id="notes" name="notes" rows="3" placeholder="مثلاً: عايز تركيز على الفرش أو الجنوط"></textarea>
@@ -854,21 +750,24 @@
 
   <!-- ══════════════ FOOTER ══════════════ -->
   <footer class="site-footer">
+    <div class="hazard" aria-hidden="true"></div>
     <div class="footer-top">
       <div class="container footer-top-inner">
         <div class="footer-brand">
+          <div class="footer-brand__sign"><svg class="emblem" viewBox="-8 -8 316 316" role="img" aria-label="DR.Care" focusable="false">
+<path class="tube tube-y" stroke-width="6" d="M135 3 H4 V296 H46 M96 296 H297 V3 H152"/>
+<path class="tube tube-y" stroke-width="5" d="M124 30 H172 M148 3 V30"/>
+<g class="tube tube-c neon-flow" stroke-width="5"><path d="M132 42 L70 122"/><path d="M140 42 L108 118"/><path d="M148 42 L150 112"/><path d="M156 42 L192 118"/><path d="M164 42 L230 122"/></g>
+<g class="neon-dot"><circle cx="38" cy="66" r="8"/><circle cx="66" cy="92" r="7"/><circle cx="226" cy="52" r="8"/><circle cx="270" cy="46" r="7"/><circle cx="252" cy="98" r="7"/><circle cx="212" cy="74" r="6"/></g>
+<g class="tube tube-p" stroke-width="6"><path d="M70 178 L92 128 Q96 120 106 120 H194 Q204 120 208 128 L230 178"/><path d="M98 170 L112 138 H188 L202 170"/><path stroke-width="4" d="M118 166 L176 140 M136 168 L194 144"/><rect x="40" y="178" width="220" height="88" rx="22"/><path stroke-width="5" d="M60 204 H100 L94 226 H62 Z M240 204 H200 L206 226 H238 Z"/><path stroke-width="5" d="M96 246 H204 M110 258 H190"/><path stroke-width="5" d="M48 266 V284 H84 V266 M216 266 V284 H252 V266"/></g>
+</svg></div>
           <a class="brand" href="#home" aria-label="DR.Care">
-            <img src="assets/img/logo.jpg" alt="DR.Care" class="brand-logo-img" loading="eager">
             <span class="brand-text">
               <strong>DR.Care</strong>
               <small>مغسلة عربيات مصرية</small>
             </span>
           </a>
           <p class="footer-brand__desc">تجربة عناية احترافية بالعربية معمولة للسوق المصري — حجز أونلاين، أسعار واضحة، متابعة لحظية.</p>
-          <div class="footer-brand__badges">
-            <span class="footer-badge">صُنع في مصر 🇪🇬</span>
-            <span class="footer-badge">PWA Ready</span>
-          </div>
           <div class="footer-social">
             <a class="footer-social__link" href="https://www.facebook.com/Dr.Careforcars" target="_blank" rel="noopener" aria-label="DR.Care على فيسبوك">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -886,7 +785,7 @@
         </div>
 
         <div class="footer-col">
-          <h5>الباقات</h5>
+          <h5>الأسعار</h5>
           <a href="#packages">غسيل داخلي وخارجي — 150 ج</a>
           <a href="#packages">غسيل خارجي فقط — 100 ج</a>
           <a href="#packages">غسيل متخصص — 250 ج</a>
@@ -907,6 +806,7 @@
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <p id="footerCopyright" style="cursor:default;user-select:none">© 2026 DR.Care — جميع الحقوق محفوظة</p>
+        <p class="footer-made">صُنع في مصر</p>
         <div class="footer-links" id="footerAdminLinks" style="display:none">
           <a href="admin.html">لوحة الإدارة</a>
           <a href="login.html">إدارة النظام</a>
@@ -939,7 +839,8 @@
 
   <script src="assets/js/transitions.js?v=9"></script>
   <script src="assets/js/idb.js?v=9"></script>
-  <script src="assets/js/script.js?v=10"></script>
+  <script src="assets/js/script.js?v=11"></script>
+  <script src="assets/js/brand.js?v=1" defer></script>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
@@ -955,13 +856,13 @@
       .setView([30.1877, 31.2041], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
     const icon = L.divIcon({
-      html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#ffd21f;transform:rotate(-45deg);border:3px solid #0a0800;box-shadow:0 4px 12px rgba(255,210,31,.6)"></div>`,
+      html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#ffd21f;transform:rotate(-45deg);border:3px solid #111214;box-shadow:0 3px 0 rgba(0,0,0,.45)"></div>`,
       iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -30], className: ''
     });
     const markers = BRANCHES.map(b =>
       L.marker([b.lat, b.lng], { icon })
         .addTo(map)
-        .bindPopup(`<div dir="rtl" style="font-family:Cairo,sans-serif;font-size:13px;font-weight:700;min-width:120px">
+        .bindPopup(`<div dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;font-weight:700;min-width:120px">
           ${b.name}<br>
           <a href="https://maps.google.com/?q=${encodeURIComponent(b.name+' مصر')}" target="_blank" style="font-size:11px;color:#1a73e8;font-weight:400">فتح في خرائط جوجل ↗</a>
         </div>`)

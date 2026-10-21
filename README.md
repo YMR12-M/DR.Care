@@ -78,7 +78,7 @@
 
 | الطبقة | التقنية |
 |--------|---------|
-| الواجهة | HTML5، CSS3 (تصميم داكن + ذهبي)، JavaScript (Vanilla) |
+| الواجهة | HTML5، CSS3 (هوية «خط الغسيل»: أسفلت + أصفر تحذيري + نيون — [التفاصيل](docs/DESIGN_SYSTEM.md))، JavaScript (Vanilla) |
 | الخادم | PHP 8.1+ مع PDO |
 | قاعدة البيانات | SQLite (`data/drcare.db`) |
 | PWA | `manifest.json` + `sw.js` + IndexedDB (`assets/js/idb.js`) |
@@ -959,6 +959,7 @@ composer test:php
 
 | الملف | المحتوى |
 |-------|---------|
+| **[DESIGN_SYSTEM.md](./docs/DESIGN_SYSTEM.md)** | **نظام التصميم «خط الغسيل»** — ألوان، خطوط، مكوّنات، وأماكن الملفات |
 | **[FEATURES.md](./docs/FEATURES.md)** | **دليل شامل لكل المميزات والتفاصيل الدقيقة** |
 | [BOOKING_WORKFLOW.md](./docs/BOOKING_WORKFLOW.md) | نظام Workflow الحجز (State Machine) + مخططات mermaid |
 | [CUSTOMER_SYSTEM.md](./docs/CUSTOMER_SYSTEM.md) | تفاصيل API العملاء والتحقق |

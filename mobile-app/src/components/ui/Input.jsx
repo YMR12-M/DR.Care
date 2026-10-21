@@ -2,25 +2,25 @@ export default function Input({ icon: Icon, trailing, error, className = '', sty
   return (
     <div className={`relative ${className}`}>
       <input
-        className={`input-premium rounded-2xl text-[0.95rem] ${error ? 'input-error' : ''}`}
+        className={`input-premium text-[0.95rem] ${error ? 'input-error' : ''}`}
         style={{
-          paddingRight: Icon ? '3.1rem' : '1.3rem',
-          paddingLeft: trailing ? '3.1rem' : '1.3rem',
+          paddingRight: Icon ? '3rem' : '1.1rem',
+          paddingLeft: trailing ? '3rem' : '1.1rem',
           ...style,
         }}
         {...props}
       />
       {Icon && (
-        <Icon size={19} className="absolute top-1/2 -translate-y-1/2 pointer-events-none" style={{ right: '1.15rem', color: 'var(--muted)' }} />
+        <Icon size={18} className="absolute top-1/2 -translate-y-1/2 pointer-events-none" style={{ right: '1.05rem', color: 'var(--muted)' }} />
       )}
       {trailing && (
         <button
           type="button"
           onClick={trailing.onClick}
           className="absolute top-1/2 -translate-y-1/2 active:opacity-70"
-          style={{ left: '1.15rem', color: 'var(--muted)' }}
+          style={{ left: '1.05rem', color: 'var(--muted)' }}
         >
-          <trailing.icon size={19} />
+          <trailing.icon size={18} />
         </button>
       )}
     </div>

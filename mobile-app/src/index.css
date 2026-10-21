@@ -1,70 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --black:       #020202;
-  --ink:         #060606;
-  --panel:       #0d0d0d;
-  --panel-2:     #141414;
-  --panel-3:     #1a1a1a;
-  --panel-4:     #212121;
-  --yellow:      #ffd21f;
-  --yellow-2:    #f5c400;
-  --yellow-deep: #c99500;
-  --yellow-soft: rgba(255,210,31,0.10);
-  --yellow-glow: rgba(255,210,31,0.22);
-  --yellow-line: rgba(255,210,31,0.28);
-  --white:       #f7f5ee;
-  --white-2:     #ebe8dd;
-  --muted:       #9e9689;
-  --muted-2:     #6e6860;
-  --faint:       rgba(255,255,255,0.05);
-  --line:        rgba(255,255,255,0.07);
-  --line-2:      rgba(255,255,255,0.12);
-  --success:     #6fcf47;
-  --error:       #f0533e;
+/* ═══════════════════════════════════════════════════════════════
+   DR.Care — "خط الغسيل" design language
+   The wash bay as an interface: asphalt floor, hazard-yellow signage,
+   paper tickets, Egyptian plates, LED boards and one neon sign.
+   Flat colour + hard edges. No glass, no gold gradients, no glow
+   (except where a real light source would glow: neon + LED).
+   ═══════════════════════════════════════════════════════════════ */
 
-  /* ── Category accent colors (Figma reference — colored service icons) ── */
-  --cat-blue:    #5ba4f5;
-  --cat-purple:  #aa3bff;
-  --cat-green:   #6fcf47;
-  --cat-orange:  #ff9f43;
-  --cat-pink:    #f06292;
-  --cat-teal:    #26c6da;
-  --cat-indigo:  #7c8cff;
-  --cat-amber:   #ffb020;
+@theme {
+  --font-display: 'Lalezar', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-led:     'Handjet', 'Lalezar', ui-monospace, monospace;
+
+  /* Signage has squared-off corners. Re-pointing the radius scale squares up every screen that
+     still uses rounded-* utilities (staff POS / admin) without touching their markup. */
+  --radius-md:  6px;
+  --radius-lg:  8px;
+  --radius-xl:  8px;
+  --radius-2xl: 10px;
+  --radius-3xl: 12px;
+}
+
+:root {
+  /* ── Surfaces: wet asphalt, never pure black ── */
+  --black:       #0d0f12;
+  --ink:         #0d0f12;
+  --panel:       #14161a;
+  --panel-2:     #1b1e23;
+  --panel-3:     #262a31;
+  --panel-4:     #30353d;
+  --steel:       #3a3f48;
+
+  /* ── Brand ── */
+  --yellow:      #ffd21f;
+  --yellow-2:    #ffd21f;
+  --yellow-deep: #b88f00;
+  --on-yellow:   #111214;
+  --yellow-soft: rgba(255, 210, 31, 0.12);
+  --yellow-glow: rgba(255, 210, 31, 0);
+  --yellow-line: rgba(255, 210, 31, 0.6);
+
+  /* ── Neon tubes — straight from the logo (use sparingly) ── */
+  --water:       #46c9e7;
+  --neon-y:      #f4ee55;
+  --neon-p:      #f13fa0;
+
+  /* ── Paper / foam ── */
+  --white:       #f3f0e6;
+  --white-2:     #e3ddcb;
+  --paper:       #f3f0e6;
+  --paper-2:     #e3ddcb;
+  --paper-ink:   #111214;
+  --paper-mute:  #6b6552;
+
+  /* ── Text ── */
+  --muted:       #9aa1ac;
+  --muted-2:     #7f8691;
+
+  /* ── Lines ── */
+  --faint:       rgba(243, 240, 230, 0.05);
+  --line:        rgba(243, 240, 230, 0.10);
+  --line-2:      #2f343c;
+
+  /* ── State ── */
+  --success:     #58d68d;
+  --error:       #ff5a4d;
+  --plate:       #1c4ea6;
+
+  /* ── Legacy rainbow collapsed to the brand set (old screens keep working) ── */
+  --cat-blue:    var(--water);
+  --cat-purple:  var(--neon-p);
+  --cat-green:   var(--success);
+  --cat-orange:  var(--yellow);
+  --cat-pink:    var(--neon-p);
+  --cat-teal:    var(--water);
+  --cat-indigo:  var(--water);
+  --cat-amber:   var(--yellow);
+
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top:    env(safe-area-inset-top, 0px);
 
-  /* ── Elevation (Uber/Careem-style real depth, not just 1px borders) ── */
-  --shadow-card:        0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-elevated:    0 8px 24px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
-  --shadow-floating:    0 12px 32px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.35);
-  --shadow-yellow-glow: 0 4px 20px rgba(255,210,31,0.18);
+  /* ── Elevation: hard edges only (a ticket sits on the floor, it doesn't float) ── */
+  --shadow-card:         none;
+  --shadow-elevated:     0 4px 0 rgba(0, 0, 0, 0.45);
+  --shadow-floating:     0 6px 0 rgba(0, 0, 0, 0.5);
+  --shadow-yellow-glow:  none;
+  --shadow-premium:      0 4px 0 rgba(0, 0, 0, 0.45);
+  --shadow-gold-premium: 0 4px 0 rgba(0, 0, 0, 0.45);
 
-  /* ── Premium elevation — deeper, layered, ambient (luxury-car showroom feel) ── */
-  --shadow-premium:      0 24px 70px -16px rgba(0,0,0,0.75), 0 8px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
-  --shadow-gold-premium: 0 24px 60px -12px rgba(255,210,31,0.28), 0 8px 20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+  /* ── Legacy "metal" gradients → flat signage yellow ── */
+  --gradient-gold:      #ffd21f;
+  --gradient-gold-soft: rgba(255, 210, 31, 0.10);
 
-  /* ── Metallic gold gradients ── */
-  --gradient-gold:      linear-gradient(135deg, #ffe37a 0%, #ffd21f 32%, #e8ab00 68%, #ffd21f 100%);
-  --gradient-gold-soft: linear-gradient(160deg, rgba(255,210,31,0.20) 0%, rgba(255,210,31,0.05) 55%, rgba(255,210,31,0.10) 100%);
+  --glass-bg:     #14161a;
+  --glass-border: #2f343c;
 
-  /* ── Glass surface ── */
-  --glass-bg:     rgba(18,18,18,0.6);
-  --glass-border: rgba(255,255,255,0.09);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
 
-  /* ── Radius scale (documented reference for the rounded-* classes in use) ── */
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --font-ui: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 /* Wrapped in Tailwind's base layer — unlayered rules always beat @layer utilities
-   regardless of specificity, which was silently zeroing out every padding and margin
-   utility class in the entire project (spacing only "worked" where flex/grid gap
-   was used instead). This is what made text read as cramped/edge-to-edge everywhere
-   despite screens using normal Tailwind padding classes. */
+   regardless of specificity, which would silently zero out every padding and margin
+   utility class in the project. */
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
@@ -80,170 +121,285 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-ui);
   direction: rtl;
-  /* Ambient depth instead of flat black — soft warm glow top-start, cool glow bottom-end,
-     like light falling across a showroom floor. This alone changes the whole app's mood. */
-  background:
-    radial-gradient(ellipse 900px 650px at 12% -8%, rgba(255,210,31,0.07), transparent 60%),
-    radial-gradient(ellipse 700px 550px at 105% 105%, rgba(124,140,255,0.05), transparent 55%),
-    var(--black);
-  background-attachment: fixed;
+  background: var(--black);
   color: var(--white);
   color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  font-feature-settings: "kern", "liga";
 }
 
-/* noise texture like desktop */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+::selection { background: var(--yellow); color: var(--on-yellow); }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; border-radius: 4px; }
+
+@layer components {
+
+  /* ═══════ Surfaces ═══════ */
+  .glass {                       /* legacy name — now a plain solid panel */
+    background: var(--panel);
+    border: 2px solid var(--line-2);
+  }
+  .gold-rim { position: relative; } /* legacy: the glossy top hairline is gone */
+
+  .scroll-hide::-webkit-scrollbar { display: none; }
+  .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .main-content { padding-bottom: calc(92px + var(--safe-bottom)); }
+
+  /* ═══════ Type ═══════ */
+  .text-gradient-yellow { color: var(--yellow); }  /* legacy: gradient text retired */
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  .led.num { letter-spacing: 0.05em; }
+
+  /* LED board — dot-matrix type that actually looks lit */
+  .led {
+    font-family: var(--font-led);
+    font-weight: 600;
+    font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+    letter-spacing: 0;               /* never space Arabic — it breaks the joins */
+    color: var(--yellow);
+    text-shadow: 0 0 8px rgba(255, 210, 31, 0.55);
+    line-height: 1;
+  }
+  .led-board { position: relative; background: #000; }
+  .led-board::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at 1.5px 1.5px, rgba(0,0,0,0.4) 1px, transparent 1.4px) 0 0 / 3px 3px;
+  }
+
+  /* ═══════ Hazard tape ═══════ */
+  .hazard {
+    height: 12px;
+    background: repeating-linear-gradient(-45deg, var(--yellow) 0 10px, var(--on-yellow) 10px 20px);
+  }
+  .hazard--sm { height: 8px; background: repeating-linear-gradient(-45deg, var(--yellow) 0 7px, var(--on-yellow) 7px 14px); }
+  .hazard--belt {
+    background-size: 22.63px 22.63px;
+    animation: belt 0.9s linear infinite;
+  }
+
+  /* ═══════ Road-sign button ═══════ */
+  .btn-sign {
+    --bg: var(--yellow);
+    --fg: var(--on-yellow);
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+    background: var(--bg);
+    color: var(--fg);
+    border: 0;
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.08s ease, color 0.08s ease;
+    -webkit-user-select: none; user-select: none;
+  }
+  .btn-sign::before {              /* the inner border every road sign has */
+    content: ""; position: absolute; inset: 4px;
+    border: 2px solid currentColor; border-radius: 5px;
+    opacity: 0.85; pointer-events: none;
+  }
+  .btn-sign:active:not(:disabled) { --bg: var(--on-yellow); --fg: var(--yellow); outline: 2px solid var(--yellow); outline-offset: -2px; transform: translateY(2px); }
+  .btn-sign:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-sign--lg { padding: 1.15rem 1.4rem; font-size: 1.55rem; }
+  .btn-sign--md { padding: 0.85rem 1.1rem; font-size: 1.2rem; }
+  .btn-sign--secondary { --bg: transparent; --fg: var(--white); outline: 2px solid var(--steel); outline-offset: -2px; }
+  .btn-sign--secondary::before { display: none; }
+  .btn-sign--secondary:active:not(:disabled) { --bg: var(--white); --fg: var(--on-yellow); outline-color: var(--white); }
+  .btn-sign--ghost { --bg: transparent; --fg: var(--yellow); }
+  .btn-sign--ghost::before { display: none; }
+  .btn-sign--ghost:active:not(:disabled) { --bg: var(--yellow-soft); --fg: var(--yellow); outline: none; }
+  .btn-sign--danger { --bg: transparent; --fg: var(--error); outline: 2px solid var(--error); outline-offset: -2px; }
+  .btn-sign--danger::before { display: none; }
+
+  /* legacy class names kept so old call-sites don't break */
+  .btn-yellow { background: var(--yellow); color: var(--on-yellow); font-family: var(--font-display); }
+  .btn-pulse  { animation: none; }
+
+  /* ═══════ Fields: flat, 2px, no inner glow ═══════ */
+  .input-premium, .textarea-premium {
+    width: 100%;
+    background: var(--panel-2);
+    border: 2px solid var(--line-2);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: var(--font-ui);
+    color-scheme: dark;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .input-premium { height: 3.3rem; }
+  .input-premium::placeholder, .textarea-premium::placeholder { color: var(--muted-2); }
+  .input-premium:focus, .textarea-premium:focus {
+    outline: none; border-color: var(--yellow); background: var(--panel-3);
+  }
+  .input-premium.input-error { border-color: var(--error); }
+
+  /* ═══════ Menu board ═══════ */
+  .board {
+    position: relative;
+    background: #0a0b0d;
+    border: 2px solid var(--steel);
+    border-radius: 10px;
+  }
+  .board::before {
+    content: ""; position: absolute; inset: 4px; pointer-events: none;
+    border: 1px solid rgba(243, 240, 230, 0.13); border-radius: 6px;
+  }
+  .leader { flex: 1; min-width: 12px; border-bottom: 3px dotted rgba(243, 240, 230, 0.26); transform: translateY(-4px); }
+
+  /* ═══════ Skeleton: a dull panel that breathes — no shimmer sweep ═══════ */
+  .skeleton { background: var(--panel-3); animation: breathe 1.4s ease-in-out infinite; }
+
+  /* ═══════ Entrance (mount-triggered, staggered) ═══════ */
+  .fade-in { animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .fade-in-1 { animation-delay: 0.04s; } .fade-in-2 { animation-delay: 0.09s; } .fade-in-3 { animation-delay: 0.14s; }
+  .fade-in-4 { animation-delay: 0.19s; } .fade-in-5 { animation-delay: 0.24s; } .fade-in-6 { animation-delay: 0.29s; }
+  .fade-in-7 { animation-delay: 0.34s; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.45s ease, transform 0.45s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.08s; } .reveal-delay-2 { transition-delay: 0.16s; } .reveal-delay-3 { transition-delay: 0.24s; }
+
+  .scroll-fade-x {
+    mask-image: linear-gradient(to left, transparent 0, black 20px, black calc(100% - 4px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, transparent 0, black 20px, black calc(100% - 4px), transparent 100%);
+  }
+
+  .pill-slide { transition: left 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
+
+  .shadow-card     { box-shadow: var(--shadow-card); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-floating { box-shadow: var(--shadow-floating); }
 }
 
-/* ── Glass surface utility ── */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid var(--glass-border);
+/* ═══════ Egyptian plate ═══════ */
+.plate {
+  --pf: 1.5rem;
+  position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--plate); color: #fff; direction: rtl;
+  border: 3px solid #fff; border-radius: 9px;
+  box-shadow: 0 0 0 2px #0b2a66, 0 4px 0 -1px rgba(0, 0, 0, 0.4);
+  padding: 0.95em 0.8em 0.35em; font-family: var(--font-display); line-height: 1; vertical-align: middle;
+  font-size: var(--pf);
+}
+.plate--sm { --pf: 1.05rem; border-width: 2px; border-radius: 6px; box-shadow: 0 0 0 1.5px #0b2a66; padding-top: 0.9em; }
+.plate--md { --pf: 1.45rem; }
+.plate--lg { --pf: 1.85rem; border-width: 4px; border-radius: 11px; }
+.plate__country { position: absolute; top: 0.18em; left: 50%; transform: translateX(-50%); font: 600 0.28em var(--font-ui); letter-spacing: 0.3em; opacity: 0.92; }
+.plate__row { display: inline-flex; align-items: center; gap: 0.5em; }
+.plate__letters, .plate__digits, .plate__raw { font-weight: 400; letter-spacing: 0.08em; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); white-space: nowrap; }
+.plate__sep { width: 2px; height: 0.95em; background: rgba(255, 255, 255, 0.55); display: block; }
+.plate__raw { font-size: 0.7em; max-width: 12em; overflow: hidden; text-overflow: ellipsis; }
+.plate__field {
+  background: transparent; border: 0; outline: 0; color: #fff; font: inherit; letter-spacing: 0.08em;
+  text-align: center; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); padding: 0.1em 0;
+}
+.plate__field::placeholder { color: rgba(255, 255, 255, 0.38); }
+.plate__field--letters { width: 2.9em; letter-spacing: 0.04em; }
+.plate__field--digits  { width: 3em; }
+.plate--input:focus-within { outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+/* ═══════ Paper ticket ═══════ */
+.ticket { --r: 10px; color: var(--paper-ink); filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.4)); }
+.ticket--print { animation: printOut 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.ticket__main {
+  background: var(--paper); padding: 1.1rem 1.15rem 1.25rem; border-radius: 8px 8px 0 0;
+  -webkit-mask: radial-gradient(var(--r) at 0 100%, #0000 97%, #000) left / 51% 100% no-repeat, radial-gradient(var(--r) at 100% 100%, #0000 97%, #000) right / 51% 100% no-repeat;
+          mask: radial-gradient(var(--r) at 0 100%, #0000 97%, #000) left / 51% 100% no-repeat, radial-gradient(var(--r) at 100% 100%, #0000 97%, #000) right / 51% 100% no-repeat;
+}
+.ticket__stub {
+  position: relative; background: var(--paper); padding: 0.95rem 1.15rem 1rem; border-radius: 0 0 8px 8px; color: var(--paper-ink);
+  -webkit-mask: radial-gradient(var(--r) at 0 0, #0000 97%, #000) left / 51% 100% no-repeat, radial-gradient(var(--r) at 100% 0, #0000 97%, #000) right / 51% 100% no-repeat;
+          mask: radial-gradient(var(--r) at 0 0, #0000 97%, #000) left / 51% 100% no-repeat, radial-gradient(var(--r) at 100% 0, #0000 97%, #000) right / 51% 100% no-repeat;
+}
+.ticket__stub::before { content: ""; position: absolute; top: 0; left: 14px; right: 14px; border-top: 2px dashed #b9b19a; }
+.ticket__k { font: 600 0.68rem var(--font-ui); letter-spacing: 0.04em; color: var(--paper-mute); margin-bottom: 2px; }
+.ticket__v { font: 400 1.35rem/1.15 var(--font-display); color: var(--paper-ink); overflow-wrap: anywhere; }
+.ticket__v--big { font-size: 2rem; }
+.ticket__grid > :nth-child(even) { text-align: end; }
+.ticket__rule { height: 0; border-top: 2px dashed #cfc7b2; margin: 0.8rem 0; }
+
+/* ═══════ Receipt roll (points history) ═══════ */
+.receipt { position: relative; background: var(--paper); color: var(--paper-ink); padding: 1rem 1.1rem 1.4rem; border-radius: 8px 8px 0 0; margin-bottom: 8px; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4)); }
+.receipt::after {      /* torn thermal-paper edge: a row of downward teeth */
+  content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpath d='M0 0H16L8 8Z' fill='%23f3f0e6'/%3E%3C/svg%3E") repeat-x left top;
+}
+.receipt__row { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.55rem 0; }
+.receipt__row + .receipt__row { border-top: 1px dashed #cfc7b2; }
+
+/* ═══════ Coupon ticket (stub on the side) ═══════ */
+.coupon { --r: 10px; display: flex; color: var(--paper-ink); filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4)); }
+.coupon__main {
+  flex: 1; min-width: 0; background: var(--paper); padding: 0.9rem 1rem; border-radius: 8px 0 0 8px;
+  -webkit-mask: radial-gradient(var(--r) at 0 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(var(--r) at 0 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(var(--r) at 0 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(var(--r) at 0 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+}
+.coupon__stub {
+  position: relative; flex-shrink: 0; width: 6.4rem; background: var(--paper); padding: 0.9rem 0.7rem; border-radius: 0 8px 8px 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; text-align: center;
+  -webkit-mask: radial-gradient(var(--r) at 100% 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(var(--r) at 100% 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(var(--r) at 100% 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(var(--r) at 100% 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+}
+.coupon__stub::before { content: ""; position: absolute; top: 14px; bottom: 14px; right: 0; border-inline-end: 2px dashed #b9b19a; }
+.coupon--locked { filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4)) saturate(0.2); }
+.coupon--locked .coupon__main, .coupon--locked .coupon__stub { background: #8c897f; }
+
+/* ═══════ Neon "open" sign ═══════ */
+.opensign {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 0.3rem 1rem 0.4rem; border: 3px solid var(--steel); border-radius: 12px; color: var(--muted-2);
+}
+.opensign__word { font: 400 1.9rem/1 var(--font-display); }
+.opensign__sub  { font: 700 0.7rem/1 var(--font-ui); }
+.opensign.is-open {
+  border-color: var(--neon-p); color: #ffe0f0;
+  box-shadow: 0 0 0 1px rgba(241, 63, 160, 0.45), 0 0 16px rgba(241, 63, 160, 0.55), inset 0 0 14px rgba(241, 63, 160, 0.35);
+  text-shadow: 0 0 4px #fff, 0 0 12px var(--neon-p);
 }
 
-/* ── Gold hairline rim — thin metallic edge along a card's top, like brushed trim ── */
-.gold-rim { position: relative; }
-.gold-rim::before {
-  content: '';
-  position: absolute; top: 0; left: 12%; right: 12%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,210,31,0.7), transparent);
-}
+/* ═══════ Neon tube drawing (NeonEmblem, OpenSign) ═══════ */
+.tube { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.tube-y { stroke: var(--neon-y); filter: drop-shadow(0 0 3px var(--neon-y)) drop-shadow(0 0 9px rgba(244, 238, 85, 0.65)); }
+.tube-c { stroke: var(--water);  filter: drop-shadow(0 0 3px var(--water))  drop-shadow(0 0 9px rgba(70, 201, 231, 0.65)); }
+.tube-p { stroke: var(--neon-p); filter: drop-shadow(0 0 3px var(--neon-p)) drop-shadow(0 0 9px rgba(241, 63, 160, 0.65)); }
+.neon-dot { fill: var(--water); filter: drop-shadow(0 0 5px var(--water)); }
+.neon-flow { stroke-dasharray: 10 8; animation: flow 1.1s linear infinite; }
+.neon-on  { animation: neonOn 1.4s steps(1, end) both; }
 
-.scroll-hide::-webkit-scrollbar { display: none; }
-.scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+/* ═══════ Hero scene (SVG) ═══════ */
+.hs-jet  { stroke-dasharray: 7 9; animation: jetFlow 0.7s linear infinite; }
+.hs-spin { animation: wheelSpin 1.2s linear infinite; }
+.hs-bub  { animation: rise 4s ease-in infinite; }
+.hs-still { animation: none !important; }
 
-/* ── Sliding selection pill (SlidingPill component) ── */
-.pill-slide { transition: left 0.45s cubic-bezier(0.34,1.56,0.64,1), width 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+/* ═══════ Keyframes ═══════ */
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes belt        { to { background-position: 22.63px 0; } }
+@keyframes flow        { to { stroke-dashoffset: -18; } }
+@keyframes jetFlow     { to { stroke-dashoffset: -16; } }
+@keyframes breathe     { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@keyframes marquee     { to { transform: translateX(50%); } }
+@keyframes rise        { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-70px); opacity: 0; } }
+@keyframes drip        { 0% { transform: scaleY(0.4); } 60% { transform: scaleY(1); } 100% { transform: scaleY(0.4); } }
+@keyframes spin        { to { transform: rotate(360deg); } }
+@keyframes neonOn {
+  0%   { opacity: 0.15; } 8%  { opacity: 1; } 12% { opacity: 0.2; } 18% { opacity: 1; }
+  24%  { opacity: 0.35; } 30% { opacity: 1; } 100% { opacity: 1; }
+}
+@keyframes printOut { from { transform: translateY(-70%); opacity: 0; } 55% { opacity: 1; } to { transform: translateY(0); opacity: 1; } }
+@keyframes stampIn  { 0% { transform: scale(2.4) rotate(-14deg); opacity: 0; } 55% { transform: scale(0.94) rotate(-6deg); opacity: 1; } 100% { transform: scale(1) rotate(-6deg); opacity: 1; } }
+@keyframes wheelSpin { to { transform: rotate(360deg); } }
+@keyframes carIdle  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
 
-.main-content {
-  /* Clears the floating glass pill nav (its own height + 14px offset) with breathing room above it */
-  padding-bottom: calc(108px + var(--safe-bottom));
-}
-
-/* ── Scroll reveal ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.reveal-delay-1 { transition-delay: 0.08s; }
-.reveal-delay-2 { transition-delay: 0.16s; }
-.reveal-delay-3 { transition-delay: 0.24s; }
-
-/* ── Gradient text ── */
-.text-gradient-yellow {
-  background: linear-gradient(135deg, #ffd21f 0%, #f5c400 60%, #c99500 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── yellow glow on active elements ── */
-.btn-yellow {
-  background: var(--yellow);
-  color: #0a0800;
-  font-weight: 900;
-  box-shadow: 0 0 0 1px rgba(255,210,31,0.4), inset 0 -3px 0 rgba(0,0,0,0.2);
-  transition: box-shadow 0.15s, transform 0.1s;
-}
-.btn-yellow:active {
-  box-shadow: 0 0 0 3px rgba(255,210,31,0.25), 0 8px 24px rgba(255,210,31,0.3), inset 0 -3px 0 rgba(0,0,0,0.2);
-  transform: scale(0.97);
-}
-
-/* ── Elevation utility classes ── */
-.shadow-card     { box-shadow: var(--shadow-card); }
-.shadow-elevated { box-shadow: var(--shadow-elevated); }
-.shadow-floating { box-shadow: var(--shadow-floating); }
-
-/* ── Entrance micro-animation (mount-triggered, staggered) ── */
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.fade-in { animation: fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
-.fade-in-1 { animation-delay: 0.04s; }
-.fade-in-2 { animation-delay: 0.09s; }
-.fade-in-3 { animation-delay: 0.14s; }
-.fade-in-4 { animation-delay: 0.19s; }
-.fade-in-5 { animation-delay: 0.24s; }
-.fade-in-6 { animation-delay: 0.29s; }
-.fade-in-7 { animation-delay: 0.34s; }
-
-/* ── Horizontal scroll edge fade (hints there's more content) ── */
-.scroll-fade-x {
-  mask-image: linear-gradient(to left, transparent 0, black 20px, black calc(100% - 4px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to left, transparent 0, black 20px, black calc(100% - 4px), transparent 100%);
-}
-
-/* ── Subtle attention pulse for the primary CTA ── */
-@keyframes pulseRing {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(255,210,31,0.4), inset 0 -3px 0 rgba(0,0,0,0.2), 0 0 0 0 rgba(255,210,31,0.35); }
-  50%      { box-shadow: 0 0 0 1px rgba(255,210,31,0.4), inset 0 -3px 0 rgba(0,0,0,0.2), 0 0 0 7px rgba(255,210,31,0); }
-}
-.btn-pulse { animation: pulseRing 2.4s ease-in-out infinite; }
-
-/* ── Premium input — spacious height, recessed "carved" depth, real focus glow.
-   The old version had no focus state at all (outline-none with nothing replacing
-   it), so typing anywhere gave zero feedback — that's the "ضيق ووحش" feeling. ── */
-.input-premium {
-  height: 3.4rem;
-  width: 100%;
-  background: linear-gradient(180deg, var(--panel-3) 0%, var(--panel-2) 100%);
-  border: 1.5px solid var(--line-2);
-  color: var(--white);
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02);
-  color-scheme: dark; /* native date/time pickers follow the dark theme instead of popping up white */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-.input-premium::placeholder { color: var(--muted-2); }
-.input-premium:focus {
-  outline: none;
-  border-color: var(--yellow-line);
-  background: linear-gradient(180deg, var(--panel-4) 0%, var(--panel-3) 100%);
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.25), 0 0 0 4px rgba(255,210,31,0.14), 0 6px 20px rgba(255,210,31,0.12);
-}
-.input-premium.input-error { border-color: var(--error); }
-.input-premium.input-error:focus {
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.25), 0 0 0 4px rgba(240,83,62,0.16);
-}
-
-.textarea-premium {
-  width: 100%;
-  background: linear-gradient(180deg, var(--panel-3) 0%, var(--panel-2) 100%);
-  border: 1.5px solid var(--line-2);
-  color: var(--white);
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-.textarea-premium::placeholder { color: var(--muted-2); }
-.textarea-premium:focus {
-  outline: none;
-  border-color: var(--yellow-line);
-  background: linear-gradient(180deg, var(--panel-4) 0%, var(--panel-3) 100%);
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.25), 0 0 0 4px rgba(255,210,31,0.14), 0 6px 20px rgba(255,210,31,0.12);
-}
-
-/* ── Skeleton shimmer ── */
-@keyframes shimmer { 0% { background-position: -300px 0; } 100% { background-position: 300px 0; } }
-.skeleton {
-  background: linear-gradient(90deg, var(--panel-2) 25%, var(--panel-3) 37%, var(--panel-2) 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.4s ease infinite;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

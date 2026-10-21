@@ -59,12 +59,11 @@ function TokenGate({ onUnlocked }) {
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: 'var(--black)' }}>
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl opacity-10 pointer-events-none" style={{ background: 'var(--yellow)' }} />
-      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative fade-in"
-        style={{ background: 'var(--gradient-gold-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-gold-premium)' }}>
-        <ShieldCheck size={32} style={{ color: 'var(--yellow)' }} strokeWidth={2.2} />
+      <div className="w-20 h-20 flex items-center justify-center mb-5 relative fade-in"
+        style={{ background: 'var(--yellow)', color: 'var(--on-yellow)', borderRadius: 12 }}>
+        <ShieldCheck size={34} strokeWidth={2.4} />
       </div>
-      <h1 className="text-xl font-black mb-2 relative fade-in fade-in-1" style={{ color: 'var(--white)' }}>DR.Care POS</h1>
+      <h1 className="font-display text-[2rem] leading-none mb-2 relative fade-in fade-in-1" style={{ color: 'var(--white)' }}>DR.Care POS</h1>
       <p className="text-sm mb-7 relative fade-in fade-in-2" style={{ color: 'var(--muted)' }}>أدخل رمز الموظف عشان تفتح نظام الفواتير</p>
 
       <div className="w-full relative fade-in fade-in-3">
@@ -111,11 +110,11 @@ function InvoiceView({ booking, onNew }) {
   return (
     <div className="p-5 flex flex-col gap-4 fade-in">
       <div className="flex flex-col items-center text-center pt-2">
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
-          style={{ background: 'var(--yellow-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-yellow-glow)' }}>
-          <CheckCircle2 size={26} style={{ color: 'var(--yellow)' }} />
+        <div className="w-14 h-14 flex items-center justify-center mb-3"
+          style={{ background: 'var(--success)', color: 'var(--on-yellow)', borderRadius: 10 }}>
+          <CheckCircle2 size={28} strokeWidth={2.6} />
         </div>
-        <h2 className="text-lg font-black" style={{ color: 'var(--white)' }}>اتعملت الفاتورة ✓</h2>
+        <h2 className="font-display text-[1.6rem] leading-none" style={{ color: 'var(--white)' }}>اتعملت الفاتورة</h2>
         <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>رقم الحجز <span className="font-black" style={{ color: 'var(--yellow)' }}>#{booking.id}</span></p>
       </div>
 
@@ -301,7 +300,7 @@ export default function PosScreen() {
       {/* Header */}
       <header
         className="sticky top-0 z-40 px-5 py-3.5 flex items-center gap-3"
-        style={{ background: 'rgba(2,2,2,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
+        style={{ background: 'var(--black)', borderBottom: '2px solid var(--line-2)' }}
       >
         <IconBadge icon={ReceiptText} size="sm" tone="yellow" />
         <div className="flex-1 min-w-0">
@@ -456,8 +455,8 @@ export default function PosScreen() {
           {/* Sticky total + submit */}
           <div className="px-5 pt-3 flex items-center gap-3"
             style={{
-              background: 'rgba(2,2,2,0.95)', backdropFilter: 'blur(16px)',
-              borderTop: '1px solid var(--line)',
+              background: 'var(--black)',
+              borderTop: '2px solid var(--line-2)',
               paddingBottom: 'calc(0.9rem + env(safe-area-inset-bottom, 0px))',
             }}>
             <div className="flex-shrink-0">

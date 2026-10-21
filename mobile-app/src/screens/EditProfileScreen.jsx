@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, User, Phone, Lock, Mail, CalendarDays, ClipboardList } from 'lucide-react';
+import { User, Phone, Lock } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { secureFetch } from '../lib/api';
 import Card from '../components/ui/Card';
+import ScreenHeader from '../components/ui/ScreenHeader';
+import MemberCard from '../components/brand/MemberCard';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 
 function fmtMemberSince(str) {
   if (!str) return '—';
-  return new Date(str).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' });
+  return new Date(str).toLocaleDateString('ar-EG-u-nu-latn', { year: 'numeric', month: 'long' });
 }
 
 export default function EditProfileScreen() {
@@ -59,7 +61,7 @@ export default function EditProfileScreen() {
       });
       const d = await res.json();
       if (d.ok) {
-        showToast(d.message || 'اتحفظت البيانات ✓', 'success');
+        showToast(d.message || 'اتحفظت البيانات', 'success');
         setUser(u => ({ ...u, name: form.name.trim(), phone: form.phone.trim() }));
         setProfile(p => (p ? { ...p, name: form.name.trim(), phone: form.phone.trim() } : p));
       } else {
@@ -84,7 +86,7 @@ export default function EditProfileScreen() {
       });
       const d = await res.json();
       if (d.ok) {
-        showToast(d.message || 'اتحدّثت كلمة المرور ✓', 'success');
+        showToast(d.message || 'اتحدّثت كلمة المرور', 'success');
         setPwForm({ current_password: '', new_password: '' });
       } else {
         showToast(d.message || 'فشل تحديث كلمة المرور', 'error');
@@ -98,56 +100,25 @@ export default function EditProfileScreen() {
 
   return (
     <div className="h-full overflow-y-auto scroll-hide main-content" style={{ background: 'var(--black)' }}>
-      <header
-        className="sticky top-0 z-40 flex items-center gap-3 px-5 py-3.5"
-        style={{ background: 'rgba(2,2,2,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
-      >
-        <button onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
-          style={{ background: 'var(--panel-3)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--line-2)' }}
-          type="button">
-          <ChevronLeft size={18} style={{ color: 'var(--muted)' }} />
-        </button>
-        <h1 className="text-base font-black" style={{ color: 'var(--white)' }}>تعديل البيانات</h1>
-      </header>
+      <ScreenHeader title="تعديل البيانات" onBack={() => navigate(-1)} />
 
-      <div className="p-6 flex flex-col gap-5">
-        {/* Identity card */}
-        <Card variant="premium" className="p-5 relative overflow-hidden fade-in">
-          <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-15 pointer-events-none" style={{ background: 'var(--yellow)' }} />
-          <div className="relative flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black shrink-0"
-              style={{ background: 'var(--gradient-gold)', color: '#0a0800', boxShadow: 'var(--shadow-gold-premium)' }}>
-              {profile?.name?.[0] || 'أ'}
+      <div className="p-4 flex flex-col gap-4 pt-5">
+        <MemberCard name={profile?.name} email={profile?.email} className="fade-in">
+          <div className="flex gap-3 mt-4 pt-3.5" style={{ borderTop: '2px dashed var(--line-2)' }}>
+            <div className="flex-1">
+              <p className="ticket__k" style={{ color: 'var(--muted-2)' }}>عميل من</p>
+              <p className="font-display text-lg leading-tight">{fmtMemberSince(profile?.created_at)}</p>
             </div>
-            <div className="min-w-0">
-              <h2 className="font-black text-base leading-tight truncate" style={{ color: 'var(--white)' }}>{profile?.name || '...'}</h2>
-              <p className="text-xs mt-1 inline-flex items-center gap-1.5 truncate" style={{ color: 'var(--muted)' }}>
-                <Mail size={12} className="flex-shrink-0" /> {profile?.email || '—'}
-              </p>
+            <div className="flex-1">
+              <p className="ticket__k" style={{ color: 'var(--muted-2)' }}>عدد الحجوزات</p>
+              <p className="font-display text-lg leading-tight num">{profile?.booking_count ?? 0}</p>
             </div>
           </div>
-          <div className="relative flex gap-3 mt-4 pt-4" style={{ borderTop: '1px dashed var(--line-2)' }}>
-            <div className="flex-1 flex items-center gap-2">
-              <CalendarDays size={14} style={{ color: 'var(--muted-2)' }} />
-              <div>
-                <p className="text-[10px]" style={{ color: 'var(--muted-2)' }}>عميل منذ</p>
-                <p className="text-xs font-bold" style={{ color: 'var(--white-2)' }}>{fmtMemberSince(profile?.created_at)}</p>
-              </div>
-            </div>
-            <div className="flex-1 flex items-center gap-2">
-              <ClipboardList size={14} style={{ color: 'var(--muted-2)' }} />
-              <div>
-                <p className="text-[10px]" style={{ color: 'var(--muted-2)' }}>إجمالي الحجوزات</p>
-                <p className="text-xs font-bold" style={{ color: 'var(--white-2)' }}>{profile?.booking_count ?? 0}</p>
-              </div>
-            </div>
-          </div>
-        </Card>
+        </MemberCard>
 
         {/* Personal info */}
         <Card as="form" onSubmit={saveInfo} className="p-5 flex flex-col gap-4 fade-in fade-in-1">
-          <p className="text-sm font-black" style={{ color: 'var(--white)' }}>البيانات الشخصية</p>
+          <h2 className="font-display text-[1.3rem] leading-none">البيانات الشخصية</h2>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>الاسم الكامل</label>
             <Input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} icon={User} />
@@ -164,7 +135,7 @@ export default function EditProfileScreen() {
 
         {/* Password */}
         <Card as="form" onSubmit={savePassword} className="p-5 flex flex-col gap-4 fade-in fade-in-2">
-          <p className="text-sm font-black" style={{ color: 'var(--white)' }}>تغيير كلمة المرور</p>
+          <h2 className="font-display text-[1.3rem] leading-none">تغيير كلمة المرور</h2>
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--muted)' }}>كلمة المرور الحالية</label>
             <Input type="password" dir="ltr" value={pwForm.current_password}

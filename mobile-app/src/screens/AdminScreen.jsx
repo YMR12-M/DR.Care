@@ -40,7 +40,7 @@ const SOURCE_LABELS = { web: 'الموقع', mobile: 'التطبيق', pos: 'POS
 
 function fmtDateTime(str) {
   if (!str) return '—';
-  return new Date(str).toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  return new Date(str).toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 }
 
 function dayBucketLabel(str) {
@@ -50,7 +50,7 @@ function dayBucketLabel(str) {
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
   if (day.getTime() === today.getTime()) return 'اليوم';
   if (day.getTime() === yesterday.getTime()) return 'أمس';
-  return day.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+  return day.toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long' });
 }
 
 function groupByDay(list) {
@@ -90,7 +90,7 @@ function slotDateLabel(dateStr) {
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
   if (day.getTime() === today.getTime()) return 'اليوم';
   if (day.getTime() === tomorrow.getTime()) return 'بكرة';
-  return day.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+  return day.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 function groupSlotsByDate(slots) {
@@ -142,12 +142,11 @@ function AdminGate({ checking, onUnlocked }) {
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: 'var(--black)' }}>
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl opacity-10 pointer-events-none" style={{ background: 'var(--yellow)' }} />
-      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative fade-in"
-        style={{ background: 'var(--gradient-gold-soft)', border: '1px solid var(--yellow-line)', boxShadow: 'var(--shadow-gold-premium)' }}>
-        <LayoutDashboard size={32} style={{ color: 'var(--yellow)' }} strokeWidth={2.2} />
+      <div className="w-20 h-20 flex items-center justify-center mb-5 relative fade-in"
+        style={{ background: 'var(--yellow)', color: 'var(--on-yellow)', borderRadius: 12 }}>
+        <LayoutDashboard size={34} strokeWidth={2.4} />
       </div>
-      <h1 className="text-xl font-black mb-2 relative fade-in fade-in-1" style={{ color: 'var(--white)' }}>لوحة الأدمن</h1>
+      <h1 className="font-display text-[2rem] leading-none mb-2 relative fade-in fade-in-1" style={{ color: 'var(--white)' }}>لوحة الأدمن</h1>
       <p className="text-sm mb-7 relative fade-in fade-in-2" style={{ color: 'var(--muted)' }}>سجّل دخولك ببيانات الأدمن عشان تفتح اللوحة</p>
 
       <div className="w-full flex flex-col gap-3 relative fade-in fade-in-3">
@@ -539,7 +538,7 @@ function ProfitsPanel({ bookings }) {
         .filter(b => b.status !== 'cancelled')
         .filter(b => { const t = new Date(b.created_at); return t >= d && t < next; })
         .reduce((sum, b) => sum + Number(b.total_price || 0), 0);
-      days.push({ label: d.toLocaleDateString('ar-EG', { weekday: 'short' }), revenue });
+      days.push({ label: d.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'short' }), revenue });
     }
     return days;
   }, [bookings]);
@@ -870,7 +869,7 @@ export default function AdminScreen() {
     <div className="h-full flex flex-col" style={{ background: 'var(--black)' }}>
       <header
         className="sticky top-0 z-40 px-5 py-3.5 flex items-center gap-3"
-        style={{ background: 'rgba(2,2,2,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}
+        style={{ background: 'var(--black)', borderBottom: '2px solid var(--line-2)' }}
       >
         <IconBadge icon={ShieldCheck} size="sm" tone="yellow" />
         <div className="flex-1 min-w-0">

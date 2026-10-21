@@ -27,6 +27,7 @@ vendor/
 tests/
 tools/
 docs/
+marketing/
 .phpunit.cache/
 phpunit.xml
 composer.json
