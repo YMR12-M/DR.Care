@@ -47,3 +47,4 @@ composer.phar
 # Python cache
 __pycache__/
 *.pyc
+demo-dist/
